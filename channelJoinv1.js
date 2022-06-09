@@ -1,4 +1,4 @@
-function channelJoinv1(authUserId, channelId, uId) {
-    return 'authUserId' + 'channelId' + 'uId';
+function channelJoinV1(authUserId, channelId) {
+    return 'authUserId' + 'channelId';
 }
 
