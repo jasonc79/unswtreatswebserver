@@ -7,7 +7,8 @@ beforeEach(() => {
 
 describe(('Testing authRegisterV1'), () => {
     test('Invalid Email', () => {
-        //const authUserId = authRegisterV1()
+        let authUserId = authRegisterV1('invalidEmail', 'password', 'firstname', 'lastname');
+        expect(authUserId).toStrictEqual({error: 'error'});
     });
     test('Email already exists', () => {
         let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
