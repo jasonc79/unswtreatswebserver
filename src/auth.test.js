@@ -8,12 +8,16 @@ beforeEach(() => {
 describe(('Testing authRegisterV1'), () => {
     test('Invalid Email', () => {
         let authUserId = authRegisterV1('invalidEmail', 'password', 'firstname', 'lastname');
+        let authUserId2 = authRegisterV1('invalidEmail@', 'password', 'firstname2', 'lastname2');
         expect(authUserId).toStrictEqual({error: 'error'});
+        expect(authUserId2).toStrictEqual({error: 'error'});
     });
     test('Email already exists', () => {
         let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         let authUserId2 = authRegisterV1('email@gmail.com', 'password', 'firstname2', 'lastname2');
+        let authUserId3 = authRegisterV1('EMAIL@gmail.com', 'password', 'firstname2', 'lastname2');
         expect(authUserId2).toStrictEqual({error: 'error'});
+        expect(authUserId3).toStrictEqual({error: 'error'});
     });
 
     test('Password is less than 6 characters', () => {
