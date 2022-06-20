@@ -42,7 +42,7 @@ describe(('Testing authRegisterV1'), () => {
     });
 
     test('authUserId is returned', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', '');
+        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         expect(authUserId).toStrictEqual(
             expect.objectContaining({
                 authUserId: expect.any(Number)
