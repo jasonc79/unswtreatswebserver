@@ -1,6 +1,32 @@
 // YOU SHOULD MODIFY THIS OBJECT BELOW
-let data = {};
+let data = {
+  users: [],
+  channels: [],
+  messages: []
+};
 
+/* Data objects
+user = {
+  uId: uId,
+  email: email,
+  nameFirst: nameFirst,
+  nameLast: nameLast,
+  handleStr: handleStr
+}
+
+channel = {
+  channelId: channelId,
+  name: name
+}
+
+messages = {
+  messageId: messageId
+  uId: uId,
+  message: message,
+  timeSent: timeSent
+}
+
+*/
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
 /*
