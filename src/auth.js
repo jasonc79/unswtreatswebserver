@@ -123,20 +123,5 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     return handle;
   }
   
-  function test() {
-    let data = getData(); 
-    let user = {
-      uId: 0,
-      email: "email@email.com",
-      password: 'password',
-      nameFirst: "Sam",
-      nameLast: "Kim",
-      handleStr: "samkim"
-    };
-    data.users.push(user);
-    setData(data);
-    return authLoginV1('email@email.com', 'password');
-  }
-
-  console.log(test()); 
+ 
   export { authLoginV1, authRegisterV1 };
