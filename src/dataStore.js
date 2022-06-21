@@ -1,4 +1,5 @@
-// YOU SHOULD MODIFY THIS OBJECT BELOW
+// Populate each array in data with a user and channel object.
+
 let data = {
   users: [],
   channels: [],

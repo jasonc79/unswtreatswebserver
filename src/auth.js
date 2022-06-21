@@ -37,8 +37,16 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
   }
   
   function authLoginV1(email, password) {
+    let user = checkEmailExists(email);
+    if (!user) {
+      return {error: 'error'};
+    }
+    if (user.password !== password) {
+      return {error: 'error'};
+    }
+
     return {
-      authUserId: 1,
+      authUserId: user.uId
     }
   }
 
@@ -67,6 +75,19 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
 
     return true;
   }
+
+    // Check if a valid email exists. Returns an email if it exists.
+  // Otherwise, returns false.
+  function checkEmailExists(email) {
+    let data = getData();
+    for (let user of data.users) {
+      if (user.email === email) {
+        return user;
+      }
+    }
+    return false;
+  }
+  
 
   // Takes in first name and last name (both lower case) and creates a handle
   function createHandle(firstName, lastName) {
@@ -102,6 +123,20 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     return handle;
   }
   
-  export { authLoginV1, authRegisterV1 };
+  function test() {
+    let data = getData(); 
+    let user = {
+      uId: 0,
+      email: "email@email.com",
+      password: 'password',
+      nameFirst: "Sam",
+      nameLast: "Kim",
+      handleStr: "samkim"
+    };
+    data.users.push(user);
+    setData(data);
+    return authLoginV1('email@email.com', 'password');
+  }
 
-  
+  console.log(test()); 
+  export { authLoginV1, authRegisterV1 };
