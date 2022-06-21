@@ -17,11 +17,12 @@ describe('Testing authLoginV1', () => {
     });
     test('Correct return', () => {
         let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
-        let incorrectId = authLoginV1('email@gmail.com', 'password');
-        expect(incorrectId).toStrictEqual(
+        authUserId = authLoginV1('email@gmail.com', 'password');
+        expect(authUserId).toStrictEqual(
             expect.objectContaining({
                 authUserId: expect.any(Number)
             })
         );
     });
 });
+
