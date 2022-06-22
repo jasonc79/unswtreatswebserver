@@ -25,7 +25,8 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
       email: email,
       nameFirst: nameFirst,
       nameLast: nameLast,
-      handleStr: handle
+      handleStr: handle,
+      password: password
     }
 
     // Update data
