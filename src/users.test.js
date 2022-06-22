@@ -11,19 +11,19 @@ describe("Testing userProfileV1", () => {
     test('Valid uId', () => {
         const authUserId = authRegisterV1('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
         const uId = authRegisterV1('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-        expect(userProfileV1(authUserId.authUserId, uId.authUserId)).toStrictEqual(
-            expect.objectContaining({
-                uId: uIdauthUserId, 
-                email: uId.email,
-                nameFirst: uId.nameFirst, 
-                nameLast: uId.nameLast, 
-                handleStr: uId.handleStr,
-            })
-        );
+        const data = getData();
+        expect(userProfileV1(authUserId.authUserId, uId.authUserId)).toStrictEqual({
+            uId: uId.authUserId, 
+            email: 'email2@gmail.com',
+            nameFirst: 'firstname2', 
+            nameLast: 'lastname2', 
+            handleStr: data.users[1].handleStr,
+            password: 'password2',
+        });
     });
     test('Invalid uId', () => {
         const data = getData();
-        const uId = data.users.length * 100;
+        const uId = (data.users.length + 1) * 100;
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         expect(userProfileV1(authUserId.authUserId, uId)).toStrictEqual({ error: 'error'});
     });
