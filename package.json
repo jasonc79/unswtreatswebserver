@@ -3,6 +3,7 @@
         "test": "jest"
     },
     "dependencies": {
+        "prompt-sync": "^4.2.0",
         "rewire": "^6.0.0"
     },
     "devDependencies": {
