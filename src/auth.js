@@ -9,9 +9,12 @@ import validator from 'validator';
  * @param {string} password   - The password of the user registering
  * @param {string} nameFirst  - The user's first name, with non-alphanumeric characters
  * @param {string} nameLast   - The user's last name, with non-alphanumeric characters
- * @returns 
+ * @returns {error: 'error'}    when email is invalid
+ * @returns {error: 'error'}    when length of password is less than 6 characters
+ * @returns {error: 'error'}    when length of nameFirst or nameLast is not between 1 and 50 characters
+ * @returns {authUserId: 'authUserId'}  on no error
+ * 
  */
-
 function authRegisterV1(email, password, nameFirst, nameLast) {
     email = email.toLowerCase();
     nameFirst = removeNonAlphaNumeric(nameFirst);
