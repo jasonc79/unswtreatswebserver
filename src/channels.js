@@ -7,6 +7,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
 
     let data = getData();
     let channels = data.channels;
+    //console.log(channels);
     let user;
     const channelId = channels.length;
 
@@ -20,13 +21,12 @@ function channelsCreateV1(authUserId, name, isPublic) {
         channelId: channelId,
         name: name,
         messages: [],
-        allMembers: [person],
-        staffMembers: [person],
+        allMembers: [user],
+        staffMembers: [user],
         isPublic: isPublic,
     }
 
     channels.push(newChannel);
-    setData(channels);
 
     return {
         channelId: channelId,
@@ -35,7 +35,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
 
 function channelsListV1(authUserId) {
     let data = getData();
-    const user;
+    let user;
     for (let person of data.users) {
         if (person.uId === authUserId) {
             user = person;
@@ -44,17 +44,13 @@ function channelsListV1(authUserId) {
 
     let channels = [];
     for (let channel of data.channels) {
-        for (let member of channel.allMembers) {
-            if (member === user) {
-                channels.push(channel);
-                break;
-            }
+        if (channel.allMembers.includes(user)) {
+            console.log(channel)
+            channels.push(channel);
         }
     }
 
-    return {
-        channels
-    };
+    return channels;
 }
   
 function channelsListallV1(authUserId) {
