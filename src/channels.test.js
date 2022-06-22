@@ -52,13 +52,15 @@ describe("Testing channelsListV1", () => {
         const authUserId2 = authRegisterV1('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
         const channel1 = channelsCreateV1(authUserId1.authUserId, 'name1', true);
         const channel2 = channelsCreateV1(authUserId2.authUserId, 'name2', true);
-        expect(channelsListV1(authUserId1.authUserId)).toStrictEqual({
-            channelId: channel1.channelId,
-            name: 'name1',
-            messages: [],
-            allMembers: [userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
-            staffMembers:[userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
-            isPublic: true,
-        });
+        expect(channelsListV1(authUserId1.authUserId)).toStrictEqual([
+            {
+                channelId: channel1.channelId,
+                name: 'name1',
+                messages: [],
+                allMembers: [userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
+                staffMembers:[userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
+                isPublic: true,
+            },
+        ]);
     });
 });
