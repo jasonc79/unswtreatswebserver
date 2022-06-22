@@ -2,7 +2,9 @@
 let data = {
   users: [],
   channels: [],
+  messages: []
 }
+
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
