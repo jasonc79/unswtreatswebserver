@@ -12,7 +12,7 @@ function channelDetailsV1(authUserId, channelId) {
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
     for (let i = 0; i < authUserChannelList.length; i++) {
-        if (channelId === authUserChannelList.id) {
+        if (channelId === authUserChannelList.channelId) {
             authUserValid = true;
             break;
         }
@@ -21,21 +21,18 @@ function channelDetailsV1(authUserId, channelId) {
         return {error: 'error'};
     }
     // All error test passes; return channel details
-    for (let i = 0; i < data.channels.length; i++) {
-        if (channelId === data.channels[i].id) {
-            let channelName = data.channels[i].name;
-            let channelIsPublic = data.channels[i].isPublic;
-            let channelOwnerMembers = data.channels[i].ownerMembers;
-            let channelAllMembers = datta.channels[i].allMembers;
+    for (let channel of data.channels) {
+        if (channelId === channel.id) {
+            let channelDetail = {
+                name: channel.Name,
+                isPublic : channel.isPublic,
+                ownerMembers: channel.ownerMembers,
+                allMembers: channel.allMembers,
+            }
             break;
         }
     }
-    return {
-      name: channelName,
-      isPublic: channelIsPublic,
-      ownerMembers: channelOwnerMembers,
-      allMembers: channelAllMembers,
-    };
+    return {channelDetail};
   }
   
   function channelJoinV1(authUserId, channelId) {
@@ -49,7 +46,7 @@ function channelDetailsV1(authUserId, channelId) {
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
     for (let i = 0; i < authUserChannelList.length; i++) {
-        if (channelId === authUserChannelList.id) {
+        if (channelId === authUserChannelList.channelId) {
             authUserValid = true;
             break;
         }
@@ -59,32 +56,39 @@ function channelDetailsV1(authUserId, channelId) {
     }
     // Check if channelId refers to a channel that is private
     // And authUser is not already a channel member and not a global owner. 
+    let user;
+    for (let person of data.users) {
+        if (person.uId === authUserId) {
+            user = person;
+        }
+    }
+
     const allChannelsList = channelsListallV1(authUserId);
-    // Assume that ownerMembers and allMembers hold authUserIds in their respective arrays.
-    let valid = true;
+    let memberValid = false;
+    let ownerValid = false;
     for (let j = 0; j < allChannelsList.length; j++) {
-        if (channelId === allChannelsList[j].id) {
+        if (channelId === allChannelsList[j].channelId) {
             if (allChannelsList[j].isPublic === false) {
-                for (let k = 0; k < allChannelsList[j].ownerMembers.length; k++) {
-                    if (allChannelsList[j].ownerMembers[k] === authUserId) {
-                        valid = false;
+                for (let ownerMembers of allChannelsList[j].ownerMembers) {
+                    if (ownerMembers === user) {
+                        ownerValid = true;
                     }
                 }
-                for (let a = 0; a < allChannelsList[j].ownerMembers.length; a++) {
-                    if (allChannelsList[j].allMembers[a] === authUserId) {
-                        valid = false;
+                for (let allMembers of allChannelsList[j].allMembers) {
+                    if (allMembers === user) {
+                        memberValid = true;
                     }
                 }
             }
         }
     }
-    if (valid === false) {
+    if (!memberValid || !ownerValid) {
         return {error: 'error'};
     }
-    // Add authUser to the selected channel, update channel list in data, append authUser to allMembers array.
-    for (let b = 0; b < data.channels.length; b++) {
-        if (channelId === data.channels[b].id) {
-            data.channels[b].allMembers.push(authUserId);
+    // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
+    for (let channel of data.channels) {
+        if (channelId === channel.channelId) {
+            channel.allMembers.push(user);
             setData(data);
             break;
         }
