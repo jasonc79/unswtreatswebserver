@@ -27,6 +27,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
     }
 
     channels.push(newChannel);
+    setData(data);
 
     return {
         channelId: channelId,
