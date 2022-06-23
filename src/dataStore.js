@@ -1,9 +1,9 @@
 // Populate each array in data with a user and channel object.
+
 let data = {
   users: [],
   channels: [],
 }
-
 
 /* Data objects
 user = {
@@ -48,7 +48,6 @@ channel = {
   ],
   isPublic: boolean
 }
-
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
