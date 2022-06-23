@@ -18,7 +18,14 @@ user = {
 channel = {
   channelId: number,
   name: string
-  messages: [],
+  messages: [
+    {
+      messageId: number,
+      uId: number,
+      message: string,
+      timeSent: number
+    }
+  ],
   allMembers: [
     {
       uId: number,
