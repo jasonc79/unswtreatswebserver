@@ -6,10 +6,9 @@ function channelsCreateV1(authUserId, name, isPublic) {
     }
 
     let data = getData();
-    let channels = data.channels;
-    //console.log(channels);
+    // let channels = data.channels;
     let user;
-    const channelId = channels.length;
+    const channelId = data.channels.length;
 
     for (let person of data.users) {
         if (person.uId === authUserId) {
@@ -26,7 +25,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
         isPublic: isPublic,
     }
 
-    channels.push(newChannel);
+    data.channels.push(newChannel);
     setData(data);
 
     return {
