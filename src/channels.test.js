@@ -14,6 +14,7 @@ beforeEach(() => {
 });
 
 describe("Pass scenario", () => {
+  
   test('1 channels', () => {
     const id = authRegisterV1(
       'hayden@gmail.com',
