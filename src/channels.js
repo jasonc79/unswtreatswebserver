@@ -3,7 +3,7 @@ import { checkValidId } from './helper.js'
 
 /*
 channelsCreateV1 creates a new channel which is added to the dataStore
-The channel is named the given name and created if the name is greater than 0 and less than 20 characters long
+The channel is named the given name and created if the name is greater than 0 and less than 21 characters long
 
 Arguments:
     authUserId (number)     - holds the id of the user creating the channel
@@ -11,7 +11,9 @@ Arguments:
     idPublic (boolean)      - value determining if the channel will be private or public
 
 Return Value:
-    Returns { channelId : channelId } on if the authUserId 
+    Returns { channelId : channelId } on no errors, where channelId is a number
+    Returns { error: 'error' } on an invalid authUserId and if the name is less than 1 
+        or greater than 20 characters long
 */
 
 function channelsCreateV1(authUserId, name, isPublic) {
@@ -43,6 +45,19 @@ function channelsCreateV1(authUserId, name, isPublic) {
 
     return { channelId: channelId };
 }
+
+/*
+channelsListV1 checks if the authUserId is valid and then returns an object containing 
+an array of channels that the user is apart of
+
+Arguments:
+    authUserId (number)     - holds the id of the user that is being searched for
+
+Return Value:
+    Returns { channels: channels } on if the authUserId is valid, where channels is an array of objects 
+        containing the channelId and name
+    Returns { error: 'error' } on an invalid authUserId
+*/
 
 function channelsListV1(authUserId) {
     if (!checkValidId(authUserId)) {
