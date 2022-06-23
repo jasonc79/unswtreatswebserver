@@ -16,7 +16,6 @@ import validator from 'validator';
  * 
  */
 function authRegisterV1(email, password, nameFirst, nameLast) {
-  
     email = email.toLowerCase();
     nameFirst = removeNonAlphaNumeric(nameFirst);
     nameLast = removeNonAlphaNumeric(nameLast);
