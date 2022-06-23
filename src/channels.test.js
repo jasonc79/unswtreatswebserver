@@ -10,9 +10,9 @@ beforeEach(() => {
   clearV1();
 });
 
-describe("Pass scenario", () => {
+describe("Testing for channelsListallV1", () => {
 
-  test("Single channel", () => {
+  test("No channels", () => {
     const id = authRegisterV1(
       "hayden@gmail.com",
       "hayden123",
