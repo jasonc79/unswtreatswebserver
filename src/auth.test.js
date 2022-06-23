@@ -22,7 +22,7 @@ describe('Testing authLoginV1', () => {
         let correctId = authLoginV1('email@gmail.com', 'password');
         expect(correctId).toStrictEqual(
             expect.objectContaining({
-                authUserId: expect.any(Number)
+                authUserId: authUserId.authUserId
             })
         )
     })
