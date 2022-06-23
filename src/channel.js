@@ -11,8 +11,8 @@ function channelDetailsV1(authUserId, channelId) {
     // Check if authorised user is member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
-    for (let i = 0; i < authUserChannelList.length; i++) {
-        if (channelId === authUserChannelList.channelId) {
+    for (let channelList of authUserChannelList) {
+        if (channelId === channelList.channelId) {
             authUserValid = true;
             break;
         }
@@ -22,7 +22,7 @@ function channelDetailsV1(authUserId, channelId) {
     }
     // All error test passes; return channel details
     for (let channel of data.channels) {
-        if (channelId === channel.id) {
+        if (channelId === channel.channelId) {
             let channelDetail = {
                 name: channel.Name,
                 isPublic : channel.isPublic,
@@ -45,8 +45,8 @@ function channelDetailsV1(authUserId, channelId) {
     // Check if authUser is a member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
-    for (let i = 0; i < authUserChannelList.length; i++) {
-        if (channelId === authUserChannelList.channelId) {
+    for (let channelList of authUserChannelList) {
+        if (channelId === channelList.channelId) {
             authUserValid = true;
             break;
         }
