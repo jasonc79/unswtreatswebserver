@@ -41,7 +41,16 @@ describe("Testing channelsListV1", () => {
         const channel1 = channelsCreateV1(authUserId.authUserId, 'name1', true);
         const channel2 = channelsCreateV1(authUserId.authUserId, 'name2', true);
         const data = getData();
-        expect(channelsListV1(authUserId.authUserId)).toStrictEqual(data.channels);
+        expect(channelsListV1(authUserId.authUserId)).toStrictEqual([
+            {
+                channelId: channel1.channelId,
+                name: 'name1',
+            },
+            {
+                channelId: channel2.channelId,
+                name: 'name2',
+            },
+        ]);
     });
     test('Correct return no channels', () => {
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
@@ -56,10 +65,6 @@ describe("Testing channelsListV1", () => {
             {
                 channelId: channel1.channelId,
                 name: 'name1',
-                messages: [],
-                allMembers: [userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
-                ownerMembers:[userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
-                isPublic: true,
             },
         ]);
     });

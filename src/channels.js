@@ -43,9 +43,13 @@ function channelsListV1(authUserId) {
     }
 
     let channels = [];
+    
     for (let channel of data.channels) {
         if (channel.allMembers.includes(user)) {
-            channels.push(channel);
+            channels.push({
+                channelId: channel.channelId,
+                name: channel.name,
+            })
         }
     }
 
