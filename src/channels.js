@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore.js'
-import { checkValidId } from './helper.js'
-import { userProfileV1 } from "./users.js"
+import { checkValidId, returnValidId } from './helper.js'
+import { authRegisterV1 } from "./auth.js"
 
 /*
 channelsCreateV1 creates a new channel which is added to the dataStore
@@ -21,10 +21,10 @@ function channelsCreateV1(authUserId, name, isPublic) {
     if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
         return { error: 'error' };
     }
+
     let data = getData();
-    let user;
     const channelId = data.channels.length;
-    const user = userProfileV1(authUserId, authUserId);
+    const user = returnValidId(authUserId);
 
     let newChannel = {
         channelId: channelId,
@@ -59,7 +59,7 @@ function channelsListV1(authUserId) {
         return { error: 'error' };
     }
     let data = getData();
-    const user = userProfileV1(authUserId, authUserId);
+    const user = returnValidId(authUserId);
 
     let channels = [];
     
