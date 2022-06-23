@@ -12,7 +12,7 @@ function checkValidId(id) {
 
 function checkValidChannel(id) {
     let data = getData();
-    for (const channel of data.channels) {
+    for (let channel of data.channels) {
         if (channel.channelId === id) {
             return true;
         }
@@ -31,7 +31,7 @@ function returnValidId(id) {
 
 function returnValidChannel(id) {
     let data = getData();
-    for (const channel of data.channels) {
+    for (let channel of data.channels) {
         if (channel.channelId === id) {
             return channel;
         }
