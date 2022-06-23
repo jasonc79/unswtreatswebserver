@@ -2,7 +2,44 @@
 let data = {
   users: [],
   channels: [],
-  messages: []
+}
+
+
+/* Data objects
+user = {
+  uId: number,
+  email: string,
+  nameFirst: string,
+  nameLast: string,
+  handleStr: string,
+  password: string
+}
+
+channel = {
+  channelId: number,
+  name: string
+  messages: [],
+  allMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  ownerMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  isPublic: boolean
 }
 
 
