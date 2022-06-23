@@ -38,15 +38,4 @@ function returnValidChannel(id) {
     }
 }
 
-function isMember(id, cid) {
-    let data = getData();
-    let currChannel = returnValidChannel(cid);
-    for (let member of currChannel.allMembers) {
-        if (member.uId === id) {
-            return true;
-        }
-    }
-    return false;
-}
-
-export { checkValidId, checkValidChannel, returnValidId, returnValidChannel, isMember };
+export { checkValidId, checkValidChannel, returnValidId, returnValidChannel };
