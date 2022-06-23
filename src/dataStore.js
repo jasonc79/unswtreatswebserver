@@ -1,5 +1,53 @@
-// YOU SHOULD MODIFY THIS OBJECT BELOW
-let data = {};
+// Populate each array in data with a user and channel object.
+
+let data = {
+  users: [],
+  channels: [],
+}
+
+/* Data objects
+user = {
+  uId: number,
+  email: string,
+  nameFirst: string,
+  nameLast: string,
+  handleStr: string,
+  password: string
+}
+
+channel = {
+  channelId: number,
+  name: string
+  messages: [
+    {
+      messageId: number,
+      uId: number,
+      message: string,
+      timeSent: number
+    }
+  ],
+  allMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  ownerMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  isPublic: boolean
+}
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
