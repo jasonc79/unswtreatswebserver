@@ -1,13 +1,25 @@
 import { getData, setData } from './dataStore.js'
 import { checkValidId } from './helper.js'
 
+/*
+channelsCreateV1 creates a new channel which is added to the dataStore
+The channel is named the given name and created if the name is greater than 0 and less than 20 characters long
+
+Arguments:
+    authUserId (number)     - holds the id of the user creating the channel
+    name (string)           - contains the string which is set to be the channel name
+    idPublic (boolean)      - value determining if the channel will be private or public
+
+Return Value:
+    Returns { channelId : channelId } on if the authUserId 
+*/
+
 function channelsCreateV1(authUserId, name, isPublic) {
     if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
         return { error: 'error' };
     }
 
     let data = getData();
-    // let channels = data.channels;
     let user;
     const channelId = data.channels.length;
 
@@ -29,9 +41,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
     data.channels.push(newChannel);
     setData(data);
 
-    return {
-        channelId: channelId,
-    };
+    return { channelId: channelId };
 }
 
 function channelsListV1(authUserId) {
@@ -57,7 +67,7 @@ function channelsListV1(authUserId) {
         }
     }
 
-    return channels;
+    return { channels: channels };
 }
   
 function channelsListallV1(authUserId) {
