@@ -3,31 +3,52 @@
 let data = {
   users: [],
   channels: [],
-  messages: []
-};
+}
 
 /* Data objects
 user = {
-  uId: uId,
-  email: email,
-  nameFirst: nameFirst,
-  nameLast: nameLast,
-  handleStr: handleStr
+  uId: number,
+  email: string,
+  nameFirst: string,
+  nameLast: string,
+  handleStr: string,
+  password: string
 }
 
 channel = {
-  channelId: channelId,
-  name: name
+  channelId: number,
+  name: string
+  messages: [
+    {
+      messageId: number,
+      uId: number,
+      message: string,
+      timeSent: number
+    }
+  ],
+  allMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  ownerMembers: [
+    {
+      uId: number,
+      email: string,
+      nameFirst: string,
+      nameLast: string,
+      handleStr: string,
+      password: string
+    }
+  ],
+  isPublic: boolean
 }
 
-messages = {
-  messageId: messageId
-  uId: uId,
-  message: message,
-  timeSent: timeSent
-}
-
-*/
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
 /*
