@@ -69,11 +69,23 @@ function channelsListV1(authUserId) {
 
     return { channels: channels };
 }
-  
+
+
+/*
+This function goes through all channels in channels then returns
+all channels and their associated details
+*/ 
 function channelsListallV1(authUserId) {
-    return {
-        channels: [] // see interface for contents
+  const data = getData();
+  let channelList = [];
+  for (let channel of data.channels) {
+    let tempChannel = {
+      channelId: channel.channelId,
+      name: channel.name,
     };
+    channelList.push(tempChannel);
+  }
+  return { 'channels': channelList };
 }
   
 export { channelsCreateV1, channelsListV1, channelsListallV1 };
