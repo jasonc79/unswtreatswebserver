@@ -59,7 +59,7 @@ function channelsListV1(authUserId) {
 
     return channels;
 }
-  
+
 function channelsListallV1(authUserId) {
   const data = getData();
   let channelList = [];
@@ -70,7 +70,7 @@ function channelsListallV1(authUserId) {
     };
     channelList.push(tempChannel);
   }
-  
+
   return channelList;
 }
   
