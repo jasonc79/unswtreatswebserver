@@ -1,6 +1,11 @@
 import { getData } from './dataStore.js'
+import { checkValidId } from './helper.js'
 
 function userProfileV1(authUserId, uId) {
+    if (!checkValidId(authUserId)) {
+        return { error: 'error' };
+    }
+
     let data = getData();
     for (let user of data.users) {
         if (user.uId === uId) {
@@ -10,7 +15,6 @@ function userProfileV1(authUserId, uId) {
                 nameFirst: user.nameFirst, 
                 nameLast: user.nameLast, 
                 handleStr: user.handleStr,
-                password: user.password,
             }
         }
     }

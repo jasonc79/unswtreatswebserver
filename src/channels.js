@@ -1,7 +1,8 @@
 import { getData, setData } from './dataStore.js'
+import { checkValidId } from './helper.js'
 
 function channelsCreateV1(authUserId, name, isPublic) {
-    if (name.length < 1 || name.length > 20) {
+    if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
         return { error: 'error' };
     }
 
@@ -34,6 +35,9 @@ function channelsCreateV1(authUserId, name, isPublic) {
 }
 
 function channelsListV1(authUserId) {
+    if (!checkValidId(authUserId)) {
+        return { error: 'error' };
+    }
     let data = getData();
     let user;
     for (let person of data.users) {
