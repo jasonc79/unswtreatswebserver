@@ -1,15 +1,15 @@
 import { getData, setData } from './dataStore.js'
+import { checkValidId } from './helper.js'
 
 function channelsCreateV1(authUserId, name, isPublic) {
-    if (name.length < 1 || name.length > 20) {
+    if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
         return { error: 'error' };
     }
 
     let data = getData();
-    let channels = data.channels;
-    //console.log(channels);
+    // let channels = data.channels;
     let user;
-    const channelId = channels.length;
+    const channelId = data.channels.length;
 
     for (let person of data.users) {
         if (person.uId === authUserId) {
@@ -26,7 +26,8 @@ function channelsCreateV1(authUserId, name, isPublic) {
         isPublic: isPublic,
     }
 
-    channels.push(newChannel);
+    data.channels.push(newChannel);
+    setData(data);
 
     return {
         channelId: channelId,
@@ -34,6 +35,9 @@ function channelsCreateV1(authUserId, name, isPublic) {
 }
 
 function channelsListV1(authUserId) {
+    if (!checkValidId(authUserId)) {
+        return { error: 'error' };
+    }
     let data = getData();
     let user;
     for (let person of data.users) {

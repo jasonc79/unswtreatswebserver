@@ -17,8 +17,7 @@ describe("Testing userProfileV1", () => {
             email: 'email2@gmail.com',
             nameFirst: 'firstname2', 
             nameLast: 'lastname2', 
-            handleStr: data.users[1].handleStr,
-            password: 'password2',
+            handleStr: data.users[1].handleStr
         });
     });
     test('Invalid uId', () => {
