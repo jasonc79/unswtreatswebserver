@@ -70,6 +70,7 @@ function channelsListallV1(authUserId) {
     };
     channelList.push(tempChannel);
   }
+  
   return channelList;
 }
   
