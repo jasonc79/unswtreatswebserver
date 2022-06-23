@@ -6,15 +6,26 @@ import { channelMessagesV1 } from "./channel.js";
 import { channelsCreateV1, channelsListV1 } from "./channels.js";
 import { userProfileV1 } from "./users.js";
 
-// need to return array of objects
-// Array of object, where each objects contains types { channelId, name }
-// Provide an array of all channels, including private channels, (and their associated details)
 beforeEach(() => {
   clearV1();
 });
 
 describe("Pass scenario", () => {
-  test("1 channels", () => {
+
+  test("Single channel", () => {
+    const id = authRegisterV1(
+      "hayden@gmail.com",
+      "hayden123",
+      "Hayden",
+      "Smith"
+    );
+
+    expect(channelsListallV1(id)).toEqual({
+      channels: [],
+    });
+  });
+
+  test("Single channel", () => {
     const id = authRegisterV1(
       "hayden@gmail.com",
       "hayden123",
@@ -34,7 +45,7 @@ describe("Pass scenario", () => {
     });
   });
 
-  test("More than 1 channel", () => {
+  test("More than one channel", () => {
     const id = authRegisterV1(
       "hayden@gmail.com",
       "hayden123",
