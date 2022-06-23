@@ -60,6 +60,11 @@ function channelsListV1(authUserId) {
     return channels;
 }
 
+
+/*
+This function goes through all channels in channels then returns
+all channels and their associated details
+*/ 
 function channelsListallV1(authUserId) {
   const data = getData();
   let channelList = [];
