@@ -1,8 +1,13 @@
 import { channelsListallV1 } from "./channels.js";
+import { clearV1 } from "./other.js"
+import { getData } from "./dataStore.js"
 
 // need to return array of objects
 // Array of object, where each objects contains types { channelId, name }
 // Provide an array of all channels, including private channels, (and their associated details)
+beforeEach(() => {
+  clearV1();
+});
 
 describe("Pass scenario", () => {
   test('1 channels', () => {
