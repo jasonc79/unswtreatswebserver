@@ -130,56 +130,40 @@ describe("Testing channelsCreateV1", () => {
 });
 
 describe("Testing channelsListV1", () => {
-  test("Correct return all channels", () => {
-    const authUserId = authRegisterV1(
-      "email@gmail.com",
-      "password",
-      "firstname",
-      "lastname"
-    );
-    const channel1 = channelsCreateV1(authUserId.authUserId, "name1", true);
-    const channel2 = channelsCreateV1(authUserId.authUserId, "name2", true);
-    const data = getData();
-    expect(channelsListV1(authUserId.authUserId)).toStrictEqual([
-      {
-        channelId: channel1.channelId,
-        name: "name1",
-      },
-      {
-        channelId: channel2.channelId,
-        name: "name2",
-      },
-    ]);
-  });
-  test("Correct return no channels", () => {
-    const authUserId = authRegisterV1(
-      "email@gmail.com",
-      "password",
-      "firstname",
-      "lastname"
-    );
-    expect(channelsListV1(authUserId.authUserId)).toStrictEqual([]);
-  });
-  test("Correct return some channels", () => {
-    const authUserId1 = authRegisterV1(
-      "email1@gmail.com",
-      "password1",
-      "firstname1",
-      "lastname1"
-    );
-    const authUserId2 = authRegisterV1(
-      "email2@gmail.com",
-      "password2",
-      "firstname2",
-      "lastname2"
-    );
-    const channel1 = channelsCreateV1(authUserId1.authUserId, "name1", true);
-    const channel2 = channelsCreateV1(authUserId2.authUserId, "name2", true);
-    expect(channelsListV1(authUserId1.authUserId)).toStrictEqual([
-      {
-        channelId: channel1.channelId,
-        name: "name1",
-      },
-    ]);
-  });
+    test('Correct return all channels', () => {
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const channel1 = channelsCreateV1(authUserId.authUserId, 'name1', true);
+        const channel2 = channelsCreateV1(authUserId.authUserId, 'name2', true);
+        const data = getData();
+        expect(channelsListV1(authUserId.authUserId)).toStrictEqual({ 
+            channels: [
+                {
+                    channelId: channel1.channelId,
+                    name: 'name1',
+                },
+                {
+                    channelId: channel2.channelId,
+                    name: 'name2',
+                },
+            ]
+        });
+    });
+    test('Correct return no channels', () => {
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        expect(channelsListV1(authUserId.authUserId)).toStrictEqual({ channels: [] });
+    });
+    test('Correct return some channels', () => {
+        const authUserId1 = authRegisterV1('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+        const authUserId2 = authRegisterV1('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+        const channel1 = channelsCreateV1(authUserId1.authUserId, 'name1', true);
+        const channel2 = channelsCreateV1(authUserId2.authUserId, 'name2', true);
+        expect(channelsListV1(authUserId1.authUserId)).toStrictEqual({
+            channels: [
+                {
+                    channelId: channel1.channelId,
+                    name: 'name1',
+                }
+            ]
+        });
+    });
 });
