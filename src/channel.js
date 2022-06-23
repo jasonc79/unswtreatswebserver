@@ -1,3 +1,6 @@
+import { checkValidChannel, returnValidChannel } from './helper.js'
+import { getData } from './dataStore.js'
+
 function channelDetailsV1(authUserId, channelId) {
     return {
       name: 'secret candy crush team', 
@@ -16,10 +19,34 @@ function channelDetailsV1(authUserId, channelId) {
   }
   
   function channelMessagesV1(authUserId, channelId, start) {
+    const data = getData();
+    if (!checkValidChannel(channelId)) {
+      return { error: "error" };
+    }
+    const currChannel = returnValidChannel(channelId);
+    const channelMsg = currChannel.messages;
+    if (channelMsg.length < start) {
+      return { error: "error" };
+    }
+    if (!currChannel.allMembers.include(authUserId)) {
+      return { error: "error" };
+    }
+    const messages = [];
+    let final = start + 50;
+    for (let i = start; i < final; i++) {
+      if (i >= channelMsg.length) {
+        return {
+          'messages': messages,
+          'start': start,
+          'end': -1,
+        };
+      }
+      messages.push(channelMsg[i]);
+    }
     return {
-      messages: [],
-      start: 0,
-      end: -1,
+      'messages': messages,
+      'start': start,
+      'end': final,
     };
   }
   
