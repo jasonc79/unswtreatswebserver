@@ -1,12 +1,28 @@
 import {getData, setData} from './dataStore.js';
 import validator from 'validator';
 
+
+/** Create an account for a new user. Additionally, it generates a handle
+ * and an authUserId which is stored as the user's details.
+ *
+ * @param {string} email      - The email adress of the user registering
+ * @param {string} password   - The password of the user registering
+ * @param {string} nameFirst  - The user's first name, with non-alphanumeric characters
+ * @param {string} nameLast   - The user's last name, with non-alphanumeric characters
+ * @returns {error: 'error'}    when email is invalid
+ * @returns {error: 'error'}    when length of password is less than 6 characters
+ * @returns {error: 'error'}    when length of nameFirst or nameLast is not between 1 and 50 characters
+ * @returns {authUserId: 'authUserId'}  on no error
+ * 
+ */
 function authRegisterV1(email, password, nameFirst, nameLast) {
     email = email.toLowerCase();
-    nameFirst = nameFirst.toLowerCase();
-    nameLast = nameLast.toLowerCase();
+    nameFirst = removeNonAlphaNumeric(nameFirst);
+    nameLast = removeNonAlphaNumeric(nameLast);
+    let data = getData();
+    let handle = createHandle(nameFirst, nameLast);
 
-  // Error Checking
+    // Error Checking
     if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
       return {error: 'error'};
     }
@@ -16,10 +32,8 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     if (!checkValidEmail(email)) {
       return {error: 'error'};
     }
-    
-    let data = getData();
-    let handle = createHandle(nameFirst, nameLast);
 
+    // Generate uId using the size of array users
     let user = {
       uId: data.users.length,
       email: email,
@@ -32,16 +46,19 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     // Update data
     data.users.push(user);
     setData(data);
+
     return {
       authUserId: user.uId
     }
-  }
+}
   
   function authLoginV1(email, password) {
     let user = checkEmailExists(email);
+
     if (!user) {
       return {error: 'error'};
     }
+
     if (user.password !== password) {
       return {error: 'error'};
     }
@@ -51,8 +68,8 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     }
   }
 
-
-// HELPER FUNCTIONS
+  // HELPER FUNCTIONS
+  // Check if name has a length between 1 and 50 inclusive.
   function checkNameLength(name) {
     if (name.length < 1 || name.length > 50) {
       return false;
@@ -62,22 +79,20 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     }
   }
 
+  // Check if an email is valid. Returns true if valid and false otherwise.
   function checkValidEmail(email) {
     if (!validator.isEmail(email)) {
       return false;
     }
 
-    let data = getData();
-    for (let user of data.users) {
-      if (user.email === email) {
-        return false;
-      }
+    if (checkEmailExists(email) !== false) {
+      return false;
     }
 
     return true;
   }
 
-    // Check if a valid email exists. Returns an email if it exists.
+  // Check if a valid email exists. Returns an email if it exists.
   // Otherwise, returns false.
   function checkEmailExists(email) {
     let data = getData();
@@ -93,21 +108,20 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
   // Takes in first name and last name (both lower case) and creates a handle
   function createHandle(firstName, lastName) {
     let data = getData();
-
-    // Concatenate the names and cut off characters if necessary
-    let concatenatedStr = firstName.concat(lastName);
-    let handle = concatenatedStr;
-
-    if (concatenatedStr.length > 20) {
-      handle = concatenatedStr.slice(0, 20);
-    }
-
     let handleNumber = 0;
     let handleExists = false;
+
+    // Concatenate the names and cut off characters if necessary
+    let handle = firstName.concat(lastName);
+    if (handle.length > 20) {
+      handle = handle.slice(0, 20);
+    }
+
     // Check if the handle already exists 
     for (let user of data.users) {
       if (user.handleStr.slice(0, handle.length) === handle) {
-        // Slice the number off the end, if it exists
+        // Slice the number off the end, if it exists and compare it with
+        // the highest number found
         let extractedNum = parseInt(user.handleStr.slice(handle.length));
         if (extractedNum != NaN && extractedNum > handleNumber) {
           handleNumber = extractedNum;
@@ -115,7 +129,7 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
         handleExists = true;
       }
     }
-    // Add the number if handle already exists
+    // Add the number to the string if the handle already exists
     if (handleExists === true) {
       handleNumber += 1;
       handle = handle.concat(handleNumber.toString());
@@ -124,5 +138,15 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     return handle;
   }
   
- 
+  // Removes alphanumeric values from a string. Returns the string in lower
+  // case
+  function removeNonAlphaNumeric(string) {
+    /* This code removes non alphanumeric characters
+    https://bobbyhadz.com/blog/javascript-remove-non-alphanumeric-characters-
+    //from-string#:~:text=To%20remove%20all%20non%2Dalphanumeric,string%20with
+    %20all%20matches%20replaced.&text=Copied!*/
+    string = string.replace(/[^a-zA-Z0-9]/gi, '');
+    return string.toLowerCase();
+    
+  }
   export { authLoginV1, authRegisterV1 };
