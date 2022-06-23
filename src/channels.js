@@ -22,7 +22,7 @@ function channelsCreateV1(authUserId, name, isPublic) {
         name: name,
         messages: [],
         allMembers: [user],
-        staffMembers: [user],
+        ownerMembers: [user],
         isPublic: isPublic,
     }
 

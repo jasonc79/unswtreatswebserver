@@ -58,7 +58,7 @@ describe("Testing channelsListV1", () => {
                 name: 'name1',
                 messages: [],
                 allMembers: [userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
-                staffMembers:[userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
+                ownerMembers:[userProfileV1(authUserId2.authUserId, authUserId1.authUserId)],
                 isPublic: true,
             },
         ]);
