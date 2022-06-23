@@ -37,7 +37,7 @@ describe("channelMessages Fail scenarios", () => {
       "Smith"
     );
 
-    const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
 
     expect(channelMessagesV1(id.authUserId, channel1.channelId, 1)).toEqual({
       error: "error",
@@ -51,7 +51,7 @@ describe("channelMessages Fail scenarios", () => {
       "Smith"
     );
 
-    const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
     let invalidId = channel1.channelId + 1;
 
     expect(channelMessagesV1(id.authUserId, invalidId, 1)).toEqual({
@@ -73,9 +73,9 @@ describe("channelMessages Fail scenarios", () => {
       "Brown"
     );
 
-    const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
 
-    expect(channelMessagesV1(id2.authUserId, invalidId, 1)).toEqual({
+    expect(channelMessagesV1(id2.authUserId, channel1, 1)).toEqual({
       error: "error",
     });
   });
