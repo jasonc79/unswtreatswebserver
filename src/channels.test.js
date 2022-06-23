@@ -58,16 +58,6 @@ describe("Pass scenario", () => {
       ],
     });
   });
-  // expect(channelsListallV1(id)).toEqual([
-  //   {
-  //     channelId: channel1.channelId,
-  //     name: 'Hayden',
-  //   },
-  //   {
-  //     channelId: channel2.channelId,
-  //     name: 'Hayden2',
-  //   },
-  // ]);
 });
 beforeEach(() => {
   clearV1();
