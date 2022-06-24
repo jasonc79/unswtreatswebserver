@@ -76,9 +76,16 @@ function channelsListV1(authUserId) {
 
 
 /*
-This function goes through all channels in channels then returns
-all channels and their associated details
-*/ 
+This function returns an object containing an array of objects, the array contains objects 
+containing information about each channel.
+
+Arguments:
+    authUserId (number)       - The userId of the user calling the function
+
+Return Value:
+    Returns {error: 'error'}  on invalid authUserId
+    Returns {channels: channelList} on no error
+ */
 function channelsListallV1(authUserId) {
   const data = getData();
   let channelList = [];

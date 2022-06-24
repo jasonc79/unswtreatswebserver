@@ -24,8 +24,8 @@ returns 50 messages from a specified channel. If there are less than start+50
 messages it returns -1 in the "end: " 
 
 Arguments:
-    authUserId (number)   - The email inputted by the user
-    channelId (number)    - The password inputted by the user
+    authUserId (number)   - The userId of the user calling the function
+    channelId (number)    - The channelId that user wishes to examine
     start(number)         - The index of messages you wish to start from
 
 Return Value:
