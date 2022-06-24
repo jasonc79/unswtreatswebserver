@@ -1,10 +1,120 @@
-import { channelsListallV1 } from "./channels.js"
 import { clearV1 } from "./other.js"
 import { authRegisterV1 } from "./auth.js"
 import { channelDetailsV1, channelInviteV1, channelJoinV1, channelMessagesV1 } from "./channel.js"
-import { channelsCreateV1, channelsListV1 } from "./channels.js";
+import { channelsCreateV1, channelsListV1, channelsListallV1 } from "./channels.js";
+import { userProfileV1 } from "./users.js";
+
 beforeEach(() => {
-    clearV1();
+    clearV1(); 
+});
+
+// Tests for channelInviteV1
+describe('Testing channelInviteV1', () =>  {
+    
+    const authUserID1 = authRegisterV1('test1@gmail.com', '123abc!@#', 'Test1', 'Smith'); 
+    const authUserID2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith'); 
+    const channelID = channelsCreateV1(authUserID1.authUserId, 'Channel1', true);
+    
+    test ('Valid inputs', () => {
+        const authUserID1 = authRegisterV1('test1@gmail.com', '123abc!@#', 'Test1', 'Smith'); 
+        const authUserID2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith'); 
+        const channelID = channelsCreateV1(authUserID1.authUserId, 'Channel1', true);
+        const validInput = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId); 
+        expect(validInput).toEqual({}); 
+    }); 
+    
+    test ('Invalid channelID', () => {
+        const invalidChannelID = channelInviteV1(authUserID1.authUserId, -1, authUserID2.authUserId); 
+        expect(invalidChannelID).toEqual({ error: 'error' }); 
+    }); 
+    
+    test ('Invalid userID', () => {
+        const invalidUserID = channelInviteV1(authUserID1.authUserId, channelID.channelId, -1); 
+        expect(invalidUserID).toEqual({ error: 'error' }); 
+    }); 
+    
+    test ('User is already a member', () => {
+        channelJoinV1(authUserID2.authUserId, channelID.channelId); 
+        const alreadyMember = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId); 
+        expect(alreadyMember).toEqual({ error: 'error' }); 
+    }); 
+    
+    test ('Authorised user is not a member', () => {
+        const notMember = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId); 
+        expect(notMember).toEqual({ error: 'error' }); 
+    })
+})
+
+// Tests for channelMessagesV1
+describe("channelMessages Pass scenarios", () => {
+  test("Empty messages", () => {
+    const id = authRegisterV1(
+      "hayden@gmail.com",
+      "hayden123",
+      "Hayden",
+      "Smith"
+    );
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
+
+    expect(channelMessagesV1(id.authUserId, channel1.channelId, 0)).toEqual({
+      messages: [],
+      start: 0,
+      end: -1,
+    });
+  });
+});
+
+describe("channelMessages Fail scenarios", () => {
+  test("Start is greater than messages", () => {
+    const id = authRegisterV1(
+      "hayden@gmail.com",
+      "hayden123",
+      "Hayden",
+      "Smith"
+    );
+
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
+
+    expect(channelMessagesV1(id.authUserId, channel1.channelId, 1)).toEqual({
+      error: "error",
+    });
+  });
+  test("ChannelId is invalid", () => {
+    const id = authRegisterV1(
+      "hayden@gmail.com",
+      "hayden123",
+      "Hayden",
+      "Smith"
+    );
+
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
+    let invalidId = channel1.channelId + 1;
+
+    expect(channelMessagesV1(id.authUserId, invalidId, 0)).toEqual({
+      error: "error",
+    });
+  });
+  test("ChannelId is valid but user is not part of channel", () => {
+    const id = authRegisterV1(
+      "hayden@gmail.com",
+      "hayden123",
+      "Hayden",
+      "Smith"
+    );
+
+    const id2 = authRegisterV1(
+      "nathan@gmail.com",
+      "nathan123",
+      "Nathan",
+      "Brown"
+    );
+
+    const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
+
+    expect(channelMessagesV1(id2.authUserId, channel1.channelId, 0)).toEqual({
+      error: "error",
+    });
+  });
 });
 
 describe('Testing channelDetailsV1', () => {
@@ -144,3 +254,4 @@ describe("channelMessages Fail scenarios", () => {
     });
   });
 });
+
