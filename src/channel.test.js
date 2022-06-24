@@ -1,8 +1,6 @@
-import { channelsListallV1 } from "./channels.js";
 import { clearV1 } from "./other.js";
-import { getData } from "./dataStore.js";
 import { authRegisterV1 } from "./auth.js";
-import { channelMessagesV1 } from "./channel.js";
+import { channelMessagesV1, channelJoinV1, channelInviteV1 } from "./channel.js";
 import { channelsCreateV1, channelsListV1 } from "./channels.js";
 import { userProfileV1 } from "./users.js";
 
@@ -47,7 +45,6 @@ describe('Testing channelInviteV1', () =>  {
         expect(notMember).toEqual({ error: 'error' }); 
     })
 })
-
 
 // Tests for channelMessagesv1
 describe("channelMessages Pass scenarios", () => {
