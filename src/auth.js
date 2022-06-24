@@ -1,20 +1,24 @@
 import {getData, setData} from './dataStore.js';
 import validator from 'validator';
 
+/*
+Create an account for a new user. Additionally, it generates a handle
+and an authUserId which is stored as the user's details.
 
-/** Create an account for a new user. Additionally, it generates a handle
- * and an authUserId which is stored as the user's details.
- *
- * @param {string} email      - The email adress of the user registering
- * @param {string} password   - The password of the user registering
- * @param {string} nameFirst  - The user's first name, with non-alphanumeric characters
- * @param {string} nameLast   - The user's last name, with non-alphanumeric characters
- * @returns {error: 'error'}    when email is invalid
- * @returns {error: 'error'}    when length of password is less than 6 characters
- * @returns {error: 'error'}    when length of nameFirst or nameLast is not between 1 and 50 characters
- * @returns {authUserId: 'authUserId'}  on no error
- * 
+Arguments:
+    email (string)     - The email adress of the user registering
+    password (string)  - The password of the user registering
+    nameFirst (string) - The user's first name, with non-alphanumeric characters
+    nameLast (string)  - The user's last name, with non-alphanumeric characters
+
+Return Value:
+    Returns {error: 'error'}  on invalid email
+    Returns {error: 'error'}  on a password with less than 6 characters
+    Returns {error: 'error'}  when length of nameFirst or nameLast is not 
+                              between 1 and 50 characters
+    Returns {authUserId: authUserId} on no error
  */
+
 function authRegisterV1(email, password, nameFirst, nameLast) {
     email = email.toLowerCase();
     nameFirst = removeNonAlphaNumeric(nameFirst);
@@ -51,7 +55,19 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
       authUserId: user.uId
     }
 }
-  
+/*
+This function checks if the user's email and password is valid and returns
+their authUserId to login
+
+Arguments:
+    email (string)    - The email inputted by the user
+    password (string)    - The password inputted by the user
+
+Return Value:
+    Returns {error: 'error'} on an email not belonging to the user
+    Returns {error: 'error'} on an incorrect password
+    Returns {authUserId:  'authUserId'} when the email and password are valid
+*/
   function authLoginV1(email, password) {
     let user = checkEmailExists(email);
 
@@ -69,6 +85,7 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
   }
 
   // HELPER FUNCTIONS
+  
   // Check if name has a length between 1 and 50 inclusive.
   function checkNameLength(name) {
     if (name.length < 1 || name.length > 50) {

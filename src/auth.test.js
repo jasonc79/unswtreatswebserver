@@ -1,5 +1,6 @@
 import {authLoginV1, authRegisterV1} from './auth';
 import {clearV1} from './other';
+import {userProfileV1} from './users.js';
 
 beforeEach(() => {
     clearV1();
@@ -7,19 +8,19 @@ beforeEach(() => {
 
 describe('Testing authLoginV1', () => {
     test('Email does not exist', () => {
-        let incorrectId = authLoginV1('incorrectEmail@gmail.com', 'password');
+        const incorrectId = authLoginV1('incorrectEmail@gmail.com', 'password');
         expect(incorrectId).toStrictEqual({error: 'error'});
     });
     
     test('Incorrect password', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
-        let incorrectId = authLoginV1('email@gmail.com', 'wrongPassword');
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const incorrectId = authLoginV1('email@gmail.com', 'wrongPassword');
         expect(incorrectId).toStrictEqual({error: 'error'});
     });
 
     test('Correct return', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
-        let correctId = authLoginV1('email@gmail.com', 'password');
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const correctId = authLoginV1('email@gmail.com', 'password');
         expect(correctId).toStrictEqual(
             expect.objectContaining({
                 authUserId: authUserId.authUserId
@@ -30,46 +31,52 @@ describe('Testing authLoginV1', () => {
 
 describe(('Testing authRegisterV1'), () => {
     test('Invalid Email', () => {
-        let authUserId = authRegisterV1('invalidEmail', 'password', 'firstname', 'lastname');
-        let authUserId2 = authRegisterV1('invalidEmail@', 'password', 'firstname2', 'lastname2');
+        const authUserId = authRegisterV1('invalidEmail', 'password', 'firstname', 'lastname');
+        const authUserId2 = authRegisterV1('invalidEmail@', 'password', 'firstname2', 'lastname2');
         expect(authUserId).toStrictEqual({error: 'error'});
         expect(authUserId2).toStrictEqual({error: 'error'});
     });
     test('Email already exists', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
-        let authUserId2 = authRegisterV1('email@gmail.com', 'password', 'firstname2', 'lastname2');
-        let authUserId3 = authRegisterV1('EMAIL@gmail.com', 'password', 'firstname2', 'lastname2');
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const authUserId2 = authRegisterV1('email@gmail.com', 'password', 'firstname2', 'lastname2');
+        const authUserId3 = authRegisterV1('EMAIL@gmail.com', 'password', 'firstname2', 'lastname2');
         expect(authUserId2).toStrictEqual({error: 'error'});
         expect(authUserId3).toStrictEqual({error: 'error'});
     });
 
     test('Password is less than 6 characters', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'pw', 'firstname', 'lastname');
+        const authUserId = authRegisterV1('email@gmail.com', 'pw', 'firstname', 'lastname');
         expect(authUserId).toStrictEqual({error: 'error'});
     });
 
     test('Length of nameFirst is not between 1 and 50 characters inclusive', () => {
         const longName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy'
-        let authUserId = authRegisterV1('email@gmail.com', 'password', '', 'lastname');
-        let authUserId2 = authRegisterV1('email2@gmail.com', 'password', longName, 'lastname2');
+        const authUserId = authRegisterV1('email@gmail.com', 'password', '', 'lastname');
+        const authUserId2 = authRegisterV1('email2@gmail.com', 'password', longName, 'lastname2');
         expect(authUserId).toStrictEqual({error: 'error'});
         expect(authUserId2).toStrictEqual({error: 'error'});
     });
     
     test('Length of nameLast is not between 1 and 50 characters inclusive', () => {
         const longName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy'
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', '');
-        let authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname2', longName);
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', '');
+        const authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname2', longName);
         expect(authUserId).toStrictEqual({error: 'error'});
         expect(authUserId2).toStrictEqual({error: 'error'});
     });
 
     test('authUserId is returned', () => {
-        let authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         expect(authUserId).toStrictEqual(
             expect.objectContaining({
                 authUserId: expect.any(Number)
             })
         );
+    });
+
+    test('Handle generated is correctly concatenated', () => {
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
+        expect(user.user.handleStr).toStrictEqual('firstnamelastname');
     });
 });
