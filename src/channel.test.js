@@ -75,7 +75,7 @@ describe("channelMessages Fail scenarios", () => {
 
     const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
 
-    expect(channelMessagesV1(id2.authUserId, channel1, 1)).toEqual({
+    expect(channelMessagesV1(id2.authUserId, channel1.channelId, 1)).toEqual({
       error: "error",
     });
   });
