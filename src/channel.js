@@ -14,18 +14,20 @@ function channelJoinV1(authUserId, channelId) {
   return {};
 }
 
-/** Invites a user with ID uId to join a channel with ID channelId. 
- * Once invited, the user is added to the channel immediately.
- *
- * @param {string} authUserId - The authUserId of the inviter
- * @param {string} channelId  - The channelId of the channel to be joined 
- * @param {string} uID        - The uID of the invitee 
- * @returns {error: 'error'}    when channelId does not refer to a valid channel
- * @returns {error: 'error'}    when uId does not refer to a valid user
- * @returns {error: 'error'}    when uId refers to a user who is already a member of the channel
- * @returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
- * @returns {}  on no error
- * 
+/*
+Invites a user with ID uId to join a channel with ID channelId. 
+Once invited, the user is added to the channel immediately.
+
+Arguments:
+    authUserId (number)         - A unique identifier for the authorised user 
+    channelId (number)          - A unique identifier for the channel
+    uId (uId)                   - The user's first name, with non-alphanumeric characters
+
+Return Value:
+    Returns {error: 'error'}    when uId does not refer to a valid user
+    Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
+    Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
+    Returns {} on no error
  */
 function channelInviteV1(authUserId, channelId, uId) {
   // Checking if channelID and uId are valid
@@ -37,9 +39,16 @@ function channelInviteV1(authUserId, channelId, uId) {
   }
 
   // Checking if uId and authUserID are already members
-  const uIdMember = channel.allMembers.includes(uId); 
-  const authUserIdMember = channel.allMembers.includes(authUserID); 
-  if (uIdMember === true || authUserdMember === false ) {
+  let uIdMember = false; 
+  let authUserIdMember = false; 
+  for (let member of channel.allMembers) {
+    if (member.uID === uID) {
+      uIdMember = true; 
+    } else if (member.uID === authUserID) {
+      authUserIdMember = true; 
+    }
+  }
+  if (uIdMember === true || authUserIdMember === false ) {
     return { error: 'error' };
   }
 
