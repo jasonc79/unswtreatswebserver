@@ -31,7 +31,7 @@ function userProfileV1(authUserId, uId) {
     for (let user of data.users) {
         if (user.uId === uId) {
             return { 
-                users: {
+                user: {
                     uId: user.uId, 
                     email: user.email,
                     nameFirst: user.nameFirst, 

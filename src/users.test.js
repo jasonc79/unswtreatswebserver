@@ -11,7 +11,7 @@ describe("Testing userProfileV1", () => {
         const authUserId = authRegisterV1('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
         const uId = authRegisterV1('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
         expect(userProfileV1(authUserId.authUserId, uId.authUserId)).toStrictEqual({
-            users: {
+            user: {
                 uId: uId.authUserId, 
                 email: 'email2@gmail.com',
                 nameFirst: 'firstname2', 

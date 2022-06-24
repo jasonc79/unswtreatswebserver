@@ -16,7 +16,7 @@ describe("Testing for channelsListallV1", () => {
       "Smith"
     );
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [],
     });
   });
@@ -31,7 +31,7 @@ describe("Testing for channelsListallV1", () => {
 
     const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [
         {
           channelId: channelId.channelId,
@@ -52,7 +52,7 @@ describe("Testing for channelsListallV1", () => {
     const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
     const channel2 = channelsCreateV1(id.authUserId, "Hayden2", true);
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [
         {
           channelId: channel1.channelId,
@@ -65,9 +65,6 @@ describe("Testing for channelsListallV1", () => {
       ],
     });
   });
-});
-beforeEach(() => {
-  clearV1();
 });
 
 describe("Testing channelsCreateV1", () => {
