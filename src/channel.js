@@ -1,6 +1,6 @@
 import {getData, setData} from './dataStore.js';
 import {channelsListV1, channelsListallV1} from './channels.js';
-import { checkValidChannel, returnValidChannel, returnValidId } from './helper.js';
+import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper.js';
 /*
 ChannelDetailsV1 Function
 Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
