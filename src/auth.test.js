@@ -1,5 +1,5 @@
-import {authLoginV1, authRegisterV1} from './auth';
-import {clearV1} from './other';
+import {authLoginV1, authRegisterV1} from './auth.js';
+import {clearV1} from './other.js';
 import {userProfileV1} from './users.js';
 
 beforeEach(() => {
@@ -74,19 +74,32 @@ describe(('Testing authRegisterV1'), () => {
         );
     });
 
-    /*
-    test('First user has permission 1 ', () => {
+    test('Handle generated is correctly concatenated', () => {
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
-        expect(user.user.permissionId).toStrictEqual(1);
+        expect(user.user.handleStr).toStrictEqual('firstnamelastname');
     });
 
-    test('Second user has permission 2', () => {
+    test('Handle generated is no more than 20 characters', () => {
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'longlastname');
+        const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
+        expect(user.user.handleStr).toStrictEqual('firstnamelonglastnam');
+    });
+    
+
+    test('Handle generated already exists and needs a number', () => {
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         const authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname', 'lastname');
+        const authUserId3 = authRegisterV1('email3@gmail.com', 'password', 'firstname', 'lastname');
+        const authUserId4 = authRegisterV1('email4@gmail.com', 'password', 'firstname', 'lastname');
         const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
         const user2 = userProfileV1(authUserId.authUserId, authUserId2.authUserId);
-        expect(user2.user.permissionId).toStrictEqual(2);
-    });*/
+        const user3 = userProfileV1(authUserId.authUserId, authUserId3.authUserId);
+        const user4 = userProfileV1(authUserId.authUserId, authUserId4.authUserId);
+        expect(user.user.handleStr).toStrictEqual('firstnamelastname');
+        expect(user2.user.handleStr).toStrictEqual('firstnamelastname0');
+        expect(user3.user.handleStr).toStrictEqual('firstnamelastname1');
+        expect(user4.user.handleStr).toStrictEqual('firstnamelastname2')
+    });
 
 });
