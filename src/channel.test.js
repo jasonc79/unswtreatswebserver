@@ -46,7 +46,7 @@ describe('Testing channelInviteV1', () =>  {
     })
 })
 
-// Tests for channelMessagesv1
+// Tests for channelMessagesV1
 describe("channelMessages Pass scenarios", () => {
   test("Empty messages", () => {
     const id = authRegisterV1(
