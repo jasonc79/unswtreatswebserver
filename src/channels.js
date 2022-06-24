@@ -1,5 +1,6 @@
 import { getData, setData } from './dataStore.js'
 import { checkValidId } from './helper.js'
+import { userProfileV1 } from "./users.js";
 
 /*
 channelsCreateV1 creates a new channel which is added to the dataStore
@@ -22,24 +23,16 @@ function channelsCreateV1(authUserId, name, isPublic) {
     }
 
     let data = getData();
-    let user;
     const channelId = data.channels.length;
-
-    for (let person of data.users) {
-        if (person.uId === authUserId) {
-            user = person;
-        }
-    }
-
+    const user = userProfileV1(authUserId, authUserId);
     let newChannel = {
         channelId: channelId,
         name: name,
         messages: [],
-        allMembers: [user],
-        ownerMembers: [user],
+        allMembers: [user.user],
+        ownerMembers: [user.user],
         isPublic: isPublic,
     }
-
     data.channels.push(newChannel);
     setData(data);
 
@@ -64,21 +57,17 @@ function channelsListV1(authUserId) {
         return { error: 'error' };
     }
     let data = getData();
-    let user;
-    for (let person of data.users) {
-        if (person.uId === authUserId) {
-            user = person;
-        }
-    }
-
+    const user = userProfileV1(authUserId, authUserId);
     let channels = [];
     
     for (let channel of data.channels) {
-        if (channel.allMembers.includes(user)) {
-            channels.push({
-                channelId: channel.channelId,
-                name: channel.name,
-            })
+        for (let person of channel.allMembers) {
+            if (person.uId === user.user.uId) {
+                channels.push({
+                    channelId: channel.channelId,
+                    name: channel.name,
+                })
+            }
         }
     }
 
@@ -100,7 +89,7 @@ function channelsListallV1(authUserId) {
     };
     channelList.push(tempChannel);
   }
-  return { 'channels': channelList };
+  return { channels: channelList };
 }
   
 export { channelsCreateV1, channelsListV1, channelsListallV1 };
