@@ -13,21 +13,6 @@ Return Value:
     Returns {error: 'error'} on invalid channel
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
-
-
-
->>>>>>> AP/channelInviteV1
-
-ChannelJoinV1 Function
-Given a channelId of a channel that the authorised user can join, adds them to that channel.
-Arguments:
-    authUserId (number) - A unique identifier for the authorised user
-    channelId (number) - A unique identifier for the channel 
-Return Value: 
-    Returns {error: 'error'} on invalid channel
-    Returns {error: 'error'} if authorised user is already a member of channel
-    Returns {error: 'error'} on a private channel and auth user is not a global owner
-    Returns {} on no error
 */
 function channelDetailsV1(authUserId, channelId) {
     // Check if channelId and authUserId is valid
@@ -54,6 +39,19 @@ function channelDetailsV1(authUserId, channelId) {
     }
     return channelDetail;
   }
+
+/*
+ChannelJoinV1 Function
+Given a channelId of a channel that the authorised user can join, adds them to that channel.
+Arguments:
+    authUserId (number) - A unique identifier for the authorised user
+    channelId (number) - A unique identifier for the channel 
+Return Value: 
+    Returns {error: 'error'} on invalid channel
+    Returns {error: 'error'} if authorised user is already a member of channel
+    Returns {error: 'error'} on a private channel and auth user is not a global owner
+    Returns {} on no error
+*/
   function channelJoinV1(authUserId, channelId) {
     // Check if channelId and authUserId is valid
     if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
