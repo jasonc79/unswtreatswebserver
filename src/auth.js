@@ -48,7 +48,7 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
       password: password, 
       permissionId: 2,
     }
-    // Global member
+    // Global owner
     if (user.uId === 0) {
       user.permissionId = 1;
     }
@@ -131,7 +131,7 @@ Return Value:
   // Takes in first name and last name (both lower case) and creates a handle
   function createHandle(firstName, lastName) {
     let data = getData();
-    let handleNumber = 0;
+    let handleNumber = -1;
     let handleExists = false;
 
     // Concatenate the names and cut off characters if necessary
@@ -153,9 +153,7 @@ Return Value:
     }
     // Add the number to the string if the handle already exists
     if (handleExists === true) {
-      if (handleNumber != 0) {
-        handleNumber += 1;
-      }
+      handleNumber += 1;
       handle = handle.concat(handleNumber.toString());
     }
 
@@ -174,12 +172,3 @@ Return Value:
     
   }
   export { authLoginV1, authRegisterV1 };
-
-
-function test() {
-  const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
-  const authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname', 'lastname');
-  let data = getData();
-  return data.users;
-}
-
