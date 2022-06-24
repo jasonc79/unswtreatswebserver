@@ -1,6 +1,5 @@
 import { channelsListallV1 } from "./channels.js"
 import { clearV1 } from "./other.js"
-import { getData } from "./dataStore.js"
 import { authRegisterV1 } from "./auth.js"
 import { channelDetailsV1, channelInviteV1, channelJoinV1, channelMessagesV1 } from "./channel.js"
 import { channelsCreateV1, channelsListV1 } from "./channels.js";
@@ -27,19 +26,21 @@ describe('Testing channelDetailsV1', () => {
         const authUser = authRegisterV1('hayden@gmail.com', 'password', 'Hayden', 'Smith');
         const createChannel = channelsCreateV1(authUser.authUserId, 'crazyTown', true);
         const channelDetail = channelDetailsV1(authUser.authUserId, createChannel.channelId);
+        const channelList = channelsListV1(authUser.authUserId);
         let user = {
             uId: authUser.authUserId,
             email: 'hayden@gmail.com',
-            nameFirst: 'Hayden',
-            nameLast: 'Smith',
-            handleStr: 'haydensmith'
+            nameFirst: 'hayden',
+            nameLast: 'smith',
+            handleStr: 'haydensmith',
+            password: 'password'
         }
         
         expect(channelDetail).toStrictEqual({
              name: 'crazyTown',
              isPublic: true,
-             ownerMembers: user,
-             allMembers: user,
+             ownerMembers: [user],
+             allMembers: [user],
         });
     });
 

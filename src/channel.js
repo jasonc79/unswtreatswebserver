@@ -1,9 +1,17 @@
 import {getData, setData} from './dataStore.js';
 import {channelsListV1, channelsListallV1} from './channels.js';
 import { checkValidChannel, returnValidChannel } from './helper.js'
-
+/*
+Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
+Arguments:
+    authUserId (string) - A unique identifier for the authorised user
+    channelId (string) - 
+Return Value: 
+    Returns {error: error} on invalid channel
+    Returns {error: error} on authorised user already a member of channel
+    Returns {}
+*/
 function channelDetailsV1(authUserId, channelId) {
-    let data = getData();
     // Check if channel is valid
     let validChannel = checkValidChannel(channelId);
     if (validChannel === false) {
@@ -12,27 +20,34 @@ function channelDetailsV1(authUserId, channelId) {
     // Check if authorised user is member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
-    for (let i = 0; i < authUserChannelList.length; i++) {
-        if (channelId === authUserChannelList[i].channelId) {
-            authUserValid = true;
-        }
+    for (let channelList of authUserChannelList.channels) {
+      if (channelId === channelList.channelId) {
+          authUserValid = true;
+      }
     }
     if (authUserValid === false) {
       return {error: 'error'};
     }
     // All error test passes; return channel details
-    for (let channel of data.channels) {
-        if (channelId === channel.channelId) {
-            let channelDetail = {
-                name: channel.Name,
-                isPublic : channel.isPublic,
-                ownerMembers: channel.ownerMembers,
-                allMembers: channel.allMembers,
-            }
-            break;
+    /*let channelDetail;
+    for (let channelList of authUserChannelList.channels) {
+      if (channelId === channelList.channelId) {
+        channelDetail = {
+          name: channelList.name,
+          isPublic : channelList.isPublic,
+          ownerMembers: channelList.ownerMembers,
+          allMembers: channelList.allMembers,
         }
+      }
+    }*/
+    let channel = returnValidChannel(channelId);
+    let channelDetail = {
+      name: channel.name,
+      isPublic: channel.isPublic,
+      ownerMembers: channel.ownerMembers,
+      allMembers: channel.allMembers
     }
-    return {channelDetail};
+    return channelDetail;
   }
   
   function channelJoinV1(authUserId, channelId) {
@@ -45,7 +60,7 @@ function channelDetailsV1(authUserId, channelId) {
     // Check if authUser is a member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
-    for (let channelList of authUserChannelList) {
+    for (let channelList of authUserChannelList.channels) {
         if (channelId === channelList.channelId) {
             authUserValid = true;
             break;
@@ -56,27 +71,20 @@ function channelDetailsV1(authUserId, channelId) {
     }
     // Check if channelId refers to a channel that is private
     // And authUser is not already a channel member and not a global owner. 
-    let user;
-    for (let person of data.users) {
-        if (person.uId === authUserId) {
-            user = person;
-        }
-    }
-
     const allChannelsList = channelsListallV1(authUserId);
     let memberValid = false;
     let ownerValid = false;
-    for (let j = 0; j < allChannelsList.length; j++) {
-        if (channelId === allChannelsList[j].channelId) {
-            if (allChannelsList[j].isPublic === false) {
-                for (let ownerMembers of allChannelsList[j].ownerMembers) {
-                    if (ownerMembers === user) {
-                        ownerValid = true;
+    for (let channelList of allChannelsList.channels) {
+        if (channelId === channelList.channelId) {
+            if (channelList.isPublic === false) {
+                for (let ownerMembers of channelList.ownerMembers) {
+                    if (ownerMembers.uId === authUserId) {
+                      ownerValid = true;
                     }
                 }
-                for (let allMembers of allChannelsList[j].allMembers) {
-                    if (allMembers === user) {
-                        memberValid = true;
+                for (let allMembers of channelList.allMembers) {
+                    if (allMembers.uId === authUserId) {
+                      memberValid = true;
                     }
                 }
                 if (!memberValid || !ownerValid) {
@@ -95,22 +103,6 @@ function channelDetailsV1(authUserId, channelId) {
         }
     }
     return {};
-  }
-
-  // Helper Functions
-  function checkValidChannelId(authUserId, channelId) {
-    // Check if channelId is valid channel
-    let channelList = channelsListallV1(authUserId);
-    let valid = false;
-    for (let i = 0; i < channelList.length; i++) {
-        if (channelId === channelList[i].channelId) {
-            valid = true;
-        }
-    }
-    if (valid === false) {
-        return false;
-    }
-    return true;
   }
 
   function channelInviteV1(authUserId, channelId, uId) {
