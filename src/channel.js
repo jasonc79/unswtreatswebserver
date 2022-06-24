@@ -1,24 +1,24 @@
 import {getData, setData} from './dataStore.js';
 import {channelsListV1, channelsListallV1} from './channels.js';
+import { checkValidChannel, returnValidChannel } from './helper.js'
 
 function channelDetailsV1(authUserId, channelId) {
     let data = getData();
     // Check if channel is valid
-    let validChannel = checkValidChannelId(authUserId, channelId);
+    let validChannel = checkValidChannel(channelId);
     if (validChannel === false) {
         return {error: 'error'};
     }
     // Check if authorised user is member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
-    for (let channelList of authUserChannelList) {
-        if (channelId === channelList.channelId) {
+    for (let i = 0; i < authUserChannelList.length; i++) {
+        if (channelId === authUserChannelList[i].channelId) {
             authUserValid = true;
-            break;
         }
     }
     if (authUserValid === false) {
-        return {error: 'error'};
+      return {error: 'error'};
     }
     // All error test passes; return channel details
     for (let channel of data.channels) {
@@ -38,7 +38,7 @@ function channelDetailsV1(authUserId, channelId) {
   function channelJoinV1(authUserId, channelId) {
     let data = getData();
     // Check if channel is valid channel 
-    let validChannel = checkValidChannelId(authUserId, channelId);
+    let validChannel = checkValidChannel(channelId);
     if (validChannel === false) {
         return {error: 'error'};
     }
@@ -79,12 +79,13 @@ function channelDetailsV1(authUserId, channelId) {
                         memberValid = true;
                     }
                 }
+                if (!memberValid || !ownerValid) {
+                  return {error: 'error'};
+                }
             }
         }
     }
-    if (!memberValid || !ownerValid) {
-        return {error: 'error'};
-    }
+    
     // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
     for (let channel of data.channels) {
         if (channelId === channel.channelId) {
@@ -117,10 +118,34 @@ function channelDetailsV1(authUserId, channelId) {
   }
   
   function channelMessagesV1(authUserId, channelId, start) {
+    const data = getData();
+    if (!checkValidChannel(channelId)) {
+      return { error: "error" };
+    }
+    const currChannel = returnValidChannel(channelId);
+    const channelMsg = currChannel.messages;
+    if (channelMsg.length < start) {
+      return { error: "error" };
+    }
+    if (!currChannel.allMembers.include(authUserId)) {
+      return { error: "error" };
+    }
+    const messages = [];
+    let final = start + 50;
+    for (let i = start; i < final; i++) {
+      if (i >= channelMsg.length) {
+        return {
+          'messages': messages,
+          'start': start,
+          'end': -1,
+        };
+      }
+      messages.push(channelMsg[i]);
+    }
     return {
-      messages: [],
-      start: 0,
-      end: -1,
+      'messages': messages,
+      'start': start,
+      'end': final,
     };
   }
 

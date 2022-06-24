@@ -13,12 +13,15 @@ describe("Testing userProfileV1", () => {
         const uId = authRegisterV1('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
         const data = getData();
         expect(userProfileV1(authUserId.authUserId, uId.authUserId)).toStrictEqual({
-            uId: uId.authUserId, 
-            email: 'email2@gmail.com',
-            nameFirst: 'firstname2', 
-            nameLast: 'lastname2', 
-            handleStr: data.users[1].handleStr,
-            password: 'password2',
+            users: [
+                {
+                    uId: uId.authUserId, 
+                    email: 'email2@gmail.com',
+                    nameFirst: 'firstname2', 
+                    nameLast: 'lastname2', 
+                    handleStr: data.users[1].handleStr
+                }
+            ]
         });
     });
     test('Invalid uId', () => {

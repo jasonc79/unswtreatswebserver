@@ -149,5 +149,4 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
     return string.toLowerCase();
     
   }
-  
   export { authLoginV1, authRegisterV1 };
