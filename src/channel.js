@@ -1,20 +1,134 @@
-import { checkValidChannel, returnValidChannel, checkValidId } from "./helper.js";
-import { getData } from "./dataStore.js";
+import {getData, setData} from './dataStore.js';
+import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper.js';
+import { authRegisterV1 } from "./auth.js"
+import { channelsCreateV1, channelsListV1, channelsListallV1 } from "./channels.js";
 
+/*
+ChannelDetailsV1 Function
+Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
+Arguments:
+    authUserId (number) - A unique identifier for the authorised user
+    channelId (number) - A unique identifier for the channel 
+Return Value: 
+    Returns {error: 'error'} on invalid channel
+    Returns {error: 'error'} if authorised user is not already a member of channel
+    Returns {name, isPublic, ownerMembers, allMembers} on no error
+*/
 function channelDetailsV1(authUserId, channelId) {
-  return {
-    name: "secret candy crush team",
-    isPublic: true,
-    ownerMembers: [],
-    allMembers: [],
-  };
-}
+    // Check if channelId and authUserId is valid
+    if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+      return {error: 'error'};
+    }
+    // Check if authorised user is member of channel
+    const authUserChannelList = channelsListV1(authUserId);
+    let authUserValid = false;
+    for (let channelList of authUserChannelList.channels) {
+      if (channelId === channelList.channelId) {
+        authUserValid = true;
+      }
+    }
+    if (authUserValid === false) {
+      return {error: 'error'};
+    }
+    let channel = returnValidChannel(channelId);
+    let channelDetail = {
+      name: channel.name,
+      isPublic: channel.isPublic,
+      ownerMembers: channel.ownerMembers,
+      allMembers: channel.allMembers
+    }
+    return channelDetail;
+  }
 
-function channelJoinV1(authUserId, channelId) {
-  return {};
-}
+/*
+ChannelJoinV1 Function
+Given a channelId of a channel that the authorised user can join, adds them to that channel.
+Arguments:
+    authUserId (number) - A unique identifier for the authorised user
+    channelId (number) - A unique identifier for the channel 
+Return Value: 
+    Returns {error: 'error'} on invalid channel
+    Returns {error: 'error'} if authorised user is already a member of channel
+    Returns {error: 'error'} on a private channel and auth user is not a global owner
+    Returns {} on no error
+*/
+  function channelJoinV1(authUserId, channelId) {
+    // Check if channelId and authUserId is valid
+    if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+      return {error: 'error'};
+    }
+    // Check if authUser is a member of channel
+    const authUserChannelList = channelsListV1(authUserId);
+    let authUserValid = false;
+    for (let channelList of authUserChannelList.channels) {
+        if (channelId === channelList.channelId) {
+          authUserValid = true;
+          break;
+        }
+    }
+    if (authUserValid === true) {
+        return {error: 'error'};
+    }
+    // Check if channelId refers to a channel that is private
+    // And authUser is not already a channel member and not a global owner. 
+    const allChannelsList = channelsListallV1(authUserId);
+    let user = returnValidId(authUserId);
+    let channel = returnValidChannel(channelId);
+    if (channel.isPublic === false && user.permissionId === 2) {
+      return {error: 'error'};
+    }
+    // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
+    let data = getData();
+    for (let channel of data.channels) {
+        if (channelId === channel.channelId) {
+            channel.allMembers.push(user);
+            setData(data);
+            break;
+        }
+    }
+    return {};
+  }
 
+/*
+Invites a user with ID uId to join a channel with ID channelId. 
+Once invited, the user is added to the channel immediately.
+
+Arguments:
+    authUserId (number)         - A unique identifier for the authorised user 
+    channelId (number)          - A unique identifier for the channel
+    uId (uId)                   - The user's first name, with non-alphanumeric characters
+
+Return Value:
+    Returns {error: 'error'}    when uId does not refer to a valid user
+    Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
+    Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
+    Returns {} on no error
+ */
 function channelInviteV1(authUserId, channelId, uId) {
+  // Checking if channelID and uId are valid
+  let data = getData(); 
+  const channel = returnValidChannel(channelId); 
+  const user = returnValidId(uId); 
+  if (channel === undefined || user === undefined) {
+    return { error: 'error' };
+  } 
+
+  // Checking if uId and authUserID are members
+  let uIdMember = false; 
+  let authUserIdMember = false; 
+  for (let member of channel.allMembers) {
+    if (member.uId === uId) {
+      uIdMember = true; 
+    } else if (member.uId === authUserId) {
+      authUserIdMember = true; 
+    }
+  }
+  if (uIdMember === true || authUserIdMember === false ) {
+    return { error: 'error' };
+  }
+
+  channel.allMembers.push(user); 
+  setData(data); 
   return {};
 }
 
@@ -54,6 +168,7 @@ function channelMessagesV1(authUserId, channelId, start) {
       isMember = true;
     }
   }
+
   if (isMember === false) {
     return { error: "error" };
   }
@@ -80,5 +195,5 @@ function channelMessagesV1(authUserId, channelId, start) {
     end: final,
   };
 }
-
 export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+
