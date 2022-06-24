@@ -1,6 +1,8 @@
 import {getData, setData} from './dataStore.js';
-import {channelsListV1, channelsListallV1} from './channels.js';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper.js';
+import { authRegisterV1 } from "./auth.js"
+import { channelsCreateV1, channelsListV1, channelsListallV1 } from "./channels.js";
+
 /*
 ChannelDetailsV1 Function
 Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
@@ -11,10 +13,10 @@ Return Value:
     Returns {error: 'error'} on invalid channel
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
-=======
-import { checkValidChannel, returnValidChannel, checkValidId } from "./helper.js";
-import { getData } from "./dataStore.js";
->>>>>>> src/channel.js
+
+
+
+>>>>>>> AP/channelInviteV1
 
 ChannelJoinV1 Function
 Given a channelId of a channel that the authorised user can join, adds them to that channel.
@@ -89,7 +91,46 @@ function channelDetailsV1(authUserId, channelId) {
     return {};
   }
 
+/*
+Invites a user with ID uId to join a channel with ID channelId. 
+Once invited, the user is added to the channel immediately.
+
+Arguments:
+    authUserId (number)         - A unique identifier for the authorised user 
+    channelId (number)          - A unique identifier for the channel
+    uId (uId)                   - The user's first name, with non-alphanumeric characters
+
+Return Value:
+    Returns {error: 'error'}    when uId does not refer to a valid user
+    Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
+    Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
+    Returns {} on no error
+ */
 function channelInviteV1(authUserId, channelId, uId) {
+  // Checking if channelID and uId are valid
+  let data = getData(); 
+  const channel = returnValidChannel(channelId); 
+  const user = returnValidId(uId); 
+  if (channel === undefined || user === undefined) {
+    return { error: 'error' };
+  } 
+
+  // Checking if uId and authUserID are members
+  let uIdMember = false; 
+  let authUserIdMember = false; 
+  for (let member of channel.allMembers) {
+    if (member.uId === uId) {
+      uIdMember = true; 
+    } else if (member.uId === authUserId) {
+      authUserIdMember = true; 
+    }
+  }
+  if (uIdMember === true || authUserIdMember === false ) {
+    return { error: 'error' };
+  }
+
+  channel.allMembers.push(user); 
+  setData(data); 
   return {};
 }
 
@@ -129,6 +170,7 @@ function channelMessagesV1(authUserId, channelId, start) {
       isMember = true;
     }
   }
+
   if (isMember === false) {
     return { error: "error" };
   }
@@ -156,3 +198,4 @@ function channelMessagesV1(authUserId, channelId, start) {
   };
 }
 export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+
