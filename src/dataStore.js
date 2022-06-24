@@ -14,7 +14,6 @@ user = {
   handleStr: string,
   password: string, 
   permissionId: number,
-
 }
 
 channel = {
