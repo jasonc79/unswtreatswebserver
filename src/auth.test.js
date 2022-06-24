@@ -74,9 +74,19 @@ describe(('Testing authRegisterV1'), () => {
         );
     });
 
-    test('Handle generated is correctly concatenated', () => {
+    /*
+    test('First user has permission 1 ', () => {
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
-        expect(user.user.handleStr).toStrictEqual('firstnamelastname');
+        expect(user.user.permissionId).toStrictEqual(1);
     });
+
+    test('Second user has permission 2', () => {
+        const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+        const authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname', 'lastname');
+        const user = userProfileV1(authUserId.authUserId, authUserId.authUserId);
+        const user2 = userProfileV1(authUserId.authUserId, authUserId2.authUserId);
+        expect(user2.user.permissionId).toStrictEqual(2);
+    });*/
+
 });

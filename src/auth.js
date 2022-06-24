@@ -1,5 +1,6 @@
 import {getData, setData} from './dataStore.js';
 import validator from 'validator';
+import {userProfileV1} from './users.js';
 
 /*
 Create an account for a new user. Additionally, it generates a handle
@@ -37,14 +38,19 @@ function authRegisterV1(email, password, nameFirst, nameLast) {
       return {error: 'error'};
     }
 
-    // Generate uId using the size of array users
+    // Generate uId using the size of array users and default permission 2
     let user = {
       uId: data.users.length,
       email: email,
       nameFirst: nameFirst,
       nameLast: nameLast,
       handleStr: handle,
-      password: password
+      password: password, 
+      permissionId: 2,
+    }
+    // Global member
+    if (user.uId === 0) {
+      user.permissionId = 1;
     }
 
     // Update data
@@ -133,14 +139,13 @@ Return Value:
     if (handle.length > 20) {
       handle = handle.slice(0, 20);
     }
-
     // Check if the handle already exists 
     for (let user of data.users) {
       if (user.handleStr.slice(0, handle.length) === handle) {
         // Slice the number off the end, if it exists and compare it with
         // the highest number found
         let extractedNum = parseInt(user.handleStr.slice(handle.length));
-        if (extractedNum != NaN && extractedNum > handleNumber) {
+        if (extractedNum != NaN && extractedNum >= handleNumber) {
           handleNumber = extractedNum;
         }
         handleExists = true;
@@ -148,7 +153,9 @@ Return Value:
     }
     // Add the number to the string if the handle already exists
     if (handleExists === true) {
-      handleNumber += 1;
+      if (handleNumber != 0) {
+        handleNumber += 1;
+      }
       handle = handle.concat(handleNumber.toString());
     }
 
@@ -167,3 +174,12 @@ Return Value:
     
   }
   export { authLoginV1, authRegisterV1 };
+
+
+function test() {
+  const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
+  const authUserId2 = authRegisterV1('email2@gmail.com', 'password', 'firstname', 'lastname');
+  let data = getData();
+  return data.users;
+}
+
