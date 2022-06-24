@@ -12,7 +12,6 @@ user = {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
-  password: string
 }
 
 channel = {
@@ -32,8 +31,7 @@ channel = {
       email: string,
       nameFirst: string,
       nameLast: string,
-      handleStr: string,
-      password: string
+      handleStr: string
     }
   ],
   ownerMembers: [
@@ -42,8 +40,7 @@ channel = {
       email: string,
       nameFirst: string,
       nameLast: string,
-      handleStr: string,
-      password: string
+      handleStr: string
     }
   ],
   isPublic: boolean

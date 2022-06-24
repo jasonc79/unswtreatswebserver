@@ -1,45 +1,44 @@
 import {getData, setData} from './dataStore.js';
 import {channelsListV1, channelsListallV1} from './channels.js';
-import { checkValidChannel, returnValidChannel } from './helper.js'
+import { checkValidChannel, returnValidChannel, returnValidId } from './helper.js';
 /*
+ChannelDetailsV1 Function
 Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
 Arguments:
-    authUserId (string) - A unique identifier for the authorised user
-    channelId (string) - 
+    authUserId (number) - A unique identifier for the authorised user
+    channelId (number) - A unique identifier for the channel 
 Return Value: 
-    Returns {error: error} on invalid channel
-    Returns {error: error} on authorised user already a member of channel
-    Returns {}
+    Returns {error: 'error'} on invalid channel
+    Returns {error: 'error'} if authorised user is not already a member of channel
+    Returns {name, isPublic, ownerMembers, allMembers} on no error
+
+ChannelJoinV1 Function
+Given a channelId of a channel that the authorised user can join, adds them to that channel.
+Arguments:
+    authUserId (number) - A unique identifier for the authorised user
+    channelId (number) - A unique identifier for the channel 
+Return Value: 
+    Returns {error: 'error'} on invalid channel
+    Returns {error: 'error'} if authorised user is already a member of channel
+    Returns {error: 'error'} on a private channel and auth user is not a global owner
+    Returns {} on no error
 */
 function channelDetailsV1(authUserId, channelId) {
-    // Check if channel is valid
-    let validChannel = checkValidChannel(channelId);
-    if (validChannel === false) {
-        return {error: 'error'};
+    // Check if channelId and authUserId is valid
+    if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+      return {error: 'error'};
     }
     // Check if authorised user is member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
     for (let channelList of authUserChannelList.channels) {
       if (channelId === channelList.channelId) {
-          authUserValid = true;
+        authUserValid = true;
       }
     }
     if (authUserValid === false) {
       return {error: 'error'};
     }
-    // All error test passes; return channel details
-    /*let channelDetail;
-    for (let channelList of authUserChannelList.channels) {
-      if (channelId === channelList.channelId) {
-        channelDetail = {
-          name: channelList.name,
-          isPublic : channelList.isPublic,
-          ownerMembers: channelList.ownerMembers,
-          allMembers: channelList.allMembers,
-        }
-      }
-    }*/
     let channel = returnValidChannel(channelId);
     let channelDetail = {
       name: channel.name,
@@ -49,21 +48,18 @@ function channelDetailsV1(authUserId, channelId) {
     }
     return channelDetail;
   }
-  
   function channelJoinV1(authUserId, channelId) {
-    let data = getData();
-    // Check if channel is valid channel 
-    let validChannel = checkValidChannel(channelId);
-    if (validChannel === false) {
-        return {error: 'error'};
+    // Check if channelId and authUserId is valid
+    if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+      return {error: 'error'};
     }
     // Check if authUser is a member of channel
     const authUserChannelList = channelsListV1(authUserId);
     let authUserValid = false;
     for (let channelList of authUserChannelList.channels) {
         if (channelId === channelList.channelId) {
-            authUserValid = true;
-            break;
+          authUserValid = true;
+          break;
         }
     }
     if (authUserValid === true) {
@@ -72,29 +68,13 @@ function channelDetailsV1(authUserId, channelId) {
     // Check if channelId refers to a channel that is private
     // And authUser is not already a channel member and not a global owner. 
     const allChannelsList = channelsListallV1(authUserId);
-    let memberValid = false;
-    let ownerValid = false;
-    for (let channelList of allChannelsList.channels) {
-        if (channelId === channelList.channelId) {
-            if (channelList.isPublic === false) {
-                for (let ownerMembers of channelList.ownerMembers) {
-                    if (ownerMembers.uId === authUserId) {
-                      ownerValid = true;
-                    }
-                }
-                for (let allMembers of channelList.allMembers) {
-                    if (allMembers.uId === authUserId) {
-                      memberValid = true;
-                    }
-                }
-                if (!memberValid || !ownerValid) {
-                  return {error: 'error'};
-                }
-            }
-        }
+    let user = returnValidId(authUserId);
+    let channel = returnValidChannel(channelId);
+    if (channel.isPublic === false && user.permissionId === 2) {
+      return {error: 'error'};
     }
-    
     // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
+    let data = getData();
     for (let channel of data.channels) {
         if (channelId === channel.channelId) {
             channel.allMembers.push(user);
@@ -108,37 +88,45 @@ function channelDetailsV1(authUserId, channelId) {
   function channelInviteV1(authUserId, channelId, uId) {
     return {};
   }
-  
-  function channelMessagesV1(authUserId, channelId, start) {
-    const data = getData();
-    if (!checkValidChannel(channelId)) {
-      return { error: "error" };
-    }
-    const currChannel = returnValidChannel(channelId);
-    const channelMsg = currChannel.messages;
-    if (channelMsg.length < start) {
-      return { error: "error" };
-    }
-    if (!currChannel.allMembers.include(authUserId)) {
-      return { error: "error" };
-    }
-    const messages = [];
-    let final = start + 50;
-    for (let i = start; i < final; i++) {
-      if (i >= channelMsg.length) {
-        return {
-          'messages': messages,
-          'start': start,
-          'end': -1,
-        };
-      }
-      messages.push(channelMsg[i]);
-    }
-    return {
-      'messages': messages,
-      'start': start,
-      'end': final,
-    };
+/*
+This function starting from start returns 50 messages from a specified channel
+*/
+function channelMessagesV1(authUserId, channelId, start) {
+  const data = getData();
+  if (!checkValidChannel(channelId)) {
+    return { error: "error" };
   }
-
-  export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+  const currChannel = returnValidChannel(channelId);
+  let isMember = false;
+  for (let member of currChannel.allMembers) {
+    if (authUserId === member.uId) {
+      isMember = true;
+    }
+  }
+  if (isMember === false) {
+    return { error: "error" };
+  }
+  const channelMsg = currChannel.messages;
+  if (channelMsg.length < start) {
+    return { error: "error" };
+  }
+  
+  const messages = [];
+  let final = start + 50;
+  for (let i = start; i < final; i++) {
+    if (i >= channelMsg.length) {
+      return {
+        messages: messages,
+        start: start,
+        end: -1,
+      };
+    }
+    messages.push(channelMsg[i]);
+  }
+  return {
+    messages: messages,
+    start: start,
+    end: final,
+  };
+}
+export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
