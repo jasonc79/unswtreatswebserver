@@ -1,5 +1,5 @@
-import { getData, setData } from './dataStore.js'
-import { checkValidId } from './helper.js'
+import { getData, setData } from "./dataStore.js";
+import { checkValidId } from "./helper.js";
 import { userProfileV1 } from "./users.js";
 
 /*
@@ -18,25 +18,25 @@ Return Value:
 */
 
 function channelsCreateV1(authUserId, name, isPublic) {
-    if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
-        return { error: 'error' };
-    }
+  if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
+    return { error: "error" };
+  }
 
-    let data = getData();
-    const channelId = data.channels.length;
-    const user = userProfileV1(authUserId, authUserId);
-    let newChannel = {
-        channelId: channelId,
-        name: name,
-        messages: [],
-        allMembers: [user.user],
-        ownerMembers: [user.user],
-        isPublic: isPublic,
-    }
-    data.channels.push(newChannel);
-    setData(data);
+  let data = getData();
+  const channelId = data.channels.length;
+  const user = userProfileV1(authUserId, authUserId);
+  let newChannel = {
+    channelId: channelId,
+    name: name,
+    messages: [],
+    allMembers: [user.user],
+    ownerMembers: [user.user],
+    isPublic: isPublic,
+  };
+  data.channels.push(newChannel);
+  setData(data);
 
-    return { channelId: channelId };
+  return { channelId: channelId };
 }
 
 /*
@@ -53,27 +53,26 @@ Return Value:
 */
 
 function channelsListV1(authUserId) {
-    if (!checkValidId(authUserId)) {
-        return { error: 'error' };
-    }
-    let data = getData();
-    const user = userProfileV1(authUserId, authUserId);
-    let channels = [];
-    
-    for (let channel of data.channels) {
-        for (let person of channel.allMembers) {
-            if (person.uId === user.user.uId) {
-                channels.push({
-                    channelId: channel.channelId,
-                    name: channel.name,
-                })
-            }
-        }
-    }
+  if (!checkValidId(authUserId)) {
+    return { error: "error" };
+  }
+  let data = getData();
+  const user = userProfileV1(authUserId, authUserId);
+  let channels = [];
 
-    return { channels: channels };
+  for (let channel of data.channels) {
+    for (let person of channel.allMembers) {
+      if (person.uId === user.user.uId) {
+        channels.push({
+          channelId: channel.channelId,
+          name: channel.name,
+        });
+      }
+    }
+  }
+
+  return { channels: channels };
 }
-
 
 /*
 This function returns an object containing an array of objects, the array contains objects 
@@ -87,6 +86,9 @@ Return Value:
     Returns {channels: channelList} on no error
  */
 function channelsListallV1(authUserId) {
+  if (!checkValidId(authUserId)) {
+    return { error: "error" };
+  }
   const data = getData();
   let channelList = [];
   for (let channel of data.channels) {
@@ -98,5 +100,5 @@ function channelsListallV1(authUserId) {
   }
   return { channels: channelList };
 }
-  
+
 export { channelsCreateV1, channelsListV1, channelsListallV1 };
