@@ -26,10 +26,6 @@ function channelMessagesV1(authUserId, channelId, start) {
     return { error: "error" };
   }
   const currChannel = returnValidChannel(channelId);
-  const channelMsg = currChannel.messages;
-  if (channelMsg.length < start) {
-    return { error: "error" };
-  }
   let isMember = false;
   for (let member of currChannel.allMembers) {
     if (authUserId === member.uId) {
@@ -39,7 +35,11 @@ function channelMessagesV1(authUserId, channelId, start) {
   if (isMember === false) {
     return { error: "error" };
   }
-
+  const channelMsg = currChannel.messages;
+  if (channelMsg.length < start) {
+    return { error: "error" };
+  }
+  
   const messages = [];
   let final = start + 50;
   for (let i = start; i < final; i++) {
