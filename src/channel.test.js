@@ -74,28 +74,6 @@ describe('Testing channelJoinV1', () => {
     });
 });
 
-describe("Pass scenario", () => {
-  test("1 channels", () => {
-    const id = authRegisterV1(
-      "hayden@gmail.com",
-      "hayden123",
-      "Hayden",
-      "Smith"
-    );
-
-    const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
-
-    expect(channelsListallV1(id)).toEqual({
-      channels: [
-        {
-          channelId: channelId.channelId,
-          name: "Hayden",
-        },
-      ],
-    });
-  });
-});
-
 describe("channelMessages Pass scenarios", () => {
   test("Empty messages", () => {
     const id = authRegisterV1(
