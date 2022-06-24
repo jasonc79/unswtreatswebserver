@@ -9,4 +9,33 @@ function checkValidId(id) {
     }
     return false;
 }
-export { checkValidId };
+
+function checkValidChannel(id) {
+    let data = getData();
+    for (let channel of data.channels) {
+        if (channel.channelId === id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function returnValidId(id) {
+    let data = getData();
+    for (let user of data.users) {
+        if (user.uId === id) {
+            return user;
+        }
+    }
+}
+
+function returnValidChannel(id) {
+    let data = getData();
+    for (let channel of data.channels) {
+        if (channel.channelId === id) {
+            return channel;
+        }
+    }
+}
+
+export { checkValidId, checkValidChannel, returnValidId, returnValidChannel };
