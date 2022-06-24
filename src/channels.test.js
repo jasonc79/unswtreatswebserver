@@ -1,10 +1,7 @@
 import { channelsListallV1 } from "./channels.js";
 import { clearV1 } from "./other.js";
-import { getData } from "./dataStore.js";
 import { authRegisterV1 } from "./auth.js";
-import { channelMessagesV1 } from "./channel.js";
 import { channelsCreateV1, channelsListV1 } from "./channels.js";
-import { userProfileV1 } from "./users.js";
 
 beforeEach(() => {
   clearV1();
@@ -20,7 +17,7 @@ describe("Testing for channelsListallV1", () => {
       "Smith"
     );
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [],
     });
   });
@@ -35,7 +32,7 @@ describe("Testing for channelsListallV1", () => {
 
     const channelId = channelsCreateV1(id.authUserId, "Hayden", true);
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [
         {
           channelId: channelId.channelId,
@@ -56,7 +53,7 @@ describe("Testing for channelsListallV1", () => {
     const channel1 = channelsCreateV1(id.authUserId, "Hayden", true);
     const channel2 = channelsCreateV1(id.authUserId, "Hayden2", true);
 
-    expect(channelsListallV1(id)).toEqual({
+    expect(channelsListallV1(id.authUserId)).toEqual({
       channels: [
         {
           channelId: channel1.channelId,
@@ -69,9 +66,6 @@ describe("Testing for channelsListallV1", () => {
       ],
     });
   });
-});
-beforeEach(() => {
-  clearV1();
 });
 
 describe("Testing channelsCreateV1", () => {
@@ -134,7 +128,6 @@ describe("Testing channelsListV1", () => {
         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
         const channel1 = channelsCreateV1(authUserId.authUserId, 'name1', true);
         const channel2 = channelsCreateV1(authUserId.authUserId, 'name2', true);
-        const data = getData();
         expect(channelsListV1(authUserId.authUserId)).toStrictEqual({ 
             channels: [
                 {
