@@ -89,7 +89,7 @@ function channelsListallV1(authUserId) {
     };
     channelList.push(tempChannel);
   }
-  return { 'channels': channelList };
+  return { channels: channelList };
 }
   
 export { channelsCreateV1, channelsListV1, channelsListallV1 };
