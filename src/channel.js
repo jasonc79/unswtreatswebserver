@@ -1,4 +1,4 @@
-import { checkValidChannel, returnValidChannel } from "./helper.js";
+import { checkValidChannel, returnValidChannel, checkValidId } from "./helper.js";
 import { getData } from "./dataStore.js";
 
 function channelDetailsV1(authUserId, channelId) {
