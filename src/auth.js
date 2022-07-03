@@ -22,8 +22,8 @@ Return Value:
 
 function authRegisterV1(email, password, nameFirst, nameLast) {
     email = email.toLowerCase();
-    nameFirst = removeNonAlphaNumeric(nameFirst);
-    nameLast = removeNonAlphaNumeric(nameLast);
+    nameFirst = nameFirst.toLowerCase();
+    nameLast = nameLast.toLowerCase();
     let data = getData();
     let handle = createHandle(nameFirst, nameLast);
 
@@ -130,6 +130,8 @@ Return Value:
 
   // Takes in first name and last name (both lower case) and creates a handle
   function createHandle(firstName, lastName) {
+    firstName = removeNonAlphaNumeric(firstName);
+    lastName = removeNonAlphaNumeric(lastName);
     let data = getData();
     let handleNumber = -1;
     let handleExists = false;

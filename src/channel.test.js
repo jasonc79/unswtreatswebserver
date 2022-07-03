@@ -255,3 +255,69 @@ describe("channelMessages Fail scenarios", () => {
   });
 });
 
+describe('Testing user output in channelDetails', () => {
+  test('Testing handle generation', () => {
+    const u1 = authRegisterV1('sheriff.woody@andysroom.com', 'password', 'sheriff', 'woody');
+    const u2 = authRegisterV1('somerando@gmail.com', 'terriblepw', 'some', 'rando');
+    const u3 = authRegisterV1('blah@email.com', 'terriblepw', 'abcfghij', 'klmnopqrs');
+    const u4 = authRegisterV1('blah1@email.com', 'terriblepw', 'abcdefghij', 'klmnopqrs');
+    const u5 = authRegisterV1('blah2@email.com', 'terriblepw', 'abcdefghij', 'klmnopqrs');
+    const cId = channelsCreateV1(u1.authUserId, 'channel', true);
+    channelJoinV1(u4.authUserId, cId.channelId);
+    channelJoinV1(u5.authUserId, cId.channelId);
+   
+    const channelDet = channelDetailsV1(u4.authUserId, cId.channelId);
+    const expected1 = {uId: u4.authUserId, email: 'blah1@email.com', 'nameFirst': 'abcdefghij', 'nameLast': 'klmnopqrs', 'handleStr': 'abcdefghijklmnopqrs'};
+    const expected2 = {uId: u5.authUserId, email: 'blah2@email.com', 'nameFirst': 'abcdefghij', 'nameLast': 'klmnopqrs', 'handleStr': 'abcdefghijklmnopqrs0'};
+      
+    expect(channelDet['allMembers']).toContainEqual(expected1);
+    expect(channelDet['allMembers']).toContainEqual(expected2);
+  });
+
+  test('Testing handle generation for alphanumeric characters', () => {
+    const nameFirst = '@bcdefgh!j';
+    const nameLast = 'klmn opqrst';
+    const handleStr1 = 'bcdefghjklmnopqrst0';
+    const handleStr2 = 'bcdefghjklmnopqrst1'
+
+    const u1 = authRegisterV1('sheriff.woody@andysroom.com', 'password', 'sheriff', 'woody');
+    const u2 = authRegisterV1('somerando@gmail.com', 'terriblepw', 'some', 'rando');
+    const u3 = authRegisterV1('blah@email.com', 'terriblepw', nameFirst, nameLast);
+    const u4 = authRegisterV1('blah1@email.com', 'terriblepw', nameFirst, nameLast);
+    const u5 = authRegisterV1('blah2@email.com', 'terriblepw',  nameFirst, nameLast);
+    const cId = channelsCreateV1(u1.authUserId, 'channel', true);
+    channelJoinV1(u4.authUserId, cId.channelId);
+    channelJoinV1(u5.authUserId, cId.channelId);
+
+    const channelDet = channelDetailsV1(u4.authUserId, cId.channelId);
+    const expected1 = {uId: u4.authUserId, email: 'blah1@email.com', 'nameFirst': nameFirst, 'nameLast':nameLast, 'handleStr': handleStr1};
+    const expected2 = {uId: u5.authUserId, email: 'blah2@email.com', 'nameFirst':nameFirst, 'nameLast': nameLast, 'handleStr': handleStr2};
+      
+    expect(channelDet['allMembers']).toContainEqual(expected1);
+    expect(channelDet['allMembers']).toContainEqual(expected2);
+  });
+
+  
+  test('Testing handle generation for names with a number at the end', () => {
+    const nameFirst = 'abc';
+    const nameLast = 'def0';
+    const handleStr1 = 'abcdef00';
+    const handleStr2 = 'abcdef01'
+
+    const u1 = authRegisterV1('sheriff.woody@andysroom.com', 'password', 'sheriff', 'woody');
+    const u2 = authRegisterV1('somerando@gmail.com', 'terriblepw', 'some', 'rando');
+    const u3 = authRegisterV1('blah@email.com', 'terriblepw', nameFirst, nameLast);
+    const u4 = authRegisterV1('blah1@email.com', 'terriblepw', nameFirst, nameLast);
+    const u5 = authRegisterV1('blah2@email.com', 'terriblepw',  nameFirst, nameLast);
+    const cId = channelsCreateV1(u1.authUserId, 'channel', true);
+    channelJoinV1(u4.authUserId, cId.channelId);
+    channelJoinV1(u5.authUserId, cId.channelId);
+
+    const channelDet = channelDetailsV1(u4.authUserId, cId.channelId);
+    const expected1 = {uId: u4.authUserId, email: 'blah1@email.com', 'nameFirst': nameFirst, 'nameLast':nameLast, 'handleStr': handleStr1};
+    const expected2 = {uId: u5.authUserId, email: 'blah2@email.com', 'nameFirst':nameFirst, 'nameLast': nameLast, 'handleStr': handleStr2};
+      
+    expect(channelDet['allMembers']).toContainEqual(expected1);
+    expect(channelDet['allMembers']).toContainEqual(expected2);
+  });
+});
