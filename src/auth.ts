@@ -1,6 +1,6 @@
-import {getData, setData} from './dataStore.js';
+import { getData, setData, error, authUserId, errorMsg } from './dataStore';
 import validator from 'validator';
-import {userProfileV1} from './users.js';
+import {userProfileV1} from './users';
 
 /*
 Create an account for a new user. Additionally, it generates a handle
@@ -20,22 +20,22 @@ Return Value:
     Returns {authUserId: authUserId} on no error
  */
 
-function authRegisterV1(email, password, nameFirst, nameLast) {
+  const authRegisterV1 = (email: string, password: string, nameFirst: string, nameLast: string): authUserId | error => {
     email = email.toLowerCase();
-    nameFirst = removeNonAlphaNumeric(nameFirst);
-    nameLast = removeNonAlphaNumeric(nameLast);
+    nameFirst = nameFirst.toLowerCase();
+    nameLast = nameLast.toLowerCase();
     let data = getData();
     let handle = createHandle(nameFirst, nameLast);
 
     // Error Checking
     if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
-      return {error: 'error'};
+      return errorMsg;
     }
     if (password.length < 6) {
-      return {error: 'error'};
+      return errorMsg;
     }
     if (!checkValidEmail(email)) {
-      return {error: 'error'};
+      return errorMsg;
     }
 
     // Generate uId using the size of array users and default permission 2
@@ -74,15 +74,15 @@ Return Value:
     Returns {error: 'error'} on an incorrect password
     Returns {authUserId:  'authUserId'} when the email and password are valid
 */
-  function authLoginV1(email, password) {
+const authLoginV1 = (email: string, password: string) : authUserId | error => {
     let user = checkEmailExists(email);
 
     if (!user) {
-      return {error: 'error'};
+      return errorMsg;
     }
 
     if (user.password !== password) {
-      return {error: 'error'};
+      return errorMsg;
     }
 
     return {
@@ -93,7 +93,7 @@ Return Value:
   // HELPER FUNCTIONS
   
   // Check if name has a length between 1 and 50 inclusive.
-  function checkNameLength(name) {
+  const checkNameLength = (name: string) : boolean => {
     if (name.length < 1 || name.length > 50) {
       return false;
     }
@@ -103,7 +103,7 @@ Return Value:
   }
 
   // Check if an email is valid. Returns true if valid and false otherwise.
-  function checkValidEmail(email) {
+  const checkValidEmail = (email: string): boolean => {
     if (!validator.isEmail(email)) {
       return false;
     }
@@ -117,7 +117,7 @@ Return Value:
 
   // Check if a valid email exists. Returns an email if it exists.
   // Otherwise, returns false.
-  function checkEmailExists(email) {
+  const checkEmailExists = (email: string) => {
     let data = getData();
     for (let user of data.users) {
       if (user.email === email) {
@@ -129,7 +129,9 @@ Return Value:
   
 
   // Takes in first name and last name (both lower case) and creates a handle
-  function createHandle(firstName, lastName) {
+  const createHandle = (firstName: string, lastName: string): string => {
+    firstName = removeNonAlphaNumeric(firstName);
+    lastName = removeNonAlphaNumeric(lastName);
     let data = getData();
     let handleNumber = -1;
     let handleExists = false;
@@ -162,12 +164,12 @@ Return Value:
   
   // Removes alphanumeric values from a string. Returns the string in lower
   // case
-  function removeNonAlphaNumeric(string) {
+  const removeNonAlphaNumeric = (string: string) : string => {
     /* This code removes non alphanumeric characters
     https://bobbyhadz.com/blog/javascript-remove-non-alphanumeric-characters-
     //from-string#:~:text=To%20remove%20all%20non%2Dalphanumeric,string%20with
     %20all%20matches%20replaced.&text=Copied!*/
-    string = string.replace(/[^a-zA-Z0-9]/gi, '');
+    string = string.replace(/[a-zA-Z0-9]/gi, '');
     return string.toLowerCase();
     
   }

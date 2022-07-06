@@ -1,9 +1,11 @@
 // Populate each array in data with a user and channel object.
-// Declaring types
+
+// DECLARING TYPES //
 type error = { error: string };
 type authUserId = { authUserId: number }; 
 type channelId = { channelId: number };
 type uId = { uId: number }; 
+type userReturn = { user: userInfo };
 type data = {
   users: user[],
   channels: channel[],
@@ -48,6 +50,9 @@ interface message {
   timeSent: number 
 };
 
+// CONSTANTS //
+const errorMsg = { error: 'error'};
+
 let data: data = {
   users: [],
   channels: [],
@@ -79,4 +84,5 @@ function setData(newData: data) {
 }
 
 export { getData, setData };
-export { error, authUserId, channelId, channelInfo, uId, data, user, userInfo, channel, message };
+export { error, authUserId, channelId, channelInfo, uId, data, user, userInfo, userReturn, channel, message };
+export { errorMsg };

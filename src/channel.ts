@@ -1,10 +1,12 @@
-import { error, authUserId, channelId, channelInfo, uId, user, channel, message, data, getData, setData } from './dataStore';
+import { error, errorMsg, authUserId, channelId, channelInfo, uId, user, userInfo, userReturn, channel, message, data} from './dataStore';
+import { getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper';
 import { authRegisterV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1 } from './users';
 
 type channelsList = { channels: channelInfo[] };
+type channelDetails = { name: string, isPublic: boolean, ownerMembers: userInfo[], allMembers: userInfo[] }; 
 
 /*
 ChannelDetailsV1 Function
@@ -17,12 +19,10 @@ Return Value:
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
 */
-type channelDetails = { name: string, isPublic: boolean, ownerMembers: user[], allMembers: user[] }; 
-
 function channelDetailsV1(authUserId: number, channelId: number) : (error | channelDetails) {
     // Check if channelId and authUserId is valid
     if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
-      return {error: 'error'};
+      return errorMsg;
     }
     // Check if authorised user is member of channel
     const channelList = channelsListV1(authUserId) as channelsList;
@@ -33,7 +33,7 @@ function channelDetailsV1(authUserId: number, channelId: number) : (error | chan
       }
     }
     if (authUserValid === false) {
-      return {error: 'error'};
+      return errorMsg;
     }
     let channel = returnValidChannel(channelId);
     let channelDetail = {
@@ -60,17 +60,17 @@ Return Value:
   function channelJoinV1(authUserId: number, channelId: number): (error | {}) {
       // Check if channelId and authUserId is valid
       if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
-        return {error: 'error'};
+        return errorMsg;
       }
       let user = returnValidId(authUserId);
       let channel = returnValidChannel(channelId);
       if (channel.isPublic === false && user.permissionId === 2) {
-        return {error: 'error'};
+        return errorMsg;
       }
       // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
       let data = getData();
-      const newUser = userProfileV1(authUserId, authUserId);
-      channel.allMembers.push(newUser);
+      const newUser = userProfileV1(authUserId, authUserId) as userReturn;
+      channel.allMembers.push(newUser.user);
       setData(data);
       return {};
   }
@@ -90,13 +90,13 @@ Return Value:
     Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
     Returns {} on no error
  */
-function channelInviteV1(authUserId: authUserId, channelId: channelId, uId: uId): (error | {}) {
+function channelInviteV1(authUserId: number, channelId: number, uId: number): (error | {}) {
   // Checking if channelID and uId are valid
   let data = getData(); 
   const channel = returnValidChannel(channelId); 
   const user = returnValidId(uId); 
   if (channel === undefined || user === undefined) {
-    return { error: 'error' };
+    return errorMsg;
   } 
 
   // Checking if uId and authUserID are members
@@ -110,7 +110,7 @@ function channelInviteV1(authUserId: authUserId, channelId: channelId, uId: uId)
     }
   }
   if (uIdMember === true || authUserIdMember === false ) {
-    return { error: 'error' };
+    return errorMsg;
   }
 
   channel.allMembers.push(user); 
@@ -144,11 +144,11 @@ type messagesOver50 = { messages: message[], start: number, end: number };
 
 function channelMessagesV1(authUserId: number, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
   if (!checkValidId(authUserId)) {
-    return { error: "error" };
+    return errorMsg;
   }
   const data = getData();
   if (!checkValidChannel(channelId)) {
-    return { error: "error" };
+    return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
   let isMember = false;
@@ -159,11 +159,11 @@ function channelMessagesV1(authUserId: number, channelId: number, start: number)
   }
 
   if (isMember === false) {
-    return { error: "error" };
+    return errorMsg;
   }
   const channelMsg = currChannel.messages;
   if (channelMsg.length < start) {
-    return { error: "error" };
+    return errorMsg;
   }
   
   const messages: Array<message> = [];

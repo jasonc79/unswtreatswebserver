@@ -1,4 +1,4 @@
-import { error, message, channel, userInfo, channelId, getData, setData } from "./dataStore";
+import { error, message, channel, userInfo, userReturn, channelId, getData, setData } from "./dataStore";
 import { checkValidId } from "./helper";
 import { userProfileV1 } from "./users";
 
@@ -8,7 +8,7 @@ type channelReturn = {
 };
 type channelsList = { channels: channelReturn[] };
 
-type user = { user: userInfo };
+//type user = { user: userInfo };
 
 /*
 channelsCreateV1 creates a new channel which is added to the dataStore
@@ -32,7 +32,7 @@ function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) :
 
   let data = getData();
   const channelId = data.channels.length;
-  const user = userProfileV1(authUserId, authUserId) as user;
+  const user = userProfileV1(authUserId, authUserId) as userReturn;
   let newChannel : channel = {
     channelId: channelId,
     name: name,
@@ -65,7 +65,7 @@ function channelsListV1(authUserId: number) : channelsList | error {
     return { error: "error" };
   }
   let data = getData();
-  const user = userProfileV1(authUserId, authUserId) as user;
+  const user = userProfileV1(authUserId, authUserId) as userReturn;
   let channels = [];
 
   for (let channel of data.channels) {
@@ -95,7 +95,7 @@ Return Value:
  */
 function channelsListallV1(authUserId: number) : channelsList | error {
   if (!checkValidId(authUserId)) {
-    return { error: "error" };
+    return errorMsg;
   }
   const data = getData();
   let channelList = [];

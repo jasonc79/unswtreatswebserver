@@ -1,7 +1,5 @@
-import { error, userInfo, getData } from './dataStore'
+import { error, userInfo, userReturn, getData } from './dataStore'
 import { checkValidId } from './helper'
-
-type user = { user: userInfo };
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing 
@@ -24,7 +22,7 @@ Return Value:
     Returns { error: 'error' } on an invalid authUserId or uId
 */
 
-function userProfileV1(authUserId: number, uId: number) : error | user {
+function userProfileV1(authUserId: number, uId: number) : error | userReturn {
     if (!checkValidId(authUserId)) {
         return { error: 'error' };
     }
