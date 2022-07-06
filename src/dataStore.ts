@@ -9,7 +9,7 @@ type data = {
   channels: Array<channel>,
 }
 
-type user = {
+interface user {
   uId: number,
   email: string,
   nameFirst: string,
@@ -19,7 +19,7 @@ type user = {
   permissionId: number,
 }; 
 
-type channel = {
+interface channel {
   channelId: channelId,
   name: string
   messages: [
@@ -49,7 +49,14 @@ type channel = {
     }
   ],
   isPublic: boolean
-}
+};
+
+interface message { 
+  messageId: number, 
+  uId: uId, 
+  message: string, 
+  timeSent: number 
+};
 
 let data: data = {
   users: [],
@@ -82,4 +89,4 @@ function setData(newData: data) {
 }
 
 export { getData, setData };
-export { error, authUserId, channelId, uId, data, user, channel };
+export { error, authUserId, channelId, uId, data, user, channel, message };

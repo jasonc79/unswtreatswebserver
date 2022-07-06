@@ -1,5 +1,5 @@
 import {getData, setData} from './dataStore';
-import { error, authUserId, channelId, uId, user, data } from './dataStore';
+import { error, authUserId, channelId, uId, user, channel, message, data } from './dataStore';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper.js';
 import { authRegisterV1 } from "./auth.js"
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from "./channels.js";
@@ -155,7 +155,7 @@ Return Value:
     Returns {messages: messages, start: start, end: start+50} when all inputs are 
     valid and there are more or start+50 messages in messages 
 */
-type message = { messageId: number, uId: uId, message: string, timeSent: number }; 
+
 type messagesUnder50 = { messages: message[], start: number, end: -1 }; 
 type messagesOver50 = { messages: message[], start: number, end: number };
 
