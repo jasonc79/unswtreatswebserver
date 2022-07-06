@@ -1,12 +1,12 @@
 // Populate each array in data with a user and channel object.
 // Declaring types
-type error = { error: 'error' };
+type error = { error: string };
 type authUserId = { authUserId: number }; 
 type channelId = { channelId: number };
 type uId = { uId: number }; 
 type data = {
-  users: Array<user>,
-  channels: Array<channel>,
+  users: user[],
+  channels: channel[],
 }
 
 interface user {
@@ -19,36 +19,26 @@ interface user {
   permissionId: number,
 }; 
 
+interface userInfo {
+  uId: number,
+  email: string,
+  nameFirst: string,
+  nameLast: string,
+  handleStr: string,
+}; 
+
 interface channel {
-  channelId: channelId,
-  name: string
-  messages: [
-    {
-      messageId: number,
-      uId: number,
-      message: string,
-      timeSent: number
-    }
-  ],
-  allMembers: [
-    {
-      uId: number,
-      email: string,
-      nameFirst: string,
-      nameLast: string,
-      handleStr: string
-    }
-  ],
-  ownerMembers: [
-    {
-      uId: number,
-      email: string,
-      nameFirst: string,
-      nameLast: string,
-      handleStr: string
-    }
-  ],
+  channelId: number,
+  name: string,
+  messages: message[],
+  allMembers: userInfo[],
+  ownerMembers: userInfo[],
   isPublic: boolean
+};
+
+interface channelInfo {
+  channelId: number,
+  name: string,
 };
 
 interface message { 
@@ -89,4 +79,4 @@ function setData(newData: data) {
 }
 
 export { getData, setData };
-export { error, authUserId, channelId, uId, data, user, channel, message };
+export { error, authUserId, channelId, channelInfo, uId, data, user, userInfo, channel, message };

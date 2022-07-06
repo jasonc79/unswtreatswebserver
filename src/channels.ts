@@ -1,13 +1,14 @@
-import { getData, setData } from "./dataStore.js";
-import { checkValidId } from "./helper.js";
-import { userProfileV1 } from "./users.js";
+import { error, message, channel, userInfo, channelId, getData, setData } from "./dataStore";
+import { checkValidId } from "./helper";
+import { userProfileV1 } from "./users";
 
-type channelId = { channelId: number };
-type channel = { 
+type channelReturn = { 
   channelId: number,
   name: string, 
 };
-type channels = { channels: channel[] };
+type channelsList = { channels: channelReturn[] };
+
+type user = { user: userInfo };
 
 /*
 channelsCreateV1 creates a new channel which is added to the dataStore
@@ -24,15 +25,15 @@ Return Value:
         or greater than 20 characters long
 */
 
-function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) : channelId {
+function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) : error | channelId {
   if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
     return { error: "error" };
   }
 
   let data = getData();
   const channelId = data.channels.length;
-  const user = userProfileV1(authUserId, authUserId);
-  let newChannel = {
+  const user = userProfileV1(authUserId, authUserId) as user;
+  let newChannel : channel = {
     channelId: channelId,
     name: name,
     messages: [],
@@ -59,12 +60,12 @@ Return Value:
     Returns { error: 'error' } on an invalid authUserId
 */
 
-function channelsListV1(authUserId: number) : channels {
+function channelsListV1(authUserId: number) : channelsList | error {
   if (!checkValidId(authUserId)) {
     return { error: "error" };
   }
   let data = getData();
-  const user = userProfileV1(authUserId, authUserId);
+  const user = userProfileV1(authUserId, authUserId) as user;
   let channels = [];
 
   for (let channel of data.channels) {
@@ -92,7 +93,7 @@ Return Value:
     Returns {error: 'error'}  on invalid authUserId
     Returns {channels: channelList} on no error
  */
-function channelsListallV1(authUserId: number) : channels {
+function channelsListallV1(authUserId: number) : channelsList | error {
   if (!checkValidId(authUserId)) {
     return { error: "error" };
   }
