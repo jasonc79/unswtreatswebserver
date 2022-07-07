@@ -1,4 +1,4 @@
-import { error, message, channel, userInfo, channelId, getData, setData, user, data } from "./dataStore";
+import { getData, setData, Data } from './dataStore';
 
 /*
 Clears the users and channels array in datastore
@@ -7,8 +7,8 @@ Return Value:
     Returns {} on successful clear
 
 */
-function clearV1(): Object {
-  let data: data = getData();
+function clearV1(): object {
+  const data: Data = getData();
   data.users = [];
   data.channels = [];
   setData(data);
@@ -16,4 +16,3 @@ function clearV1(): Object {
 }
 
 export { clearV1 };
-

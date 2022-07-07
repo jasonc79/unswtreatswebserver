@@ -1,10 +1,10 @@
-import { error, errorMsg, message, channel, userInfo, userReturn, channelId, getData, setData } from "./dataStore";
-import { checkValidId } from "./helper";
-import { userProfileV1 } from "./users";
+import { error, errorMsg, Channel, userReturn, channelId, getData, setData } from './dataStore';
+import { checkValidId } from './helper';
+import { userProfileV1 } from './users';
 
-type channelReturn = { 
+type channelReturn = {
   channelId: number,
-  name: string, 
+  name: string,
 };
 type channelsList = { channels: channelReturn[] };
 
@@ -19,7 +19,7 @@ Arguments:
 
 Return Value:
     Returns { channelId : channelId } on no errors, where channelId is a number
-    Returns { error: 'error' } on an invalid authUserId and if the name is less than 1 
+    Returns { error: 'error' } on an invalid authUserId and if the name is less than 1
         or greater than 20 characters long
 */
 
@@ -28,10 +28,10 @@ function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) :
     return errorMsg;
   }
 
-  let data = getData();
+  const data = getData();
   const channelId = data.channels.length;
   const user = userProfileV1(authUserId, authUserId) as userReturn;
-  let newChannel : channel = {
+  const newChannel : Channel = {
     channelId: channelId,
     name: name,
     messages: [],
@@ -46,14 +46,14 @@ function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) :
 }
 
 /*
-channelsListV1 checks if the authUserId is valid and then returns an object containing 
+channelsListV1 checks if the authUserId is valid and then returns an object containing
 an array of channels that the user is apart of
 
 Arguments:
     authUserId (number)     - holds the id of the user that is being searched for
 
 Return Value:
-    Returns { channels: channels } on if the authUserId is valid, where channels is an array of objects 
+    Returns { channels: channels } on if the authUserId is valid, where channels is an array of objects
         containing the channelId and name
     Returns { error: 'error' } on an invalid authUserId
 */
@@ -62,12 +62,12 @@ function channelsListV1(authUserId: number) : channelsList | error {
   if (!checkValidId(authUserId)) {
     return errorMsg;
   }
-  let data = getData();
+  const data = getData();
   const user = userProfileV1(authUserId, authUserId) as userReturn;
-  let channels = [];
+  const channels = [];
 
-  for (let channel of data.channels) {
-    for (let person of channel.allMembers) {
+  for (const channel of data.channels) {
+    for (const person of channel.allMembers) {
       if (person.uId === user.user.uId) {
         channels.push({
           channelId: channel.channelId,
@@ -81,7 +81,7 @@ function channelsListV1(authUserId: number) : channelsList | error {
 }
 
 /*
-This function returns an object containing an array of objects, the array contains objects 
+This function returns an object containing an array of objects, the array contains objects
 containing information about each channel.
 
 Arguments:
@@ -96,9 +96,9 @@ function channelsListallV1(authUserId: number) : channelsList | error {
     return errorMsg;
   }
   const data = getData();
-  let channelList = [];
-  for (let channel of data.channels) {
-    let tempChannel = {
+  const channelList = [];
+  for (const channel of data.channels) {
+    const tempChannel = {
       channelId: channel.channelId,
       name: channel.name,
     };

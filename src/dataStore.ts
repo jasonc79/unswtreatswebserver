@@ -1,62 +1,67 @@
-// Populate each array in data with a user and channel object.
+// USER TYPES AND INTERFACES
+type uId = { uId: number };
+type authUserId = { authUserId: number };
 
-// DECLARING TYPES //
-type error = { error: string };
-type authUserId = { authUserId: number }; 
-type channelId = { channelId: number };
-type uId = { uId: number }; 
-type userReturn = { user: userInfo };
-type data = {
-  users: user[],
-  channels: channel[],
+interface User {
+  uId: number,
+  email: string,
+  nameFirst: string,
+  nameLast: string,
+  handleStr: string,
+  password: string,
+  permissionId: number,
 }
 
-interface user {
+interface UserInfo {
   uId: number,
   email: string,
   nameFirst: string,
   nameLast: string,
   handleStr: string,
-  password: string, 
-  permissionId: number,
-}; 
+}
 
-interface userInfo {
-  uId: number,
-  email: string,
-  nameFirst: string,
-  nameLast: string,
-  handleStr: string,
-}; 
+type userReturn = { user: UserInfo };
 
-interface channel {
+// MESSAGE TYPES AND INTERFACES
+interface Message {
+  messageId: number,
+  uId: uId,
+  message: string,
+  timeSent: number
+}
+
+// CHANNEL TYPES AND INTERFACES
+type channelId = { channelId: number };
+
+interface Channel {
   channelId: number,
   name: string,
-  messages: message[],
-  allMembers: userInfo[],
-  ownerMembers: userInfo[],
+  messages: Message[],
+  allMembers: UserInfo[],
+  ownerMembers: UserInfo[],
   isPublic: boolean
-};
+}
 
-interface channelInfo {
+interface ChannelInfo {
   channelId: number,
   name: string,
-};
+}
 
-interface message { 
-  messageId: number, 
-  uId: uId, 
-  message: string, 
-  timeSent: number 
-};
+// ERROR TYPES AND CONSTANTS
+type error = { error: string };
+
+type Data = {
+  users: User[],
+  channels: Channel[],
+}
 
 // CONSTANTS //
-const errorMsg = { error: 'error'};
+const errorMsg = { error: 'error' };
 
-let data: data = {
+let data: Data = {
   users: [],
   channels: [],
-}
+};
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 /*
@@ -74,15 +79,15 @@ Example usage
 */
 
 // Use get() to access the data
-function getData(): data {
+function getData(): Data {
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
-function setData(newData: data) {
+function setData(newData: Data) {
   data = newData;
 }
 
 export { getData, setData };
-export { error, authUserId, channelId, channelInfo, uId, data, user, userInfo, userReturn, channel, message };
+export { error, authUserId, channelId, ChannelInfo, uId, Data, User, UserInfo, userReturn, Channel, Message };
 export { errorMsg };
