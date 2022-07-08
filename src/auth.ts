@@ -1,4 +1,4 @@
-import { getData, setData, error, authUserId, errorMsg } from './dataStore';
+import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
 import validator from 'validator';
 
 /*
@@ -18,14 +18,7 @@ Return Value:
                               between 1 and 50 characters
     Returns {authUserId: authUserId} on no error
  */
-
 const authRegisterV1 = (email: string, password: string, nameFirst: string, nameLast: string): authUserId | error => {
-  email = email.toLowerCase();
-  nameFirst = nameFirst.toLowerCase();
-  nameLast = nameLast.toLowerCase();
-  const data = getData();
-  const handle = createHandle(nameFirst, nameLast);
-
   // Error Checking
   if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
     return errorMsg;
@@ -36,6 +29,12 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   if (!checkValidEmail(email)) {
     return errorMsg;
   }
+  email = email.toLowerCase();
+  nameFirst = nameFirst.toLowerCase();
+  nameLast = nameLast.toLowerCase();
+  const data = getData();
+  const handle = createHandle(nameFirst, nameLast);
+  const token = generateToken();
 
   // Generate uId using the size of array users and default permission 2
   const user = {
@@ -45,18 +44,19 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     nameLast: nameLast,
     handleStr: handle,
     password: password,
+    token: token,
     permissionId: 2,
   };
   // Global owner
   if (user.uId === 0) {
     user.permissionId = 1;
   }
-
   // Update data
   data.users.push(user);
   setData(data);
 
   return {
+    token: token,
     authUserId: user.uId
   };
 };
@@ -85,6 +85,7 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
   }
 
   return {
+    token: user.token,
     authUserId: user.uId
   };
 };
@@ -138,6 +139,7 @@ const createHandle = (firstName: string, lastName: string): string => {
   if (handle.length > 20) {
     handle = handle.slice(0, 20);
   }
+
   // Check if the handle already exists
   for (const user of data.users) {
     if (user.handleStr.slice(0, handle.length) === handle) {
@@ -166,7 +168,32 @@ const removeNonAlphaNumeric = (string: string) : string => {
     https://bobbyhadz.com/blog/javascript-remove-non-alphanumeric-characters-
     //from-string#:~:text=To%20remove%20all%20non%2Dalphanumeric,string%20with
     %20all%20matches%20replaced.&text=Copied! */
-  string = string.replace(/[a-zA-Z0-9]/gi, '');
+  string = string.replace(/[^a-zA-Z0-9]/gi, '');
   return string.toLowerCase();
 };
+
+const generateToken = () : token => {
+  let isValidToken = false;
+  let token = (Math.floor((Math.random() * 10000) + 1)).toString();
+  while (!isValidToken) {
+    // Generate another token
+    if (searchToken(token)) {
+      token = (Math.floor((Math.random() * 10000) + 1)).toString();
+    } else {
+      isValidToken = true;
+    }
+  }
+  return token;
+};
+
+const searchToken = (token: token) : boolean => {
+  const users = getData().users;
+  for (const user of users) {
+    if (user.token === token) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export { authLoginV1, authRegisterV1 };
