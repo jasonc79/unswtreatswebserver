@@ -4,14 +4,13 @@ import config from './config.json';
 const OK = 200;
 const port = config.port;
 const url = config.url;
-const errorMsg = {error: 'error'};
+const errorMsg = { error: 'error' };
 
 const email0 = 'email@gmail.com';
 const password0 = 'password';
 const nameFirst0 = 'firstname'; // 17 characters
 const nameLast0 = 'lastname';
 
-const email1 = 'email2@gmail.com';
 const password1 = 'password2';
 const nameFirst1 = 'firstname2'; // 17 characters
 const nameLast1 = 'lastname2';
@@ -29,7 +28,7 @@ function getRequestRegister(email: string, password: string, nameFirst: string, 
         nameFirst: nameFirst,
         nameLast: nameLast
       }),
-      headers: { 'Content-type': 'application/json'}
+      headers: { 'Content-type': 'application/json' }
     }
   );
   return res;
@@ -43,12 +42,11 @@ function getReqAuthLogin(email: string, password: string) {
         email: email,
         password: password,
       }),
-      headers: { 'Content-type': 'application/json'}
+      headers: { 'Content-type': 'application/json' }
     }
   );
   return res;
 }
-
 
 function getReqClear() {
   const res = request(
@@ -58,10 +56,9 @@ function getReqClear() {
   return res;
 }
 
-beforeEach(()=> {
+beforeEach(() => {
   getReqClear();
 });
-
 
 describe('Testing auth/register/v2', () => {
   test('Invalid email (no @)', () => {
@@ -121,7 +118,7 @@ describe('Testing auth/register/v2', () => {
     expect(res.statusCode).toBe(OK);
     expect(authUser).toEqual(errorMsg);
   });
-  
+
   test('Correct return (nameFirst is exactly 50 characters)', () => {
     const res = getRequestRegister(email0, password0, exactly50CharName, nameLast0);
     const authUser = JSON.parse(String(res.getBody()));
@@ -176,7 +173,7 @@ describe('Testing authLoginV1', () => {
     expect(res.statusCode).toBe(OK);
     expect(authUser).toStrictEqual(errorMsg);
   });
-  
+
   test('Incorrect password', () => {
     const res = getRequestRegister(email0, password0, nameFirst0, nameLast0);
     expect(res.statusCode).toBe(OK);
@@ -192,7 +189,7 @@ describe('Testing authLoginV1', () => {
     expect(res.statusCode).toBe(OK);
 
     const res2 = getReqAuthLogin(email0, password0);
-    const authUser =JSON.parse(String(res2.getBody()));
+    const authUser = JSON.parse(String(res2.getBody()));
     expect(res2.statusCode).toBe(OK);
     expect(authUser).toStrictEqual(
       expect.objectContaining({
@@ -200,6 +197,5 @@ describe('Testing authLoginV1', () => {
         authUserId: expect.any(Number)
       })
     );
-  })
+  });
 });
-  
