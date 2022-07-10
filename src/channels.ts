@@ -1,5 +1,5 @@
 import { error, errorMsg, Channel, userReturn, channelId, getData, setData } from './dataStore';
-import { checkValidId } from './helper';
+import { checkValidId, checkValidToken, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
 
 type channelReturn = {
@@ -23,14 +23,19 @@ Return Value:
         or greater than 20 characters long
 */
 
-function channelsCreateV1(authUserId: number, name: string, isPublic: boolean) : error | channelId {
-  if (name.length < 1 || name.length > 20 || !checkValidId(authUserId)) {
+function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
+  // console.log('user =', user);
+  console.log('checkValidToken(token) =', checkValidToken(token));
+  if (name.length < 1 || name.length > 20 || !checkValidToken(token)) {
     return errorMsg;
   }
 
   const data = getData();
   const channelId = data.channels.length;
-  const user = userProfileV1(authUserId, authUserId) as userReturn;
+  // const uId = returnValidUser(token).uId;
+  // const user = userProfileV1(token, uId) as userReturn;
   const newChannel : Channel = {
     channelId: channelId,
     name: name,
@@ -58,12 +63,13 @@ Return Value:
     Returns { error: 'error' } on an invalid authUserId
 */
 
-function channelsListV1(authUserId: number) : channelsList | error {
-  if (!checkValidId(authUserId)) {
+function channelsListV1(token: string) : channelsList | error {
+  if (!checkValidToken(token)) {
     return errorMsg;
   }
   const data = getData();
-  const user = userProfileV1(authUserId, authUserId) as userReturn;
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
   const channels = [];
 
   for (const channel of data.channels) {
@@ -91,8 +97,8 @@ Return Value:
     Returns {error: 'error'}  on invalid authUserId
     Returns {channels: channelList} on no error
  */
-function channelsListallV1(authUserId: number) : channelsList | error {
-  if (!checkValidId(authUserId)) {
+function channelsListallV1(token: string) : channelsList | error {
+  if (!checkValidToken(token)) {
     return errorMsg;
   }
   const data = getData();
