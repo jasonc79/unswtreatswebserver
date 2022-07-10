@@ -1,5 +1,5 @@
-import { error, userReturn, getData } from './dataStore';
-import { checkValidId } from './helper';
+import { error, errorMsg, userReturn, getData } from './dataStore';
+import { checkValidId, returnValidId, checkValidToken } from './helper';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -22,26 +22,20 @@ Return Value:
     Returns { error: 'error' } on an invalid authUserId or uId
 */
 
-function userProfileV1(authUserId: number, uId: number) : error | userReturn {
-  if (!checkValidId(authUserId)) {
-    return { error: 'error' };
+function userProfileV1(token: string, uId: number) : error | userReturn {
+  if (!checkValidId(uId) || !checkValidToken(token)) {
+    return errorMsg;
   }
-
-  const data = getData();
-  for (const user of data.users) {
-    if (user.uId === uId) {
-      return {
-        user: {
-          uId: user.uId,
-          email: user.email,
-          nameFirst: user.nameFirst,
-          nameLast: user.nameLast,
-          handleStr: user.handleStr,
-        }
-      };
+  const user = returnValidId(uId);
+  return {
+    user: {
+      uId: user.uId,
+      email: user.email,
+      nameFirst: user.nameFirst,
+      nameLast: user.nameLast,
+      handleStr: user.handleStr,
     }
-  }
-  return { error: 'error' };
+  };
 }
 
 export { userProfileV1 };
