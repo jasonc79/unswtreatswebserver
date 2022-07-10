@@ -1,4 +1,5 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
+import { checkValidToken } from './helper';
 import validator from 'validator';
 
 /*
@@ -177,23 +178,13 @@ const generateToken = () : token => {
   let token = (Math.floor((Math.random() * 10000) + 1)).toString();
   while (!isValidToken) {
     // Generate another token
-    if (searchToken(token)) {
+    if (checkValidToken(token)) {
       token = (Math.floor((Math.random() * 10000) + 1)).toString();
     } else {
       isValidToken = true;
     }
   }
   return token;
-};
-
-const searchToken = (token: token) : boolean => {
-  const users = getData().users;
-  for (const user of users) {
-    if (user.token === token) {
-      return true;
-    }
-  }
-  return false;
 };
 
 export { authLoginV1, authRegisterV1 };
