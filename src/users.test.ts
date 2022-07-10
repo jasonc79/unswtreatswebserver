@@ -1,8 +1,3 @@
-import { authRegisterV1 } from "./auth"
-import { userProfileV1 } from "./users"
-import { clearV1 } from "./other"
-import { authUserId } from './dataStore'
-
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
 
@@ -12,14 +7,14 @@ const url = config.url;
 const errorMsg = { error: 'error' };
 
 function requestHelper(method: HttpVerb, path: string, payload: object) {
-    let qs = {};
-    let json = {};
-    if (['GET', 'DELETE'].includes(method)) {
-        qs = payload;
-    } else {
-        json = payload;
-    }
-    return request(method, url + ':' + port + path, { qs, json });
+  let qs = {};
+  let json = {};
+  if (['GET', 'DELETE'].includes(method)) {
+    qs = payload;
+  } else {
+    json = payload;
+  }
+  return request(method, url + ':' + port + path, { qs, json });
 }
 
 // ========================================================================= //
@@ -35,7 +30,7 @@ function requestAuthRegister(email: string, password: string, nameFirst: string,
     password: password,
     nameFirst: nameFirst,
     nameLast: nameLast
-  })
+  });
 }
 
 function requestClear() {
@@ -46,7 +41,7 @@ beforeEach(() => {
   requestClear();
 });
 
-describe("Testing userProfileV1", () => {
+describe('Testing userProfileV1', () => {
   test('Valid uId', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
@@ -59,10 +54,10 @@ describe("Testing userProfileV1", () => {
     expect(res3.statusCode).toBe(OK);
     expect(profile).toStrictEqual({
       user: {
-        uId: uId.authUserId, 
+        uId: uId.authUserId,
         email: 'email2@gmail.com',
-        nameFirst: 'firstname2', 
-        nameLast: 'lastname2', 
+        nameFirst: 'firstname2',
+        nameLast: 'lastname2',
         handleStr: 'firstname2lastname2',
       }
     });
@@ -78,4 +73,3 @@ describe("Testing userProfileV1", () => {
     expect(profile).toStrictEqual(errorMsg);
   });
 });
-

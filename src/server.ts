@@ -53,7 +53,7 @@ app.post('/channels/create/v2', (req, res, next) => {
   } catch (err) {
     next(err);
   }
-})
+});
 
 // ================================================================ //
 // user functions

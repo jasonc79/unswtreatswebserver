@@ -1,4 +1,4 @@
-import { error, errorMsg, userReturn, getData } from './dataStore';
+import { error, errorMsg, userReturn } from './dataStore';
 import { checkValidId, returnValidId, checkValidToken } from './helper';
 
 /*

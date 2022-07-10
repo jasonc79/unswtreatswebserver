@@ -1,5 +1,5 @@
 import { error, errorMsg, Channel, userReturn, channelId, getData, setData } from './dataStore';
-import { checkValidId, checkValidToken, returnValidUser } from './helper';
+import { checkValidToken, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
 
 type channelReturn = {
@@ -26,8 +26,7 @@ Return Value:
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;
-  // console.log('user =', user);
-  console.log('checkValidToken(token) =', checkValidToken(token));
+
   if (name.length < 1 || name.length > 20 || !checkValidToken(token)) {
     return errorMsg;
   }

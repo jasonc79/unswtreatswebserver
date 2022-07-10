@@ -1,9 +1,3 @@
-import { channelsListallV1 } from './channels';
-import { clearV1 } from './other';
-import { authRegisterV1 } from './auth';
-import { channelsCreateV1, channelsListV1 } from './channels';
-import { authUserId } from './dataStore'
-
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
 
@@ -16,9 +10,9 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
   let qs = {};
   let json = {};
   if (['GET', 'DELETE'].includes(method)) {
-      qs = payload;
+    qs = payload;
   } else {
-      json = payload;
+    json = payload;
   }
   return request(method, url + ':' + port + path, { qs, json });
 }
@@ -36,7 +30,7 @@ function requestAuthRegister(email: string, password: string, nameFirst: string,
     password: password,
     nameFirst: nameFirst,
     nameLast: nameLast
-  })
+  });
 }
 
 function requestClear() {
@@ -108,12 +102,12 @@ beforeEach(() => {
 //   });
 // });
 
-describe("Testing channelsCreateV1", () => {
-  test("Correct Name, is public", () => {
+describe('Testing channelsCreateV1', () => {
+  test('Correct Name, is public', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
     expect(res1.statusCode).toBe(OK);
-    const res2 = requestChannelCreate(authUser.token, "correct name", true);
+    const res2 = requestChannelCreate(authUser.token, 'correct name', true);
     const channel = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
     expect(channel).toStrictEqual(
@@ -122,11 +116,11 @@ describe("Testing channelsCreateV1", () => {
       })
     );
   });
-  test("Correct Name, is private", () => {
+  test('Correct Name, is private', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
     expect(res1.statusCode).toBe(OK);
-    const res2 = requestChannelCreate(authUser.token, "correct name", false);
+    const res2 = requestChannelCreate(authUser.token, 'correct name', false);
     const channel = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
     expect(channel).toStrictEqual(
@@ -135,20 +129,20 @@ describe("Testing channelsCreateV1", () => {
       })
     );
   });
-  test("Incorrect Name (too small)", () => {
+  test('Incorrect Name (too small)', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
     expect(res1.statusCode).toBe(OK);
-    const res2 = requestChannelCreate(authUser.token, "", true);
+    const res2 = requestChannelCreate(authUser.token, '', true);
     const channel = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
     expect(channel).toStrictEqual(errorMsg);
   });
-  test("Incorrect Name (too large)", () => {
+  test('Incorrect Name (too large)', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
     expect(res1.statusCode).toBe(OK);
-    const res2 = requestChannelCreate(authUser.token, "very long channel name", true);
+    const res2 = requestChannelCreate(authUser.token, 'very long channel name', true);
     const channel = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
     expect(channel).toStrictEqual(errorMsg);
@@ -160,7 +154,7 @@ describe("Testing channelsCreateV1", () => {
 //         const authUserId = authRegisterV1('email@gmail.com', 'password', 'firstname', 'lastname');
 //         const channel1 = channelsCreateV1(authUserId.authUserId, 'name1', true);
 //         const channel2 = channelsCreateV1(authUserId.authUserId, 'name2', true);
-//         expect(channelsListV1(authUserId.authUserId)).toStrictEqual({ 
+//         expect(channelsListV1(authUserId.authUserId)).toStrictEqual({
 //             channels: [
 //                 {
 //                     channelId: channel1.channelId,
