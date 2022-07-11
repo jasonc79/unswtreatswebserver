@@ -1,6 +1,10 @@
 // USER TYPES AND INTERFACES
 type uId = { uId: number };
-type authUserId = { authUserId: number };
+type token = string;
+type authUserId = {
+  token: token,
+  authUserId: number
+};
 
 interface User {
   uId: number,
@@ -8,6 +12,7 @@ interface User {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
+  token: token,
   password: string,
   permissionId: number,
 }
@@ -89,5 +94,6 @@ function setData(newData: Data) {
 }
 
 export { getData, setData };
-export { error, authUserId, channelId, ChannelInfo, uId, Data, User, UserInfo, userReturn, Channel, Message };
-export { errorMsg };
+export { channelId, ChannelInfo, Data, Channel, Message };
+export { authUserId, User, UserInfo, userReturn, uId, token };
+export { error, errorMsg };

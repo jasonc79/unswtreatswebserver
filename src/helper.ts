@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data } from './dataStore';
+import { Channel, getData, User, Data, token } from './dataStore';
 
 function checkValidId(id: number): boolean {
   const data: Data = getData();
@@ -14,6 +14,16 @@ function checkValidChannel(id: number): boolean {
   const data: Data = getData();
   for (const channel of data.channels) {
     if (channel.channelId === id) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkValidToken(token: token): boolean {
+  const data: Data = getData();
+  for (const user of data.users) {
+    if (user.token === token) {
       return true;
     }
   }
@@ -38,4 +48,13 @@ function returnValidChannel(id: number): Channel {
   }
 }
 
-export { checkValidId, checkValidChannel, returnValidId, returnValidChannel };
+function returnValidUser(token: string): User {
+  const data: Data = getData();
+  for (const user of data.users) {
+    if (user.token === token) {
+      return user;
+    }
+  }
+}
+
+export { checkValidId, checkValidChannel, checkValidToken, returnValidId, returnValidChannel, returnValidUser };

@@ -1,10 +1,15 @@
-import { error, errorMsg, ChannelInfo, UserInfo, userReturn, Message } from './dataStore';
+import { error, errorMsg, UserInfo, Message } from './dataStore';
 import { getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper';
+
+// UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
+/*
+import { userReturn, ChannelInfo } from './dataStore';
 import { channelsListV1 } from './channels';
 import { userProfileV1 } from './users';
-
 type channelsList = { channels: ChannelInfo[] };
+*/
+
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
 
 /*
@@ -18,7 +23,8 @@ Return Value:
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
 */
-function channelDetailsV1(authUserId: number, channelId: number) : (error | channelDetails) {
+function channelDetailsV1(token: number, channelId: number) : (error | channelDetails) {
+  /*
   // Check if channelId and authUserId is valid
   if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
     return errorMsg;
@@ -41,7 +47,8 @@ function channelDetailsV1(authUserId: number, channelId: number) : (error | chan
     ownerMembers: channel.ownerMembers,
     allMembers: channel.allMembers
   };
-  return channelDetail;
+  return channelDetail; */
+  return errorMsg;
 }
 
 /*
@@ -57,7 +64,7 @@ Return Value:
     Returns {} on no error
 */
 function channelJoinV1(authUserId: number, channelId: number): (error | object) {
-  // Check if channelId and authUserId is valid
+  /* // Check if channelId and authUserId is valid
   if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
@@ -70,7 +77,7 @@ function channelJoinV1(authUserId: number, channelId: number): (error | object) 
   const data = getData();
   const newUser = userProfileV1(authUserId, authUserId) as userReturn;
   channel.allMembers.push(newUser.user);
-  setData(data);
+  setData(data); */
   return {};
 }
 
