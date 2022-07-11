@@ -6,6 +6,7 @@ import config from './config.json';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1 } from './channels';
 import { userProfileV1 } from './users';
+import { dmCreateV1 } from './dm'; 
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
@@ -68,6 +69,16 @@ app.get('/user/profile/v2', (req, res, next) => {
   }
 });
 
+// ================================================================ //
+// dm functions
+app.post('/dm/create/v2', (req, res, next) => {
+  try {
+    const { token, uIds } = req.body;
+    return res.json(dmCreateV1(token, uIds));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // other functions
 
