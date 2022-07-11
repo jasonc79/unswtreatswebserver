@@ -35,6 +35,13 @@ interface Message {
   timeSent: number
 }
 
+// DM TYPES AND INTERFACES
+interface Dm {
+  dmId: number, 
+  name: string,
+  members: UserInfo[], 
+}
+
 // CHANNEL TYPES AND INTERFACES
 type channelId = { channelId: number };
 
@@ -58,6 +65,7 @@ type error = { error: string };
 type Data = {
   users: User[],
   channels: Channel[],
+  dms: Dm[],
 }
 
 // CONSTANTS //
@@ -66,6 +74,7 @@ const errorMsg = { error: 'error' };
 let data: Data = {
   users: [],
   channels: [],
+  dms: [],
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
@@ -94,6 +103,6 @@ function setData(newData: Data) {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message };
+export { channelId, ChannelInfo, Data, Channel, Message, Dm };
 export { authUserId, User, UserInfo, userReturn, uId, token };
 export { error, errorMsg };
