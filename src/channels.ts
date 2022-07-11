@@ -13,7 +13,7 @@ channelsCreateV1 creates a new channel which is added to the dataStore
 The channel is named the given name and created if the name is greater than 0 and less than 21 characters long
 
 Arguments:
-    authUserId (number)     - holds the id of the user creating the channel
+    token (string)     - holds the session token for the user
     name (string)           - contains the string which is set to be the channel name
     idPublic (boolean)      - value determining if the channel will be private or public
 
@@ -54,7 +54,7 @@ channelsListV1 checks if the authUserId is valid and then returns an object cont
 an array of channels that the user is apart of
 
 Arguments:
-    authUserId (number)     - holds the id of the user that is being searched for
+    token (string)     - holds the session token for the user
 
 Return Value:
     Returns { channels: channels } on if the authUserId is valid, where channels is an array of objects
@@ -90,8 +90,7 @@ This function returns an object containing an array of objects, the array contai
 containing information about each channel.
 
 Arguments:
-    authUserId (number)       - The userId of the user calling the function
-
+    token (number)       - Holds the session token for the user
 Return Value:
     Returns {error: 'error'}  on invalid authUserId
     Returns {channels: channelList} on no error
