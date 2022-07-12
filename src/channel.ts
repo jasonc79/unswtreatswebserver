@@ -2,11 +2,11 @@ import { error, errorMsg, UserInfo, Message } from './dataStore';
 import { getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken } from './helper';
 import { userProfileV1 } from './users';
+import { channelsListV1 } from './channels';
 
 // UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
 /*
 import { userReturn, ChannelInfo } from './dataStore';
-import { channelsListV1 } from './channels';
 import { userProfileV1 } from './users';
 type channelsList = { channels: ChannelInfo[] };
 */
@@ -24,32 +24,34 @@ Return Value:
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
 */
-function channelDetailsV1(token: number, channelId: number) : (error | channelDetails) {
-  /*
-  // Check if channelId and authUserId is valid
-  if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
+  const data = getData();
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;  
+  if (!checkValidChannel(channelId)) {
     return errorMsg;
   }
-  // Check if authorised user is member of channel
-  const channelList = channelsListV1(authUserId) as channelsList;
   let authUserValid = false;
-  for (const channels of channelList.channels) {
-    if (channelId === channels.channelId) {
-      authUserValid = true;
+  const currChannel = returnValidChannel(channelId)
+
+  let isMember = false;
+  for (const member of currChannel.allMembers) {
+    if (user.uId === member.uId) {
+      isMember = true;
     }
   }
-  if (authUserValid === false) {
+
+  if (isMember === false) {
     return errorMsg;
   }
-  const channel = returnValidChannel(channelId);
+
   const channelDetail = {
     name: channel.name,
     isPublic: channel.isPublic,
     ownerMembers: channel.ownerMembers,
     allMembers: channel.allMembers
   };
-  return channelDetail; */
-  return errorMsg;
+  return channelDetail;
 }
 
 /*
@@ -105,7 +107,6 @@ function channelInviteV1(authUserId: number, channelId: number, uId: number): (e
   if (channel === undefined || user === undefined) {
     return errorMsg;
   }
-
   // Checking if uId and authUserID are members
   let uIdMember = false;
   let authUserIdMember = false;
