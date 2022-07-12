@@ -40,6 +40,7 @@ interface Dm {
   dmId: number, 
   name: string,
   members: UserInfo[], 
+  owners: UserInfo[],
 }
 
 // CHANNEL TYPES AND INTERFACES
