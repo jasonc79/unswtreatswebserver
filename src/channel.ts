@@ -1,6 +1,7 @@
 import { error, errorMsg, UserInfo, Message } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper';
+import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken } from './helper';
+import { userProfileV1 } from './users';
 
 // UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
 /*
@@ -148,18 +149,19 @@ Return Value:
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
-function channelMessagesV1(authUserId: number, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  if (!checkValidId(authUserId)) {
-    return errorMsg;
-  }
 
+function channelMessagesV1(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
+  //uId becomes valid user from returnValidUser
+  const uId = returnValidUser(token);
+  //user becomes the user given user.uId and token
+  const user = userProfileV1(token, uId.uId) as userReturn;
   if (!checkValidChannel(channelId)) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
   let isMember = false;
   for (const member of currChannel.allMembers) {
-    if (authUserId === member.uId) {
+    if (user.uId === member.uId) {
       isMember = true;
     }
   }
@@ -191,3 +193,4 @@ function channelMessagesV1(authUserId: number, channelId: number, start: number)
   };
 }
 export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+
