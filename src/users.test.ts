@@ -150,8 +150,8 @@ describe('Testing usersAllV1', () => {
         ]
       });
     });
-  })
-  
+  });
+
   test('Invalid uId', () => {
     const res1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));

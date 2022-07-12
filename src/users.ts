@@ -42,7 +42,6 @@ function usersAllV1(token: string) : error | allUserReturn {
   if (!checkValidToken(token)) {
     return errorMsg;
   }
-  const allUsers = [];
   const users = getData().users;
   return { users: users };
 }
