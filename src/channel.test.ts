@@ -377,24 +377,24 @@ describe('Testing channelMessagesV1', () => {
 
 
 describe('Testing channelDetailsV2', () => {
-  test('Success', () => {
-    const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
-    const res2 = requestChannelDetails(authUser.token, 1);
-    const details = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
-    expect(messages).toStrictEqual(
-      expect.objectContaining({
-        channelId: channelId,
-        name: name,
-        messages: [],
-        allMembers: [],
-        ownerMembers: [],
-        isPublic: isPublic,
-      })
-    );
-  });
+  // test('Success', () => {
+  //   const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+  //   const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
+  //   expect(res1.statusCode).toBe(OK);
+  //   const res2 = requestChannelDetails(authUser.token, 1);
+  //   const details = JSON.parse(String(res2.getBody(('utf-8'))));
+  //   expect(res2.statusCode).toBe(OK);
+  //   expect(details).toStrictEqual(
+  //     expect.objectContaining({
+  //       channelId: ,
+  //       name: name,
+  //       messages: [],
+  //       allMembers: [],
+  //       ownerMembers: [],
+  //       isPublic: isPublic,
+  //     })
+  //   );
+  // });
   test('ChannelId is invalid', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
@@ -402,7 +402,7 @@ describe('Testing channelDetailsV2', () => {
     const res2 = requestChannelDetails(authUser.token, 1);
     const details = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
-    expect(messages).toStrictEqual(errorMsg);
+    expect(details).toStrictEqual(errorMsg);
   });
   test('ChannelId is valid but user is not part of channel', () => {
     const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
@@ -411,6 +411,6 @@ describe('Testing channelDetailsV2', () => {
     const res2 = requestChannelDetails(authUser.token, 1);
     const details = JSON.parse(String(res2.getBody(('utf-8'))));
     expect(res2.statusCode).toBe(OK);
-    expect(messages).toStrictEqual(errorMsg);
+    expect(details).toStrictEqual(errorMsg);
   });
 })
