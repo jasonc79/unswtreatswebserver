@@ -1,4 +1,4 @@
-import { error, errorMsg, userReturn } from './dataStore';
+import { getData, error, errorMsg, userReturn, allUserReturn } from './dataStore';
 import { checkValidId, returnValidId, checkValidToken } from './helper';
 
 /*
@@ -38,4 +38,13 @@ function userProfileV1(token: string, uId: number) : error | userReturn {
   };
 }
 
-export { userProfileV1 };
+function usersAllV1(token: string) : error | allUserReturn {
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+  const allUsers = [];
+  const users = getData().users;
+  return { users: users };
+}
+
+export { userProfileV1, usersAllV1 };

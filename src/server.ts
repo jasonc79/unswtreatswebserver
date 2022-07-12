@@ -5,7 +5,7 @@ import config from './config.json';
 
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1 } from './channels';
-import { userProfileV1 } from './users';
+import { userProfileV1, usersAllV1 } from './users';
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
@@ -63,6 +63,16 @@ app.get('/user/profile/v2', (req, res, next) => {
     const uId = req.query.uId as string;
 
     return res.json(userProfileV1(token, parseInt(uId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/users/all/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+
+    return res.json(usersAllV1(token));
   } catch (err) {
     next(err);
   }
