@@ -37,9 +37,9 @@ interface Message {
 
 // DM TYPES AND INTERFACES
 interface Dm {
-  dmId: number, 
+  dmId: number,
   name: string,
-  members: UserInfo[], 
+  members: UserInfo[],
   owners: UserInfo[],
 }
 

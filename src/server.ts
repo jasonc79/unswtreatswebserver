@@ -6,7 +6,7 @@ import config from './config.json';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1 } from './channels';
 import { userProfileV1 } from './users';
-import { dmCreateV1 } from './dm'; 
+import { dmCreateV1 } from './dm';
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
