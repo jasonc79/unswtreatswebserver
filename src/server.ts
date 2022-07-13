@@ -83,8 +83,8 @@ app.get('/channels/listall/v2', (req, res, next) => {
 app.get('/channel/messages/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
-    const channelId = parseInt(req.query.token as string);
-    const start = parseInt(req.query.token as string);
+    const channelId = parseInt(req.query.channelId as string);
+    const start = parseInt(req.query.start as string);
     return res.json(channelMessagesV1(token, channelId, start));
   } catch (err) {
     next(err);
@@ -94,8 +94,43 @@ app.get('/channel/messages/v2', (req, res, next) => {
 app.get('/channel/details/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
+    const channelId = parseInt(req.query.channelId as string);
+    return res.json(channelDetailsV2(token, channelIds));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('channel/leave/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
     const channelId = parseInt(req.query.token as string);
-    return res.json(channelDetailsV2(token, channelId ));
+    const { token, channelId } = req.body;
+    return res.json(channelLeaveV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('channel/addowner/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const channelId = parseInt(req.query.channelId as string);
+    const uId = parseInt(req.query.uId as string);
+    const { token, channelId, uId } = req.body;
+    return res.json(channelAddOwnerV1(token, channelId, uId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('channel/removeowner/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const channelId = parseInt(req.query.channelId as string);
+    const uId = parseInt(req.query.uId as string);
+    const { token, channelId, uId } = req.body;
+    return res.json(channelRemoveOwnerV1(token, channelId, uId));
   } catch (err) {
     next(err);
   }
