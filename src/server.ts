@@ -8,7 +8,7 @@ import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { channelJoinV1 } from './channel';
 import { userProfileV1, usersAllV1 } from './users';
-import { messageSendV1, /*messageEditV1, messageRemoveV1*/ } from './message';
+import { messageSendV1, messageEditV1 /*, messageRemoveV1 */ } from './message';
 
 import { clearV1 } from './other';
 // Set up web app, use JSON
@@ -119,18 +119,18 @@ app.post('/message/send/v1', (req, res, next) => {
     const { token, channelId, message } = req.body;
     return res.json(messageSendV1(token, channelId, message));
   } catch (err) {
-    next (err);
+    next(err);
   }
 });
 
-// app.put('/message/edit/v1', (req, res, next) => {
-//   try {
-//     const { token, messageId, message } = req.body;
-//     return res.json(messageEditV1(token, messageId, message));
-//   } catch (err) {
-//     next (err);
-//   }
-// });
+app.put('/message/edit/v1', (req, res, next) => {
+  try {
+    const { token, messageId, message } = req.body;
+    return res.json(messageEditV1(token, messageId, message));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // app.delete('/message/remove/v1', (req, res, next) => {
 //   try {

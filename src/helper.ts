@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data, token, Message, uId } from './dataStore';
+import { Channel, getData, User, Data, token, Message } from './dataStore';
 /**
  * returns true if the id corresponds to a valid user, and false otherwise
  */
@@ -39,20 +39,32 @@ function checkValidToken(token: token) : boolean {
 }
 
 /**
+ * returns true if the channel details given the id of a message from the channel
+ * and false otherwise
+ */
+function checkChannelfromMessage(messageId: number) : boolean {
+  const data: Data = getData();
+  for (const channel of data.channels) {
+    for (const message of channel.messages) {
+      if (message.messageId === messageId) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * return true if the id corresponds to a valid message, and false otherwise
  * for the message to be valid
  *    the user needs to be in the channel/dm with the message
  */
 function checkValidMessage(token: string, messageId: number) : boolean {
-  const data: Data = getData();
-  // get channelId from messageId
   const channel = getChannelfromMessage(messageId);
-  // if messageId doesn't exist or if the user is not in the channel, return false
-  if (channel.channelId === undefined || !isMember(token, channel.channelId)) {
+  if (!checkChannelfromMessage(messageId) || !isMember(token, channel.channelId)) {
     return false;
   }
-  
-  // check that messageId refers to a message in that channel
+
   for (const message of channel.messages) {
     if (message.messageId === messageId) {
       return true;
@@ -65,6 +77,9 @@ function checkValidMessage(token: string, messageId: number) : boolean {
  * returns true if the current user is the user who sent the message
  */
 function checkMessageSender(token: string, messageId: number) : boolean {
+  if (!checkChannelfromMessage(messageId)) {
+    return false;
+  }
   const message = returnValidMessage(messageId);
   const uId = getIdfromToken(token);
   if (message.uId === uId) {
@@ -165,7 +180,7 @@ function isMember(token: string, channelId: number) : boolean {
  * returns true if the current user is an owner of the channel
  * or if the user is a global owner, and returns false otherwise
  */
- function isOwner(token: string, channelId: number) : boolean {
+function isOwner(token: string, channelId: number) : boolean {
   const channel = returnValidChannel(channelId);
   const user = returnValidId(getIdfromToken(token));
   if (user.permissionId === 2) {
@@ -183,6 +198,7 @@ export {
   checkValidId,
   checkValidChannel,
   checkValidToken,
+  checkChannelfromMessage,
   checkValidMessage,
   checkMessageSender,
   returnValidId,
