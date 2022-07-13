@@ -151,7 +151,7 @@ type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
 
-function channelMessagesV1(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
+function channelMessagesV2(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
   //uId becomes valid user from returnValidUser
   const uId = returnValidUser(token);
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
@@ -231,20 +231,20 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   const tempuId = returnValidUser(token);
   const user = userProfileV1(token, tempuId.uId) as userReturn;
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
-      !returnIsOwner(uId, channelId || !returnIsOwner(user.user.uId, channelId))) {
+      !returnIsOwner(uId, channelId) || !returnIsOwner(user.user.uId, channelId)) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
-  if (currChannel.ownerMembers.length() === 1) {
+  if (currChannel.ownerMembers.length === 1) {
     return errorMsg
   }
   const i = 0
   for (const member of currChannel.allMembers) {
-    if (member.uId = uId.uId) {
+    if (member.uId = uId) {
       currChannel.allMembers.splice(i, 1)
     }
     i++;
   }
 }
 
-export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV2 };
