@@ -59,19 +59,22 @@ app.post('/channels/create/v2', (req, res, next) => {
 // ================================================================ //
 // channel functions
 
-app.post('/channel/messages/v2', (req, res, next) => {
+app.get('/channel/messages/v2', (req, res, next) => {
   try {
-    const { token, channelId, start } = req.body;
-    return res.json(channelsCreateV1(token, channelId, start));
+    const token = req.query.token as string;
+    const channelId = parseInt(req.query.token as string);
+    const start = parseInt(req.query.token as string);
+    return res.json(channelMessagesV1(token, channelId, start));
   } catch (err) {
     next(err);
   }
 });
 
-app.post('/channel/details/v2', (req, res, next) => {
+app.get('/channel/details/v2', (req, res, next) => {
   try {
-    const { token, channelId } = req.body;
-    return res.json(channelsCreateV1(token, channelId ));
+    const token = req.query.token as string;
+    const channelId = parseInt(req.query.token as string);
+    return res.json(channelDetailsV2(token, channelId ));
   } catch (err) {
     next(err);
   }
