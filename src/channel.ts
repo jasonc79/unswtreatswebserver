@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken } from './helper';
+import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken, returnIsMember, returnIsOwner } from './helper';
 import { userProfileV1 } from './users';
 import { channelsListV1 } from './channels';
 
@@ -28,7 +28,7 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
   const data = getData();
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;  
-  if (!checkValidChannel(channelId)) {
+  if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
   let authUserValid = false;
@@ -154,22 +154,14 @@ type messagesOver50 = { messages: Message[], start: number, end: number };
 function channelMessagesV1(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
   //uId becomes valid user from returnValidUser
   const uId = returnValidUser(token);
-  //user becomes the user given user.uId and token
-  const user = userProfileV1(token, uId.uId) as userReturn;
-  if (!checkValidChannel(channelId)) {
+  if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
-  let isMember = false;
-  for (const member of currChannel.allMembers) {
-    if (user.uId === member.uId) {
-      isMember = true;
-    }
-  }
-
-  if (isMember === false) {
+  if (!returnIsMember(uId.uId, channelId)) {
     return errorMsg;
   }
+
   const channelMsg = currChannel.messages;
   if (channelMsg.length < start) {
     return errorMsg;
@@ -193,5 +185,66 @@ function channelMessagesV1(token: string, channelId: number, start: number): (er
     end: final,
   };
 }
-export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
 
+function channelLeaveV1(token: string, channelId: number): (error | {}) {
+  const data = getData();
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
+  if (!checkValidChannel(channelId) || !checkValidToken(token) || !returnIsMember(uId.uId, channelId)) {
+    return errorMsg;
+  }
+  const currChannel = returnValidChannel(channelId);
+  let i = 0
+  if (returnIsOwner(uId.uId, channelId)) {
+    let j = 0
+    for (const member of currChannel.ownerMembers) {
+      if (member.uId = uId.uId) {
+        currChannel.ownerMembers.splice(j, 1)
+      }
+      j++;
+    }
+  }
+  for (const member of currChannel.allMembers) {
+    if (member.uId = uId.uId) {
+      currChannel.allMembers.splice(i, 1)
+    }
+    i++;
+  }
+  return {};
+}
+
+function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | {}) {
+  const data = getData();
+  const tempuId = returnValidUser(token);
+  const user = userProfileV1(token, tempuId.uId) as userReturn;
+  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
+      !returnIsOwner(user.user.uId, channelId) || !returnIsMember(uId, channelId)) {
+    return errorMsg;
+  }
+  const currChannel = returnValidChannel(channelId);
+  currChannel.ownerMembers.push(user);
+  return {};
+}
+
+function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | {}) {
+  const data = getData();
+  const tempuId = returnValidUser(token);
+  const user = userProfileV1(token, tempuId.uId) as userReturn;
+  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
+      !returnIsOwner(uId, channelId || !returnIsOwner(user.user.uId, channelId))) {
+    return errorMsg;
+  }
+  const currChannel = returnValidChannel(channelId);
+  if (currChannel.ownerMembers.length() === 1) {
+    return errorMsg
+  }
+  const i = 0
+  for (const member of currChannel.allMembers) {
+    if (member.uId = uId.uId) {
+      currChannel.allMembers.splice(i, 1)
+    }
+    i++;
+  }
+}
+
+export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
