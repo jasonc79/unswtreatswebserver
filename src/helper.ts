@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data, token, Message } from './dataStore';
+import { Channel, getData, User, Data, token /* Message */ } from './dataStore';
 
 function checkValidId(id: number) : boolean {
   const data: Data = getData();
@@ -91,7 +91,7 @@ function getIdfromToken(token: string) : number {
 }
 
 function isMember(channelId: number, token: string) : boolean {
-  const data: Data = getData();
+  // const data: Data = getData();
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
   for (const user of channel.allMembers) {
@@ -102,14 +102,15 @@ function isMember(channelId: number, token: string) : boolean {
   return false;
 }
 
-export { checkValidId, 
-        checkValidChannel, 
-        checkValidToken, 
-        // checkValidMessage,
-        returnValidId, 
-        returnValidChannel, 
-        returnValidUser, 
-        // returnValidMessage,
-        getIdfromToken,
-        isMember,
-      };
+export {
+  checkValidId,
+  checkValidChannel,
+  checkValidToken,
+  // checkValidMessage,
+  returnValidId,
+  returnValidChannel,
+  returnValidUser,
+  // returnValidMessage,
+  getIdfromToken,
+  isMember,
+};

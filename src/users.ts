@@ -44,8 +44,9 @@ function usersAllV1(token: string) : error | allUserReturn {
   }
   const users = getData().users;
   const userDetails = [];
-  for (const user of users) {
-    userDetails.push(userProfileV1(token, user.uId)['user']);
+  for (const member of users) {
+    const current = userProfileV1(token, member.uId) as userReturn;
+    userDetails.push(current.user);
   }
   return { users: userDetails };
 }

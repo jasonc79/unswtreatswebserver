@@ -26,7 +26,7 @@ interface UserInfo {
 }
 
 type userReturn = { user: UserInfo };
-type allUserReturn = { users: User[] };
+type allUserReturn = { users: UserInfo[] };
 
 // MESSAGE TYPES AND INTERFACES
 interface Message {
