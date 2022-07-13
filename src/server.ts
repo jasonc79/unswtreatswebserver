@@ -2,15 +2,18 @@ import express from 'express';
 import { echo } from './echo';
 import morgan from 'morgan';
 import config from './config.json';
+import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
-import { channelsCreateV1 } from './channels';
+import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1 } from './users';
 import { clearV1 } from './other';
 import { channelMessagesV1, channelDetailsV1 } from './channel';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
+// Use middleware that allows for access from other domains
+app.use(cors());
 
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
@@ -26,7 +29,7 @@ app.get('/echo', (req, res, next) => {
 });
 
 // ================================================================ //
-// auth functions
+// Auth functions
 app.post('/auth/register/v2', (req, res, next) => {
   try {
     const { email, password, nameFirst, nameLast } = req.body;
@@ -46,11 +49,29 @@ app.post('/auth/login/v2', (req, res, next) => {
 });
 
 // ================================================================ //
-// channels functions
+// Channels functions
 app.post('/channels/create/v2', (req, res, next) => {
   try {
     const { token, name, isPublic } = req.body;
     return res.json(channelsCreateV1(token, name, isPublic));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/channels/list/v2', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(channelsListV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/channels/listall/v2', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(channelsListallV1(token));
   } catch (err) {
     next(err);
   }
@@ -94,7 +115,7 @@ app.get('/user/profile/v2', (req, res, next) => {
 });
 
 // ================================================================ //
-// other functions
+// Other functions
 
 app.delete('/clear/v1', (req, res, next) => {
   try {
