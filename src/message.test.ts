@@ -113,8 +113,8 @@ describe('Testing messageSendV1', () => {
             const channel2 = requestChannelCreate(authUser.token, 'name2', false);
             requestChannelJoin(authUser.token, channel1.channelId);
             requestChannelJoin(authUser.token, channel2.channelId);
-            const messageId = requestMessageSend(authUser.token, channel.channelId, 'message1');
-            const messageId = requestMessageSend(authUser.token, channel.channelId, 'message2');
+            const messageId1 = requestMessageSend(authUser.token, channel1.channelId, 'message1');
+            const messageId2 = requestMessageSend(authUser.token, channel2.channelId, 'message2');
             expect(messageId1).toStrictEqual(
                 expect.objectContaining({
                     messageId: expect.any(Number),
