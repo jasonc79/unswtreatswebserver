@@ -6,6 +6,7 @@ import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
+import { channelJoinV1 } from './channel';
 import { userProfileV1, usersAllV1 } from './users';
 // import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
 
@@ -79,6 +80,17 @@ app.get('/channels/listall/v2', (req, res, next) => {
 });
 
 // ================================================================ //
+// Channel functions
+app.post('/channel/join/v2', (req, res, next) => {
+  try {
+    const { token, channelId } = req.body;
+    return res.json(channelJoinV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ================================================================ //
 // User functions
 app.get('/user/profile/v2', (req, res, next) => {
   try {
@@ -100,7 +112,7 @@ app.get('/users/all/v1', (req, res, next) => {
 });
 
 // ================================================================ //
-// message functions
+// Message functions
 
 // app.post('/message/send/v1', (req, res, next) => {
 //   try {

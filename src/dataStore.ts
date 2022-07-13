@@ -31,7 +31,7 @@ type allUserReturn = { users: UserInfo[] };
 // MESSAGE TYPES AND INTERFACES
 interface Message {
   messageId: number,
-  uId: uId,
+  uId: number,
   message: string,
   timeSent: number
 }
