@@ -65,7 +65,7 @@ Return Value:
 */
 function channelJoinV1(token: string, channelId: number): (error | object) {
   // Check if channelId and token is valid
-  if (!checkValidToken(token)|| !checkValidChannel(channelId)) {
+  if (!checkValidToken(token) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
   const user = returnValidUser(token);
