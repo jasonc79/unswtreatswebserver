@@ -57,4 +57,26 @@ function returnValidUser(token: string): User {
   }
 }
 
-export { checkValidId, checkValidChannel, checkValidToken, returnValidId, returnValidChannel, returnValidUser };
+function returnIsMember(uId: number, channelId: number): boolean {
+  const data: Data = getData();
+  const currChannel = returnValidChannel(channelId);
+  for (const member of currChannel.allMembers) {
+    if (user.uId === member.uId) {
+      isMember = true;
+    }
+  }
+  return false;
+}
+
+function returnIsOwner(uId: number, channelId: number): boolean {
+  const data: Data = getData();
+  const currChannel = returnValidChannel(channelId);
+  for (const member of currChannel.ownerMembers) {
+    if (user.uId === member.uId) {
+      isMember = true;
+    }
+  }
+  return false;
+}
+
+export { checkValidId, checkValidChannel, checkValidToken, returnValidId, returnValidChannel, returnValidUser, returnIsMember, returnIsOwner };
