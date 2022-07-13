@@ -94,9 +94,6 @@ describe('Testing usersAllV1', () => {
             nameFirst: 'firstname1',
             nameLast: 'lastname1',
             handleStr: 'firstname1lastname1',
-            token: authUser.token,
-            password: 'password1',
-            permissionId: 1,
           }
         ]
       });
@@ -123,9 +120,6 @@ describe('Testing usersAllV1', () => {
             nameFirst: 'firstname1',
             nameLast: 'lastname1',
             handleStr: 'firstname1lastname1',
-            token: authUser1.token,
-            password: 'password1',
-            permissionId: 1,
           },
           {
             uId: authUser2.authUserId,
@@ -133,9 +127,6 @@ describe('Testing usersAllV1', () => {
             nameFirst: 'firstname2',
             nameLast: 'lastname2',
             handleStr: 'firstname2lastname2',
-            token: authUser2.token,
-            password: 'password2',
-            permissionId: 2,
           },
           {
             uId: authUser3.authUserId,
@@ -143,9 +134,6 @@ describe('Testing usersAllV1', () => {
             nameFirst: 'firstname3',
             nameLast: 'lastname3',
             handleStr: 'firstname3lastname3',
-            token: authUser3.token,
-            password: 'password3',
-            permissionId: 2,
           }
         ]
       });

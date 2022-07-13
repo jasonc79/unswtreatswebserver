@@ -6,6 +6,7 @@ import config from './config.json';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1 } from './channels';
 import { userProfileV1, usersAllV1 } from './users';
+// import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
@@ -61,7 +62,6 @@ app.get('/user/profile/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
     const uId = req.query.uId as string;
-
     return res.json(userProfileV1(token, parseInt(uId)));
   } catch (err) {
     next(err);
@@ -71,12 +71,41 @@ app.get('/user/profile/v2', (req, res, next) => {
 app.get('/users/all/v1', (req, res, next) => {
   try {
     const token = req.query.token as string;
-
     return res.json(usersAllV1(token));
   } catch (err) {
     next(err);
   }
 });
+
+// ================================================================ //
+// message functions
+
+// app.post('/message/send/v1', (req, res, next) => {
+//   try {
+//     const { token, channelId, message } = req.body;
+//     return res.json(messageSendV1(token, channelId, message));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
+
+// app.put('/message/edit/v1', (req, res, next) => {
+//   try {
+//     const { token, messageId, message } = req.body;
+//     return res.json(messageEditV1(token, messageId, message));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
+
+// app.delete('/message/remove/v1', (req, res, next) => {
+//   try {
+//     const { token, messageId } = req.body;
+//     return res.json(messageRemoveV1(token, messageId));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
 
 // ================================================================ //
 // other functions

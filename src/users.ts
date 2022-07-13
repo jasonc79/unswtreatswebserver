@@ -43,7 +43,11 @@ function usersAllV1(token: string) : error | allUserReturn {
     return errorMsg;
   }
   const users = getData().users;
-  return { users: users };
+  const userDetails = [];
+  for (const user of users) {
+    userDetails.push(userProfileV1(token, user.uId)['user']);
+  }
+  return { users: userDetails };
 }
 
 export { userProfileV1, usersAllV1 };
