@@ -12,7 +12,7 @@ interface User {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
-  token: token,
+  token: token[],
   password: string,
   permissionId: number,
 }

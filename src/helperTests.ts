@@ -47,6 +47,13 @@ export function requestAuthLogin(email: string, password: string) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
+
+export function requestAuthLogout(token: string) {
+  const res = requestHelper('POST', '/auth/logout/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
 // Channels functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });

@@ -30,8 +30,10 @@ function checkValidChannel(id: number) : boolean {
 function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return true;
+    for (const token of user.token) {
+      if (token === token) {
+        return true;
+      }
     }
   }
   return false;
@@ -139,8 +141,10 @@ function returnValidMessage(messageId: number) : Message {
 function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user.uId;
+    for (const token of user.token) {
+      if (user.token === token) {
+        return user.uId;
+      }
     }
   }
 }
