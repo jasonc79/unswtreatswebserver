@@ -250,6 +250,8 @@ describe('Testing auth/logout/v2', () => {
     const authUser = requestAuthRegister('email@email.com', 'password', 'name', 'name2');
     const authLogoutReturn = requestAuthLogout(authUser.token);
     expect(authLogoutReturn).toStrictEqual({});
-    expect(requestChannelCreate(authUser.token, 'channel', true)).toStrictEqual(errorMsg);
+    const channel = requestChannelCreate(authUser.token, 'channel', true);
+    expect(channel).toStrictEqual(errorMsg);
   });
 });
+

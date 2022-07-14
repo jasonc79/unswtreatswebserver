@@ -99,14 +99,14 @@ Example usage
 
 // Use get() to access the data
 function getData(): Data {
-  //loadData();
+  loadData();
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
 function setData(newData: Data) {
   data = newData;
-  //saveData();
+  saveData();
 }
 
 function saveData() {
@@ -114,7 +114,9 @@ function saveData() {
 }
 
 function loadData() {
-  data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+  if (fs.existsSync(fileName)) {
+    data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+  }
 }
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm };

@@ -1,9 +1,10 @@
-import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, User, Data, token, Dm, Message, error, errorMsg } from './dataStore';
 
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise
  * property : users | channels
  */
+
 function checkValidUser(id: number) : boolean {
   const data = getData();
   for (const item of data.users) {
@@ -30,8 +31,8 @@ function checkValidChannel(id: number) : boolean {
 function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
-    for (const token of user.token) {
-      if (token === token) {
+    for (const userToken of user.token) {
+      if (token === userToken) {
         return true;
       }
     }
@@ -113,8 +114,8 @@ function returnValidUser(token: string) : User {
         return user;
       }
     }
-    
   }
+  throw new Error('User was not found in returnValidUser');
 }
 
 function returnValidDm(id: number): Dm {
@@ -124,6 +125,7 @@ function returnValidDm(id: number): Dm {
       return dm;
     }
   }
+  throw new Error('Dm was not found in returnValidDm');
 }
 
 /**
@@ -136,6 +138,7 @@ function returnValidMessage(messageId: number) : Message {
       return message;
     }
   }
+  throw new Error('Message was not found in returnValidMessage');
 }
 
 /**
@@ -194,6 +197,28 @@ function isOwner(token: string, channelId: number) : boolean {
   return false;
 }
 
+function isMemberDm(token: string, dmId: number): boolean {
+  const uId = getIdfromToken(token);
+  const dm = returnValidDm(dmId);
+  for (const member of dm.members) {
+    if (uId === member.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isOwnerDm(token: string, dmId: number): boolean {
+  const uId = getIdfromToken(token);
+  const dm = returnValidDm(dmId);
+  for (const owner of dm.owners) {
+    if (uId === owner.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export {
   checkValidUser,
   checkValidChannel,
@@ -210,4 +235,6 @@ export {
   getChannelfromMessage,
   isMember,
   isOwner,
+  isMemberDm,
+  isOwnerDm,
 };

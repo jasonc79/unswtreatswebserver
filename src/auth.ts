@@ -76,8 +76,8 @@ Return Value:
 */
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-  let data = getData(); 
-  let token = generateToken();
+  const data = getData();
+  const token = generateToken();
   if (!user) {
     return errorMsg;
   }
@@ -86,7 +86,7 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
     return errorMsg;
   }
 
-  for (let user of data.users) {
+  for (const user of data.users) {
     if (user.email === email && user.password === password) {
       user.token.push(token);
     }
@@ -103,16 +103,18 @@ const authLogoutV1 = (token: token) : object | error => {
     return errorMsg;
   }
   const authUser = getIdfromToken(token);
-  let data = getData();
+  const data = getData();
   for (const user of data.users) {
     for (let i = 0; i < user.token.length; i++) {
       if (user.token[i] === token) {
         user.token.splice(i, 1);
       }
     }
+    setData(data);
   }
+
   return {};
-}
+};
 
 // HELPER FUNCTIONS
 
@@ -211,5 +213,3 @@ const generateToken = () : token => {
 };
 
 export { authLoginV1, authRegisterV1, authLogoutV1 };
-
-
