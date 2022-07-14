@@ -1,5 +1,5 @@
-import { error, errorMsg, userReturn } from './dataStore';
-import { checkValidId, returnValidId, checkValidToken } from './helper';
+import { getData, error, errorMsg, userReturn, allUserReturn } from './dataStore';
+import { checkValidUser, returnValidId, checkValidToken } from './helper';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -23,7 +23,7 @@ Return Value:
 */
 
 function userProfileV1(token: string, uId: number) : error | userReturn {
-  if (!checkValidId(uId) || !checkValidToken(token)) {
+  if (!checkValidUser(uId) || !checkValidToken(token)) {
     return errorMsg;
   }
   const user = returnValidId(uId);
@@ -38,4 +38,17 @@ function userProfileV1(token: string, uId: number) : error | userReturn {
   };
 }
 
-export { userProfileV1 };
+function usersAllV1(token: string) : error | allUserReturn {
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+  const users = getData().users;
+  const userDetails = [];
+  for (const member of users) {
+    const current = userProfileV1(token, member.uId) as userReturn;
+    userDetails.push(current.user);
+  }
+  return { users: userDetails };
+}
+
+export { userProfileV1, usersAllV1 };

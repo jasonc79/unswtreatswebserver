@@ -1,12 +1,12 @@
-import { error, errorMsg, UserInfo, Message } from './dataStore';
+import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, returnValidId, checkValidId } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember } from './helper';
+import { userProfileV1 } from './users';
 
 // UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
 /*
 import { userReturn, ChannelInfo } from './dataStore';
 import { channelsListV1 } from './channels';
-import { userProfileV1 } from './users';
 type channelsList = { channels: ChannelInfo[] };
 */
 
@@ -63,21 +63,36 @@ Return Value:
     Returns {error: 'error'} on a private channel and auth user is not a global owner
     Returns {} on no error
 */
-function channelJoinV1(authUserId: number, channelId: number): (error | object) {
-  /* // Check if channelId and authUserId is valid
-  if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+/**
+ * channelJoinV1
+ * Adds the current user to the channel
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel beign accessed
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the cahnnelId is invalid
+ * @returns {} if there is no error
+ */
+function channelJoinV1(token: string, channelId: number): (error | object) {
+  // Check if channelId and token is valid
+  if (!checkValidToken(token) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
-  const user = returnValidId(authUserId);
+  const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
-  if (channel.isPublic === false && user.permissionId === 2) {
+
+  if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
     return errorMsg;
   }
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
   const data = getData();
-  const newUser = userProfileV1(authUserId, authUserId) as userReturn;
+  const newUser = userProfileV1(token, user.uId) as userReturn;
   channel.allMembers.push(newUser.user);
-  setData(data); */
+  setData(data);
   return {};
 }
 
@@ -97,30 +112,30 @@ Return Value:
     Returns {} on no error
  */
 function channelInviteV1(authUserId: number, channelId: number, uId: number): (error | object) {
-  // Checking if channelID and uId are valid
-  const data = getData();
-  const channel = returnValidChannel(channelId);
-  const user = returnValidId(uId);
-  if (channel === undefined || user === undefined) {
-    return errorMsg;
-  }
+  // // Checking if channelID and uId are valid
+  // const data = getData();
+  // const channel = returnValidChannel(channelId);
+  // const user = returnValidId(uId);
+  // if (channel === undefined || user === undefined) {
+  //   return errorMsg;
+  // }
 
-  // Checking if uId and authUserID are members
-  let uIdMember = false;
-  let authUserIdMember = false;
-  for (const member of channel.allMembers) {
-    if (member.uId === uId) {
-      uIdMember = true;
-    } else if (member.uId === authUserId) {
-      authUserIdMember = true;
-    }
-  }
-  if (uIdMember === true || authUserIdMember === false) {
-    return errorMsg;
-  }
+  // // Checking if uId and authUserID are members
+  // let uIdMember = false;
+  // let authUserIdMember = false;
+  // for (const member of channel.allMembers) {
+  //   if (member.uId === uId) {
+  //     uIdMember = true;
+  //   } else if (member.uId === authUserId) {
+  //     authUserIdMember = true;
+  //   }
+  // }
+  // if (uIdMember === true || authUserIdMember === false) {
+  //   return errorMsg;
+  // }
 
-  channel.allMembers.push(user);
-  setData(data);
+  // channel.allMembers.push(user);
+  // setData(data);
   return {};
 }
 
@@ -149,45 +164,50 @@ type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
 function channelMessagesV1(authUserId: number, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  if (!checkValidId(authUserId)) {
-    return errorMsg;
-  }
+  // if (!checkValidId(authUserId)) {
+  //   return errorMsg;
+  // }
 
-  if (!checkValidChannel(channelId)) {
-    return errorMsg;
-  }
-  const currChannel = returnValidChannel(channelId);
-  let isMember = false;
-  for (const member of currChannel.allMembers) {
-    if (authUserId === member.uId) {
-      isMember = true;
-    }
-  }
+  // if (!checkValidChannel(channelId)) {
+  //   return errorMsg;
+  // }
+  // const currChannel = returnValidChannel(channelId);
+  // let isMember = false;
+  // for (const member of currChannel.allMembers) {
+  //   if (authUserId === member.uId) {
+  //     isMember = true;
+  //   }
+  // }
 
-  if (isMember === false) {
-    return errorMsg;
-  }
-  const channelMsg = currChannel.messages;
-  if (channelMsg.length < start) {
-    return errorMsg;
-  }
+  // if (isMember === false) {
+  //   return errorMsg;
+  // }
+  // const channelMsg = currChannel.messages;
+  // if (channelMsg.length < start) {
+  //   return errorMsg;
+  // }
 
-  const messages: Array<Message> = [];
-  const final = start + 50;
-  for (let i = start; i < final; i++) {
-    if (i >= channelMsg.length) {
-      return {
-        messages: messages,
-        start: start,
-        end: -1,
-      };
-    }
-    messages.push(channelMsg[i]);
-  }
+  // const messages: Array<Message> = [];
+  // const final = start + 50;
+  // for (let i = start; i < final; i++) {
+  //   if (i >= channelMsg.length) {
+  //     return {
+  //       messages: messages,
+  //       start: start,
+  //       end: -1,
+  //     };
+  //   }
+  //   messages.push(channelMsg[i]);
+  // }
+  // return {
+  //   messages: messages,
+  //   start: start,
+  //   end: final,
+  // };
   return {
-    messages: messages,
-    start: start,
-    end: final,
+    messages: [],
+    start: 1,
+    end: 1,
   };
 }
 export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };

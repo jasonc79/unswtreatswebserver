@@ -74,6 +74,12 @@ export function requestUserProfile(token: string, uId: number) {
   return JSON.parse(String(res.getBody()));
 }
 
+export function requestAllUsers(token: string) {
+  const res =  requestHelper('GET', '/users/all/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
 // Other
 export function requestClear() {
   const res = requestHelper('DELETE', '/clear/v1', {});
