@@ -21,16 +21,35 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
 // Wrapper Functions
 
 function requestUserProfile(token: string, uId: number) {
-  return requestHelper('GET', '/user/profile/v2', { token, uId });
+  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
 }
 
 function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
-  return requestHelper('POST', '/auth/register/v2', {
+  const res = requestHelper('POST', '/auth/register/v2', {
     email: email,
     password: password,
     nameFirst: nameFirst,
     nameLast: nameLast
   });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+function requestUserSetName(token: string, nameFirst: string, nameLast: string) {
+  const res = requestHelper('PUT', '/user/profile/setname/v1', { token, nameFirst, nameLast });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+function requestUserEmail(token: string, email: string) {
+  const res = requestHelper('PUT', '/user/profile/setemail/v1', { token, email });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+function requestUserHandle(token: string, handleStr: string) {
+  const res = requestHelper('PUT', '/user/profile/sethandle/v1', { token, handleStr });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
 }
 
 function requestClear() {
@@ -43,15 +62,9 @@ beforeEach(() => {
 
 describe('Testing userProfileV1', () => {
   test('Valid uId', () => {
-    const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
-    const res2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const uId = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
-    const res3 = requestUserProfile(authUser.token, uId.authUserId);
-    const profile = JSON.parse(String(res3.getBody(('utf-8'))));
-    expect(res3.statusCode).toBe(OK);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const uId = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const profile = requestUserProfile(authUser.token, uId.authUserId);
     expect(profile).toStrictEqual({
       user: {
         uId: uId.authUserId,
@@ -63,13 +76,73 @@ describe('Testing userProfileV1', () => {
     });
   });
   test('Invalid uId', () => {
-    const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const uId = authUser.authUserId + 1;
-    const res2 = requestUserProfile(authUser.token, uId);
-    const profile = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
+    const profile = requestUserProfile(authUser.token, uId);
     expect(profile).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetNameV1', () => {
+  test('Valid Name', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setNameValidator = requestUserSetName(authUser.token, 'Dan', 'Smith');
+    expect(setNameValidator).toStrictEqual({});
+  });
+
+  test('Invalid Name', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const nameFirst = 'A';
+    const nameLast = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const setNameValidator = requestUserSetName(authUser.token, nameFirst, nameLast);
+    expect(setNameValidator).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetEmailV1', () => {
+  test('Valid Email', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setEmailValidator = requestUserEmail(authUser.token, 'email@gmail.com');
+    expect(setEmailValidator).toStrictEqual({});
+  });
+  test('Invalid Email', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setEmailValidator = requestUserEmail(authUser.token, 'email@gmail,com');
+    expect(setEmailValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Email - Already being used by another user', () => {
+    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
+    const setEmailValidator = requestUserEmail(authUser1.token, 'email1@gmail.com');
+    expect(setEmailValidator).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetHandleV1', () => {
+  test('Valid Handle', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setHandleValidator = requestUserHandle(authUser.token, 'dansmith');
+    expect(setHandleValidator).toStrictEqual({});
+  });
+  test('Invalid Handle - Length too short', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setHandleValidator = requestUserHandle(authUser.token, '3r');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Handle - Length too long', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setHandleValidator = requestUserHandle(authUser.token, '3r4ef3r4ef3r4ef3r4efu');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Handle - contains characters that are non-alphanumeric', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setHandleValidator = requestUserHandle(authUser.token, '@#^@&#*&$');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Email - Already being used by another user', () => {
+    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
+    const sethandleValidator = requestUserEmail(authUser1.token, 'jasonchen');
+    expect(sethandleValidator).toStrictEqual(errorMsg);
   });
 });
