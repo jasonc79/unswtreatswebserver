@@ -47,7 +47,8 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
     dmId: dmId,
     name: dmName,
     members: DmMembers,
-    owners: [authUser.user]
+    owners: [authUser.user],
+    messages: [],
   };
   data.dms.push(newDm);
   setData(data);
