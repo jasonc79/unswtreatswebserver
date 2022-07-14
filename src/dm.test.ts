@@ -48,6 +48,12 @@ function getRequestRegister(email: string, password: string, nameFirst: string, 
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
+function requestDmLeave(token: number, dmId: number) {
+  const res = requestHelper('POST', '/dm/leave/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
 function getReqClear() {
   return requestHelper('DELETE', '/clear/v1', {});
 }
@@ -177,3 +183,27 @@ describe('Testing dm/remove/v1', () => {
   });
 });
 */
+
+describe('Testing dm/leave/v1', () => {
+  describe('errors', () => {
+    test('invalid token', () => {
+      const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
+      const uId1 = getRequestRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+      const uIds = [];
+      uIds.push(uId1.authUserId);
+      const dm = getRequestDmCreate(authUser.token, uIds);
+      const token = 'bad';
+      const dmLeave = requestDmLeave(token, dm.dmId);
+      expect(dmLeave).toStrictEqual(errorMsg);
+    });
+    test('invalid dmId', () => {
+      const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
+      const uId1 = getRequestRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+      const uIds = [];
+      uIds.push(uId1.authUserId);
+      const dm = getRequestDmCreate(authUser.token, uIds);
+      const dmLeave = requestDmLeave(authUser.token, dm.dmId + 1);
+      expect(dmLeave).toStrictEqual(errorMsg);
+    });
+  });
+});
