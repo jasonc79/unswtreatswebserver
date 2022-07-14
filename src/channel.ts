@@ -66,13 +66,13 @@ Return Value:
 /**
  * channelJoinV1
  * Adds the current user to the channel
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel beign accessed
- * 
+ *
  * Return Values:
- * @returns { error } 
+ * @returns { error }
  *    if token is invalid
  *    if the cahnnelId is invalid
  * @returns {} if there is no error

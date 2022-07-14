@@ -37,11 +37,11 @@ function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   return JSON.parse(String(res.getBody()));
 }
 
-function requestChannelJoin(token: string, channelId: number) {
-  const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
+// function requestChannelJoin(token: string, channelId: number) {
+//   const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
+//   expect(res.statusCode).toBe(OK);
+//   return JSON.parse(String(res.getBody()));
+// }
 
 function requestMessageSend(token: string, channelId: number, message: string) {
   const res = requestHelper('POST', '/message/send/v1', { token, channelId, message });
@@ -49,17 +49,17 @@ function requestMessageSend(token: string, channelId: number, message: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-function requestMessageEdit(token: string, messageId: number, message: string) {
-  const res = requestHelper('PUT', '/message/edit/v1', { token, messageId, message });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
+// function requestMessageEdit(token: string, messageId: number, message: string) {
+//   const res = requestHelper('PUT', '/message/edit/v1', { token, messageId, message });
+//   expect(res.statusCode).toBe(OK);
+//   return JSON.parse(String(res.getBody()));
+// }
 
-function requestMessageRemove(token: string, messageId: number) {
-  const res = requestHelper('DELETE', '/message/remove/v1', { token, messageId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
+// function requestMessageRemove(token: string, messageId: number) {
+//   const res = requestHelper('DELETE', '/message/remove/v1', { token, messageId });
+//   expect(res.statusCode).toBe(OK);
+//   return JSON.parse(String(res.getBody()));
+// }
 
 function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
@@ -134,99 +134,99 @@ describe('Testing messageSendV1', () => {
   });
 });
 
-describe('Testing messageEditV1', () => {
-  describe('error', () => {
-    test('message length is over 1000', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const message = 'a'.repeat(1001);
-      const newMessage = requestMessageEdit(authUser.token, messageId.messageId, message);
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-    test('invalid messageId for channel/dm', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const messageId = message.messageId + 1;
-      // const messageId = message.messageId;
-      const newMessage = requestMessageEdit(authUser.token, messageId, 'new message');
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-    test('not sent by authUser making request', () => {
-      const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser1.token, 'name', false);
-      const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
-      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-      const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'new message');
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-    test('authUser has no owner permissions', () => {
-      const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser1.token, 'name', false);
-      const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
-      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-      requestChannelJoin(authUser2.token, channel.channelId);
-      const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'message');
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-  });
+// describe('Testing messageEditV1', () => {
+//   describe('error', () => {
+//     test('message length is over 1000', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const message = 'a'.repeat(1001);
+//       const newMessage = requestMessageEdit(authUser.token, messageId.messageId, message);
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//     test('invalid messageId for channel/dm', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const messageId = message.messageId + 1;
+//       // const messageId = message.messageId;
+//       const newMessage = requestMessageEdit(authUser.token, messageId, 'new message');
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//     test('not sent by authUser making request', () => {
+//       const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser1.token, 'name', false);
+//       const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'new message');
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//     test('authUser has no owner permissions', () => {
+//       const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser1.token, 'name', false);
+//       const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       requestChannelJoin(authUser2.token, channel.channelId);
+//       const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'message');
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//   });
 
-  describe('passes', () => {
-    test('deletes message', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const newMessage = requestMessageEdit(authUser.token, messageId.messageId, '');
-      expect(newMessage).toStrictEqual({});
-    });
-    test('edits message', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
-      expect(newMessage).toStrictEqual({});
-    });
-  });
-});
+//   describe('passes', () => {
+//     test('deletes message', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const newMessage = requestMessageEdit(authUser.token, messageId.messageId, '');
+//       expect(newMessage).toStrictEqual({});
+//     });
+//     test('edits message', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
+//       expect(newMessage).toStrictEqual({});
+//     });
+//   });
+// });
 
-describe('Testing messageRemoveV1', () => {
-  describe('error', () => {
-    test('invalid messageId for channel/dm', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const messageId = message.messageId + 1;
-      const newMessage = requestMessageRemove(authUser.token, messageId);
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-    test('not sent by authUser making request', () => {
-      const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser1.token, 'name', false);
-      const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
-      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-      const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
+// describe('Testing messageRemoveV1', () => {
+//   describe('error', () => {
+//     test('invalid messageId for channel/dm', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const messageId = message.messageId + 1;
+//       const newMessage = requestMessageRemove(authUser.token, messageId);
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//     test('not sent by authUser making request', () => {
+//       const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser1.token, 'name', false);
+//       const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
 
-    test('authUser has no owner permissions', () => {
-      const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser1.token, 'name', false);
-      const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
-      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-      requestChannelJoin(authUser2.token, channel.channelId);
-      const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
-      expect(newMessage).toStrictEqual(errorMsg);
-    });
-  });
+//     test('authUser has no owner permissions', () => {
+//       const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser1.token, 'name', false);
+//       const messageId = requestMessageSend(authUser1.token, channel.channelId, 'message');
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       requestChannelJoin(authUser2.token, channel.channelId);
+//       const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
+//       expect(newMessage).toStrictEqual(errorMsg);
+//     });
+//   });
 
-  describe('passes', () => {
-    test('deletes message', () => {
-      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
-      expect(newMessage).toStrictEqual({});
-    });
-  });
-});
+//   describe('passes', () => {
+//     test('deletes message', () => {
+//       const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+//       const channel = requestChannelCreate(authUser.token, 'name', false);
+//       const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+//       const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
+//       expect(newMessage).toStrictEqual({});
+//     });
+//   });
+// });
