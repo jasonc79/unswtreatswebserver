@@ -7,8 +7,8 @@ import cors from 'cors';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
-import { dmCreateV1 } from './dm';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { dmCreateV1, dmLeaveV1 } from './dm';
 import { clearV1 } from './other';
 import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1 } from './channel';
 // Set up web app, use JSON
@@ -232,6 +232,15 @@ app.post('/message/send/v1', (req, res, next) => {
   }
 });
 
+app.post('/message/senddm/v1', (req, res, next) => {
+  try {
+    const { token, dmId, message } = req.body;
+    return res.json(messageSenddmV1(token, dmId, message));
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.put('/message/edit/v1', (req, res, next) => {
   try {
     const { token, messageId, message } = req.body;
@@ -296,6 +305,16 @@ app.delete('/dm/remove/v1', (req, res, next) => {
   }
 });
 */
+
+app.post('/dm/leave/v1', (req, res, next) => {
+  try {
+    const { token, dmId } = req.body;
+    return res.json(dmLeaveV1(token, dmId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
 // Other functions
 
