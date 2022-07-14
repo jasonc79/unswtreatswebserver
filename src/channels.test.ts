@@ -100,7 +100,7 @@ describe('Testing for channelsListallV1', () => {
 
 describe('Testing channelsCreateV1', () => {
   test('Correct Name, is public', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     expect(channel).toStrictEqual(
       expect.objectContaining({
@@ -109,7 +109,7 @@ describe('Testing channelsCreateV1', () => {
     );
   });
   test('Correct Name, is private', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', false);
     expect(channel).toStrictEqual(
       expect.objectContaining({
@@ -118,12 +118,12 @@ describe('Testing channelsCreateV1', () => {
     );
   });
   test('Incorrect Name (too small)', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, '', true);
     expect(channel).toStrictEqual(errorMsg);
   });
   test('Incorrect Name (too large)', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'very long channel name', true);
     expect(channel).toStrictEqual(errorMsg);
   });
