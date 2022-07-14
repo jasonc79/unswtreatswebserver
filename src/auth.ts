@@ -1,7 +1,6 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
 import { checkValidToken, getIdfromToken } from './helper';
 import validator from 'validator';
-import fs from 'fs';
 
 /*
 Create an account for a new user. Additionally, it generates a handle
