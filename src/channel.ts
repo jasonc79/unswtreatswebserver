@@ -17,13 +17,11 @@ Return Value:
     Returns {name, isPublic, ownerMembers, allMembers} on no error
 */
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
-  const data = getData();
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
-  const authUserValid = false;
   const currChannel = returnValidChannel(channelId);
 
   let isMember = false;
@@ -183,7 +181,7 @@ type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
 function channelMessagesV2(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  const uId = returnValidUser(token);
+  // const uId = returnValidUser(token);
 
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
@@ -219,7 +217,7 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
   };
 }
 
-function channelLeaveV1(token: string, channelId: number): (error | {}) {
+function channelLeaveV1(token: string, channelId: number): (error | object) {
   const data = getData();
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;
@@ -227,16 +225,16 @@ function channelLeaveV1(token: string, channelId: number): (error | {}) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
-  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId != user.user.uId);
-  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId != user.user.uId);
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.user.uId);
+  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.user.uId);
   setData(data);
   return {};
 }
 
-function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | {}) {
+function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | object) {
   const data = getData();
-  const tempuId = returnValidUser(token);
-  const user = userProfileV1(token, tempuId.uId) as userReturn;
+  // const tempuId = returnValidUser(token);
+  // const user = userProfileV1(token, tempuId.uId) as userReturn;
   const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
   !isOwner(token, channelId) || !isMember(tempUser.token, channelId) || isOwner(tempUser.token, channelId)) {
@@ -249,11 +247,12 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   return {};
 }
 
-function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | {}) {
+function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | object) {
   const data = getData();
-  const tempuId = returnValidUser(token);
+  // const tempuId = returnValidUser(token);
   const user = userProfileV1(token, uId) as userReturn;
-  const user2 = userProfileV1(token, tempuId.uId) as userReturn;
+  // const user2 = userProfileV1(token, tempuId.uId) as userReturn;
+  const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
       !isOwner(tempUser.token, channelId) || !isOwner(token, channelId)) {
     return errorMsg;
@@ -263,7 +262,7 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   if (currChannel.ownerMembers.length === 1) {
     return errorMsg;
   }
-  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId != user.user.uId);
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.user.uId);
   setData(data);
   return {};
 }

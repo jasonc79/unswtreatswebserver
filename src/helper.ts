@@ -23,7 +23,6 @@ function checkValidChannel(id: number) : boolean {
   return false;
 }
 
-
 /**
  * returns true if the id corresponds to a valid token, and false otherwise
  */
