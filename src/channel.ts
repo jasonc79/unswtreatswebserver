@@ -240,7 +240,7 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   const newOwnerProfile = userProfileV1(token, uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
   currChannel.ownerMembers.push(newOwnerProfile.user);
-  currChannel.allMembers.push(newOwnerProfile.user);
+  setData(data);
   return {};
 }
 
@@ -260,6 +260,7 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
     return errorMsg;
   }
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId != user.user.uId);
+  setData(data);
   return {};
 }
 
