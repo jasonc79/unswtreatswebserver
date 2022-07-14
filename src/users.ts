@@ -1,5 +1,5 @@
 import { getData, error, errorMsg, userReturn, allUserReturn } from './dataStore';
-import { checkValidId, returnValidId, checkValidToken } from './helper';
+import { checkValidUser, returnValidId, checkValidToken } from './helper';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -23,7 +23,7 @@ Return Value:
 */
 
 function userProfileV1(token: string, uId: number) : error | userReturn {
-  if (!checkValidId(uId) || !checkValidToken(token)) {
+  if (!checkValidUser(uId) || !checkValidToken(token)) {
     return errorMsg;
   }
   const user = returnValidId(uId);
