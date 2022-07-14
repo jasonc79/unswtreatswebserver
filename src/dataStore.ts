@@ -42,6 +42,7 @@ interface Dm {
   name: string,
   members: UserInfo[],
   owners: UserInfo[],
+  messages: Message[],
 }
 
 // CHANNEL TYPES AND INTERFACES
