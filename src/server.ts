@@ -2,15 +2,20 @@ import express from 'express';
 import { echo } from './echo';
 import morgan from 'morgan';
 import config from './config.json';
+import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
-import { channelsCreateV1 } from './channels';
-import { userProfileV1 } from './users';
+import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
+import { userProfileV1, usersAllV1 } from './users';
 import { dmCreateV1 } from './dm';
+// import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
+
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
+// Use middleware that allows for access from other domains
+app.use(cors());
 
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
@@ -26,7 +31,7 @@ app.get('/echo', (req, res, next) => {
 });
 
 // ================================================================ //
-// auth functions
+// Auth functions
 app.post('/auth/register/v2', (req, res, next) => {
   try {
     const { email, password, nameFirst, nameLast } = req.body;
@@ -46,7 +51,7 @@ app.post('/auth/login/v2', (req, res, next) => {
 });
 
 // ================================================================ //
-// channels functions
+// Channels functions
 app.post('/channels/create/v2', (req, res, next) => {
   try {
     const { token, name, isPublic } = req.body;
@@ -56,18 +61,74 @@ app.post('/channels/create/v2', (req, res, next) => {
   }
 });
 
+app.get('/channels/list/v2', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(channelsListV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/channels/listall/v2', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(channelsListallV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
-// user functions
+// User functions
 app.get('/user/profile/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
     const uId = req.query.uId as string;
-
     return res.json(userProfileV1(token, parseInt(uId)));
   } catch (err) {
     next(err);
   }
 });
+
+app.get('/users/all/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(usersAllV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ================================================================ //
+// message functions
+
+// app.post('/message/send/v1', (req, res, next) => {
+//   try {
+//     const { token, channelId, message } = req.body;
+//     return res.json(messageSendV1(token, channelId, message));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
+
+// app.put('/message/edit/v1', (req, res, next) => {
+//   try {
+//     const { token, messageId, message } = req.body;
+//     return res.json(messageEditV1(token, messageId, message));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
+
+// app.delete('/message/remove/v1', (req, res, next) => {
+//   try {
+//     const { token, messageId } = req.body;
+//     return res.json(messageRemoveV1(token, messageId));
+//   } catch (err) {
+//     next (err);
+//   }
+// });
 
 // ================================================================ //
 // dm functions
@@ -115,7 +176,7 @@ app.delete('/dm/remove/v1', (req, res, next) => {
 });
 */
 // ================================================================ //
-// other functions
+// Other functions
 
 app.delete('/clear/v1', (req, res, next) => {
   try {

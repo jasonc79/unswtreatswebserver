@@ -26,6 +26,7 @@ interface UserInfo {
 }
 
 type userReturn = { user: UserInfo };
+type allUserReturn = { users: UserInfo[] };
 
 // MESSAGE TYPES AND INTERFACES
 interface Message {
@@ -105,5 +106,5 @@ function setData(newData: Data) {
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm };
-export { authUserId, User, UserInfo, userReturn, uId, token };
+export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };
