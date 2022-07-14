@@ -1,4 +1,4 @@
-import { error, errorMsg, userReturn, getData, setData } from './dataStore';
+import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
 import { checkValidId, returnValidId, checkValidToken } from './helper';
 import validator from 'validator';
 
@@ -133,4 +133,17 @@ function userSetHandleV1(token: string, handleStr: string) {
   return {};
 }
 
-export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1 };
+function usersAllV1(token: string) : error | allUserReturn {
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+  const users = getData().users;
+  const userDetails: UserInfo[] = [];
+  for (const member of users) {
+    const current = userProfileV1(token, member.uId) as userReturn;
+    userDetails.push(current.user);
+  }
+  return { users: userDetails };
+}
+
+export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1 };

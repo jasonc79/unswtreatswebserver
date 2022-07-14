@@ -20,12 +20,6 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
 // ========================================================================= //
 // Wrapper Functions
 
-function requestUserProfile(token: string, uId: number) {
-  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
 function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
   const res = requestHelper('POST', '/auth/register/v2', {
     email: email,
@@ -52,6 +46,17 @@ function requestUserHandle(token: string, handleStr: string) {
   return JSON.parse(String(res.getBody()));
 }
 
+function requestUserProfile(token: string, uId: number) {
+  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestAllUsers(token: string) {
+  const res = requestHelper('GET', '/users/all/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
 function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
 }
@@ -144,5 +149,64 @@ describe('Testing userSetHandleV1', () => {
     requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
     const sethandleValidator = requestUserEmail(authUser1.token, 'jasonchen');
     expect(sethandleValidator).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing usersAllV1', () => {
+  describe('Valid Token', () => {
+    test('one user', () => {
+      const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+      const users = requestAllUsers(authUser.token);
+      expect(users).toStrictEqual({
+        users: [
+          {
+            uId: authUser.authUserId,
+            email: 'email1@gmail.com',
+            nameFirst: 'firstname1',
+            nameLast: 'lastname1',
+            handleStr: 'firstname1lastname1',
+          }
+        ]
+      });
+    });
+
+    test('multiple users', () => {
+      const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+      const authUser3 = requestAuthRegister('email3@gmail.com', 'password3', 'firstname3', 'lastname3');
+      const users = requestAllUsers(authUser1.token);
+      expect(users).toStrictEqual({
+        users: [
+          {
+            uId: authUser1.authUserId,
+            email: 'email1@gmail.com',
+            nameFirst: 'firstname1',
+            nameLast: 'lastname1',
+            handleStr: 'firstname1lastname1',
+          },
+          {
+            uId: authUser2.authUserId,
+            email: 'email2@gmail.com',
+            nameFirst: 'firstname2',
+            nameLast: 'lastname2',
+            handleStr: 'firstname2lastname2',
+          },
+          {
+            uId: authUser3.authUserId,
+            email: 'email3@gmail.com',
+            nameFirst: 'firstname3',
+            nameLast: 'lastname3',
+            handleStr: 'firstname3lastname3',
+          }
+        ]
+      });
+    });
+  });
+
+  test('Invalid uId', () => {
+    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const uId = authUser.authUserId + 1;
+    const profile = requestAllUsers(uId);
+    expect(profile).toStrictEqual(errorMsg);
   });
 });
