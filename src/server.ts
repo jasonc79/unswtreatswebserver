@@ -6,7 +6,7 @@ import config from './config.json';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1 } from './channels';
 import { userProfileV1 } from './users';
-import { dmCreateV1 } from './dm';
+import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 } from './dm';
 import { clearV1 } from './other';
 // Set up web app, use JSON
 const app = express();
@@ -80,7 +80,6 @@ app.post('/dm/create/v1', (req, res, next) => {
   }
 });
 
-/*
 app.get('/dm/details/v1', (req, res, next) => {
   try {
     const token = req.query.token as string;
@@ -113,7 +112,7 @@ app.delete('/dm/remove/v1', (req, res, next) => {
     next(err);
   }
 });
-*/
+
 // ================================================================ //
 // other functions
 
