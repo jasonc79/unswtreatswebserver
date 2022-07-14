@@ -67,7 +67,7 @@ export function requestChannelJoin(token: string, channelId: number) {
   return JSON.parse(String(res.getBody()));
 }
 
-function requestChannelMessages(token: string, channelId: number, start: number) {
+export function requestChannelMessages(token: string, channelId: number, start: number) {
   const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));

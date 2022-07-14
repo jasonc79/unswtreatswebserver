@@ -1,7 +1,5 @@
-import request, { HttpVerb } from 'sync-request';
-import config from './config.json';
-import { requestChannelCreate, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails} from './helperTests';
-import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg} from './helperTests'
+import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg } from './helperTests';
 
 let authUser: authUserReturn;
 
@@ -341,41 +339,41 @@ describe('Testing channelRemoveOwnerV1', () => {
 });
 
 // Tests for channelInviteV1
-describe('Testing channelInviteV1', () =>  {
-    test ('Valid inputs', () => {
-        const authUserId2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-        const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
-        const validInput = channelInviteV1(authUser.token, channelId.channelId, authUserId2.authUserId);
-        expect(validInput).toEqual({});
-    });
+describe('Testing channelInviteV1', () => {
+  test('Valid inputs', () => {
+    const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+    const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
+    const validInput = requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId);
+    expect(validInput).toEqual({});
+  });
 
-    test ('Invalid channelID', () => {
-      const authUserId2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-      const invalidChannelID = requestChannelInvite(authUser.authUserId, -1, authUserId2.authUserId);
-        expect(invalidChannelId).toEqual({ error: 'error' });
-    });
+  test('Invalid channelID', () => {
+    const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+    const invalidChannelId = requestChannelInvite(authUser.token, -1, authUserId2.authUserId);
+    expect(invalidChannelId).toEqual({ error: 'error' });
+  });
 
-    test ('Invalid userID', () => {
-      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
-      const invalidUserID = requestChannelInvite(authUserId.authUserId, channelId.channelId, -1);
-      expect(invalidUserID).toEqual({ error: 'error' });
-    });
+  test('Invalid userID', () => {
+    const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
+    const invalidUserId = requestChannelInvite(authUser.token, channelId.channelId, -1);
+    expect(invalidUserId).toEqual({ error: 'error' });
+  });
 
-    test ('User is already a member', () => {
-      const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
-      requestChannelJoin(authUserId2.authUserId, channelId.channelId);
-      const alreadyMember = requestChannelInvite(authUser.authUserId, channelId.channelId, authUserId2.authUserId);
-      expect(alreadyMember).toEqual({ error: 'error' });
-    });
+  test('User is already a member', () => {
+    const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+    const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
+    requestChannelJoin(authUserId2.token, channelId.channelId);
+    const alreadyMember = requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId);
+    expect(alreadyMember).toEqual({ error: 'error' });
+  });
 
-    test ('Authorised user is not a member', () => {
-      const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
-      const notMember = requestChannelInvite(authUser.authUserId, channelId.channelId, authUserId2.authUserId);
-      expect(notMember).toEqual({ error: 'error' });
-    })
-})
+  test('Authorised user is not a member', () => {
+    const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+    const channelId = requestChannelCreate(authUserId2.token, 'Channel1', true);
+    const notMember = requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId);
+    expect(notMember).toEqual({ error: 'error' });
+  });
+});
 
 // Tests for channelMessagesV1
 
