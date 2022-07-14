@@ -5,7 +5,7 @@ import config from './config.json';
 import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
-import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 } from './dm';
+import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1, dmLeaveV1 } from './dm';
 import { channelJoinV1 } from './channel';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
@@ -242,6 +242,15 @@ app.delete('/dm/remove/v1', (req, res, next) => {
     const dmId = req.query.dmId as string;
 
     return res.json(dmRemoveV1(token, parseInt(dmId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/dm/leave/v1', (req, res, next) => {
+  try {
+    const { token, dmId } = req.body;
+    return res.json(dmLeaveV1(token, dmId));
   } catch (err) {
     next(err);
   }
