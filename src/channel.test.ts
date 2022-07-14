@@ -1,99 +1,17 @@
-test('remove test', () => {
-  expect(1 + 1).toEqual(2);
-});
-
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
+import { requestChannelCreate, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails} from './helperTests';
+import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg} from './helperTests'
 
-const OK = 200;
-const port = config.port;
-const url = config.url;
-const errorMsg = { error: 'error' };
-
-function requestHelper(method: HttpVerb, path: string, payload: object) {
-  let qs = {};
-  let json = {};
-  if (['GET', 'DELETE'].includes(method)) {
-    qs = payload;
-  } else {
-    json = payload;
-  }
-  return request(method, url + ':' + port + path, { qs, json });
-}
-
-// ========================================================================= //
-// Wrapper Functions
-
-function requestChannelMessages(token: string, channelId: number, start: number) {
-  const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelAddOwner(token: string, channelId: number, uId: number) {
-  const res = requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelRemoveOwner(token: string, channelId: number, uId: number) {
-  const res = requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelLeave(token: string, channelId: number) {
-  const res = requestHelper('POST', '/channel/leave/v1', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelDetails(token: string, channelId: number) {
-  const res = requestHelper('GET', '/channel/details/v2', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestUserProfile(token: string, uId: number) {
-  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelCreate(token: string, name: string, isPublic: boolean) {
-  const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
-  const res = requestHelper('POST', '/auth/register/v2', {
-    email: email,
-    password: password,
-    nameFirst: nameFirst,
-    nameLast: nameLast
-  });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody(('utf-8'))));
-}
-
-function requestChannelJoin(token: string, channelId: number) {
-  const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestClear() {
-  return requestHelper('DELETE', '/clear/v1', {});
-}
+let authUser: authUserReturn;
 
 beforeEach(() => {
   requestClear();
+  authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
 });
 
 describe('Testing channelMessagesV1', () => {
   test('Empty messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
     expect(messages).toStrictEqual(
@@ -147,7 +65,6 @@ describe('Testing channelMessagesV1', () => {
 
 describe('Testing channelDetailsV2', () => {
   test('Success', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
     const details = requestChannelDetails(authUser.token, channel.channelId);
@@ -173,13 +90,11 @@ describe('Testing channelDetailsV2', () => {
     );
   });
   test('ChannelId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const details = requestChannelDetails(authUser.token, channel.channelId + 1);
     expect(details).toStrictEqual(errorMsg);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const details = requestChannelDetails(authUser2.token, channel.channelId);
@@ -191,7 +106,6 @@ describe('Testing channelDetailsV2', () => {
 
 describe('Testing channelLeaveV1', () => {
   test('Pass scenario', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     requestChannelJoin(authUser2.token, channel.channelId);
@@ -214,13 +128,11 @@ describe('Testing channelLeaveV1', () => {
     );
   });
   test('ChannelId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const details = requestChannelLeave(authUser.token, channel.channelId + 1);
     expect(details).toStrictEqual(errorMsg);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const details = requestChannelLeave(authUser2.token, channel.channelId);
@@ -232,7 +144,6 @@ describe('Testing channelLeaveV1', () => {
 
 describe('Testing channelAddOwnerV1', () => {
   test('Pass scenario', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
@@ -348,7 +259,6 @@ describe('Testing channelAddOwnerV1', () => {
 describe('Testing channelRemoveOwnerV1', () => {
   //
   test('Pass scenario', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     requestChannelJoin(authUser2.token, channel.channelId);
@@ -431,41 +341,41 @@ describe('Testing channelRemoveOwnerV1', () => {
 });
 
 // Tests for channelInviteV1
-// describe('Testing channelInviteV1', () =>  {
+describe('Testing channelInviteV1', () =>  {
+    test ('Valid inputs', () => {
+        const authUserId2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+        const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
+        const validInput = channelInviteV1(authUser.token, channelId.channelId, authUserId2.authUserId);
+        expect(validInput).toEqual({});
+    });
 
-//     const authUserID1 = authRegisterV1('test1@gmail.com', '123abc!@#', 'Test1', 'Smith');
-//     const authUserID2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-//     const channelID = channelsCreateV1(authUserID1.authUserId, 'Channel1', true);
+    test ('Invalid channelID', () => {
+      const authUserId2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+      const invalidChannelID = requestChannelInvite(authUser.authUserId, -1, authUserId2.authUserId);
+        expect(invalidChannelId).toEqual({ error: 'error' });
+    });
 
-//     test ('Valid inputs', () => {
-//         const authUserID1 = authRegisterV1('test1@gmail.com', '123abc!@#', 'Test1', 'Smith');
-//         const authUserID2 = authRegisterV1('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-//         const channelID = channelsCreateV1(authUserID1.authUserId, 'Channel1', true);
-//         const validInput = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-//         expect(validInput).toEqual({});
-//     });
+    test ('Invalid userID', () => {
+      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
+      const invalidUserID = requestChannelInvite(authUserId.authUserId, channelId.channelId, -1);
+      expect(invalidUserID).toEqual({ error: 'error' });
+    });
 
-//     test ('Invalid channelID', () => {
-//         const invalidChannelID = channelInviteV1(authUserID1.authUserId, -1, authUserID2.authUserId);
-//         expect(invalidChannelID).toEqual({ error: 'error' });
-//     });
+    test ('User is already a member', () => {
+      const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
+      requestChannelJoin(authUserId2.authUserId, channelId.channelId);
+      const alreadyMember = requestChannelInvite(authUser.authUserId, channelId.channelId, authUserId2.authUserId);
+      expect(alreadyMember).toEqual({ error: 'error' });
+    });
 
-//     test ('Invalid userID', () => {
-//         const invalidUserID = channelInviteV1(authUserID1.authUserId, channelID.channelId, -1);
-//         expect(invalidUserID).toEqual({ error: 'error' });
-//     });
-
-//     test ('User is already a member', () => {
-//         channelJoinV1(authUserID2.authUserId, channelID.channelId);
-//         const alreadyMember = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-//         expect(alreadyMember).toEqual({ error: 'error' });
-//     });
-
-//     test ('Authorised user is not a member', () => {
-//         const notMember = channelInviteV1(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-//         expect(notMember).toEqual({ error: 'error' });
-//     })
-// })
+    test ('Authorised user is not a member', () => {
+      const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+      const channelId = requestChannelCreate(authUser.authUserId, 'Channel1', true);
+      const notMember = requestChannelInvite(authUser.authUserId, channelId.channelId, authUserId2.authUserId);
+      expect(notMember).toEqual({ error: 'error' });
+    })
+})
 
 // Tests for channelMessagesV1
 
@@ -577,29 +487,25 @@ describe('Testing channelRemoveOwnerV1', () => {
 
 describe('Testing channelJoinV1', () => {
   test('Invalid ChannelId', () => {
-    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channelJoin = requestChannelJoin(authUser.token, 1);
     expect(channelJoin).toStrictEqual(errorMsg);
   });
   test('the authorised user is already a member of the channel', () => {
-    const authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'name', true);
     const channelJoin = requestChannelJoin(authUser.token, channel.channelId);
     expect(channelJoin).toStrictEqual(errorMsg);
   });
   test('Adding non-global user to a private channel', () => {
-    const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser1.token, 'name', false);
+    const channel = requestChannelCreate(authUser.token, 'name', false);
     const channelJoin = requestChannelJoin(authUser2.token, channel.channelId);
     // Auth user is not channel member or global owner
     expect(channelJoin).toStrictEqual(errorMsg);
   });
   test('positive case', () => {
-    const authUser1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser2.token, 'name', false);
-    const channelJoin = requestChannelJoin(authUser1.token, channel.channelId);
+    const channelJoin = requestChannelJoin(authUser.token, channel.channelId);
     expect(channelJoin).toStrictEqual({});
   });
 });
