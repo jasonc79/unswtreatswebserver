@@ -3,17 +3,21 @@ import { Channel, getData, User, Data, token, Message } from './dataStore';
  * returns true if the id corresponds to a valid user or channel, and false otherwise
  * property : users | channels
  */
-function checkValidId(id: number, property: string) : boolean {
-  const data: Data = getData();
-  for (const item of data[property]) {
-    if (property === 'users') {
-      if (item.uId === id) {
-        return true;
-      }
-    } else if (property === 'channels') {
-      if (item.channelId === id) {
-        return true;
-      }
+function checkValidUser(id: number) : boolean {
+  const data = getData();
+  for (const item of data.users) {
+    if (item.uId === id) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkValidChannel(id: number) : boolean {
+  const data = getData();
+  for (const item of data.channels) {
+    if (item.channelId === id) {
+      return true;
     }
   }
   return false;
@@ -46,25 +50,6 @@ function checkValidMessage(messageId: number) : boolean {
   }
   return false;
 }
-
-/**
- * return true if the id corresponds to a valid message, and false otherwise
- * for the message to be valid
- *    the user needs to be in the channel/dm with the message
- */
-// function checkValidMessage(token: string, messageId: number) : boolean {
-//   const channel = getChannelfromMessage(messageId);
-//   if (!checkChannelfromMessage(messageId) || !isMember(token, channel.channelId)) {
-//     return false;
-//   }
-
-//   for (const message of channel.messages) {
-//     if (message.messageId === messageId) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 /**
  * returns true if the current user is the user who sent the message
@@ -158,13 +143,25 @@ function getChannelfromMessage(messageId: number) : Channel {
 /**
  * returns true if the user is a member of the channel or an owner of a channel, and false otherwise
  */
-function isMember(token: string, channelId: number, property: string) : boolean {
+function isMember(token: string, channelId: number) : boolean {
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
-  for (const user of channel[property]) {
+  for (const user of channel.allMembers) {
     if (uId === user.uId) {
       return true;
-    } else if (property === 'ownerMembers' && user.permissionId === 2) {
+    }
+  }
+  return false;
+}
+
+function isOwner(token: string, channelId: number) : boolean {
+  const uId = getIdfromToken(token);
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.ownerMembers) {
+    const item = returnValidId(user.uId);
+    if (uId === user.uId) {
+      return true;
+    } else if (item.permissionId === 2) {
       return true;
     }
   }
@@ -172,7 +169,8 @@ function isMember(token: string, channelId: number, property: string) : boolean 
 }
 
 export {
-  checkValidId,
+  checkValidUser,
+  checkValidChannel,
   checkValidToken,
   checkValidMessage,
   checkMessageSender,
@@ -183,4 +181,5 @@ export {
   getIdfromToken,
   getChannelfromMessage,
   isMember,
+  isOwner,
 };
