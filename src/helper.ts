@@ -225,5 +225,6 @@ export {
   getChannelfromMessage,
   isMember,
   isOwner,
+  isMemberDm,
   isOwnerDm,
 };
