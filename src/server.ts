@@ -6,7 +6,6 @@ import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
-import { channelJoinV1 } from './channel';
 import { userProfileV1, usersAllV1 } from './users';
 import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
 

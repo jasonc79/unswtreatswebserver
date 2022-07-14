@@ -22,21 +22,6 @@ function checkValidChannel(id: number) : boolean {
   }
   return false;
 }
-// function checkValidId(id: number, property: string) : boolean {
-//   const data: Data = getData();
-//   for (const item of data[property]) {
-//     if (property === 'users') {
-//       if (item.uId === id) {
-//         return true;
-//       }
-//     } else if (property === 'channels') {
-//       if (item.channelId === id) {
-//         return true;
-//       }
-//     }
-//   }
-//   return false;
-// }
 
 /**
  * returns true if the id corresponds to a valid token, and false otherwise
@@ -117,19 +102,6 @@ function returnValidUser(token: string) : User {
   }
 }
 
-//Remove
-function returnIsMember(uId: number, channelId: number): boolean {
-  const data: Data = getData();
-  const currChannel = returnValidChannel(channelId);
-  for (const member of currChannel.allMembers) {
-    if (uId === member.uId) {
-      return true;
-    }
-  }
-  return false;
-}
-//
-
 /**
  * returns the details about a message given the channel and messageId
  */
@@ -182,18 +154,6 @@ function isMember(token: string, channelId: number) : boolean {
   return false;
 }
 
-///Remove
-function returnIsOwner(uId: number, channelId: number): boolean {
-  const data: Data = getData();
-  const currChannel = returnValidChannel(channelId);
-  for (const member of currChannel.ownerMembers) {
-    if (uId === member.uId) {
-      return true;
-    }
-  }
-  return false;
-}
-///
 function isOwner(token: string, channelId: number) : boolean {
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
