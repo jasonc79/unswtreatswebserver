@@ -152,6 +152,14 @@ app.get('/users/all/v1', (req, res, next) => {
 //     next (err);
 //   }
 // });
+//  app.post('/message/senddm/v1', (req, res, next) => {
+//       try {
+//         const { token, dmId, message } = req.body;
+//         return res.json(messageSendDmV1(token, dmId, message));
+//       } catch (err) {
+//         next (err);
+//       }
+//   });
 
 // ================================================================ //
 // Other functions
