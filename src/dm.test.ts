@@ -33,8 +33,8 @@ function getRequestDmDetails(token: string, dmId: number) {
 
 function getRequestDmList(token: string) {
   const res = requestHelper('GET', '/dm/list/v1', { token });
-  expect(res.statusCode).toBe(OK); 
-  return JSON.parse(String(res.getBody(('utf-8')))); 
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
 function getRequestDmRemove(token: number, dmId: number) {
@@ -130,35 +130,35 @@ describe('Testing dm/details/v1', () => {
     const dmDetail = getRequestDmDetails(authUser.token, dm);
     expect(dmDetail).toEqual(
       {
-      dm: {
-        name: 'namefirst0namelast0, namefirst1namelast1',
-        members: [
-          {
-            email: "email0@email.com",
-            handleStr: "namefirst0namelast0",
-            nameFirst: "namefirst0",
-            nameLast: "namelast0",
-            uId: 0,
-          },
-          {
-            email: "email1@email.com",
-            handleStr: "namefirst1namelast1",
-            nameFirst: "namefirst1",
-            nameLast: "namelast1",
-            uId: 1,
-          },
-        ],
-      }
-    });
+        dm: {
+          name: 'namefirst0namelast0, namefirst1namelast1',
+          members: [
+            {
+              email: 'email0@email.com',
+              handleStr: 'namefirst0namelast0',
+              nameFirst: 'namefirst0',
+              nameLast: 'namelast0',
+              uId: 0,
+            },
+            {
+              email: 'email1@email.com',
+              handleStr: 'namefirst1namelast1',
+              nameFirst: 'namefirst1',
+              nameLast: 'namelast1',
+              uId: 1,
+            },
+          ],
+        }
+      });
   });
 });
 
 describe('Testing dm/list/v1', () => {
   test('0 dms, empty list', () => {
     const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
-    const dmList = getRequestDmList(authUser.token); 
+    const dmList = getRequestDmList(authUser.token);
     expect(dmList).toStrictEqual([]);
-  }); 
+  });
 
   test('1 dm', () => {
     const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
@@ -166,14 +166,14 @@ describe('Testing dm/list/v1', () => {
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = getRequestDmCreate(authUser.token, uIds);
-    const dmList = getRequestDmList(authUser.token); 
+    const dmList = getRequestDmList(authUser.token);
     expect(dmList).toStrictEqual([
-        {
+      {
         dmId: dm.dmId,
         name: 'namefirst0namelast0, namefirst1namelast1',
-        }]
-    ); 
-  }); 
+      }]
+    );
+  });
 
   test('2 dms', () => {
     const authUser1 = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
@@ -188,19 +188,19 @@ describe('Testing dm/list/v1', () => {
     uIds2.push(uId2.authUserId);
     const dm2 = getRequestDmCreate(authUser2.token, uIds2);
 
-    const dmList = getRequestDmList(authUser1.token); 
+    const dmList = getRequestDmList(authUser1.token);
     expect(dmList).toStrictEqual([
-        {
+      {
         dmId: dm1.dmId,
         name: 'namefirst0namelast0, namefirst1namelast1',
-        },
-        {
+      },
+      {
         dmId: dm2.dmId,
         name: 'namefirst2namelast2, namefirst3namelast3',
-        }]
-    ); 
-  }); 
-})
+      }]
+    );
+  });
+});
 
 describe('Testing dm/remove/v1', () => {
   test('dmId does not refer to a valid DM', () => {
@@ -222,7 +222,7 @@ describe('Testing dm/remove/v1', () => {
   });
 
   test('dmId is valid and the authorised user is no longer in the DM', () => {
-    // Need dm/leave for it to work 
+    // Need dm/leave for it to work
     const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const uId1 = getRequestRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds = [];
@@ -243,4 +243,3 @@ describe('Testing dm/remove/v1', () => {
     expect(dmRemove).toStrictEqual({});
   });
 });
-

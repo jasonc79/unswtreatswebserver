@@ -7,7 +7,7 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
   const authUserId = returnValidUser(token);
   const authUser = userProfileV1(token, authUserId.uId) as userReturn;
   if (!checkValidToken) {
-    return errorMsg; 
+    return errorMsg;
   }
 
   // Any uId in uIds does not refer to a valid user
@@ -31,7 +31,7 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
     DmMembers.push(DmMember.user);
   }
   DmMembers.push(authUser.user);
-  const dmName = generateDmName(DmMembers); 
+  const dmName = generateDmName(DmMembers);
 
   const newDm : Dm = {
     dmId: dmId,
@@ -95,23 +95,23 @@ const dmListV1 = (token: string): dms | error => {
 
 const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
   if (!checkValidDm(dmId) || !checkValidToken(token)) {
-    return errorMsg; 
+    return errorMsg;
   }
 
   if (!isOwnerDm(token, dmId) || !isMemberDm(token, dmId)) {
-    return errorMsg; 
+    return errorMsg;
   }
 
-  const data = getData(); 
-  const dm = returnValidDm(dmId); 
+  const data = getData();
+  const dm = returnValidDm(dmId);
   data.dms = data.dms.filter((item) => {
-    return item !== dm; 
-  });  
-  setData(data); 
-  return {}; 
+    return item !== dm;
+  });
+  setData(data);
+  return {};
 };
 
-////// HELPER FUNCTIONS ///////
+/// /// HELPER FUNCTIONS ///////
 const generateDmName = (DmMembers: userReturn[]): string => {
   const DmHandles = [];
   for (const member of DmMembers) {
@@ -125,8 +125,8 @@ const generateDmName = (DmMembers: userReturn[]): string => {
     dmName += ', ';
   }
   const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
-  return dmNameFinal; 
+  return dmNameFinal;
 };
-///////////////////////////////
+/// ////////////////////////////
 
 export { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 };

@@ -1,4 +1,4 @@
-import { error, errorMsg, UserInfo, Message,  } from './dataStore';
+import { error, errorMsg, UserInfo, Message } from './dataStore';
 import { getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember } from './helper';
 import { userProfileV1 } from './users';
@@ -8,7 +8,6 @@ import { userProfileV1 } from './users';
 import { userReturn, ChannelInfo } from './dataStore';
 import { channelsListV1 } from './channels';
 type channelsList = { channels: ChannelInfo[] };
-
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
 
@@ -122,13 +121,13 @@ function channelInviteV1(token: string, channelId: number, uId: number): (error 
 
   // Checking if uId and authUserID are members
   if (!isMember(token, channelId)) {
-    return errorMsg; 
+    return errorMsg;
   }
   let uIdMember = false;
   for (const member of channel.allMembers) {
     if (member.uId === uId) {
       uIdMember = true;
-    } 
+    }
   }
   if (uIdMember === true) {
     return errorMsg;

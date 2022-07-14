@@ -44,9 +44,9 @@ function requestChannelJoin(token: string, channelId: number) {
 }
 
 function requestChannelInvite(token: string, channelId: number, uId: number) {
-  const res = requestHelper('POST', '/channel/invite/v2', {token, channelId, uId}); 
-  expect(res.statusCode).toBe(OK); 
-  return JSON.parse(String(res.getBody())); 
+  const res = requestHelper('POST', '/channel/invite/v2', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
 }
 
 function requestClear() {
@@ -58,41 +58,40 @@ beforeEach(() => {
 });
 
 // Tests for channelInviteV1
-describe('Testing channelInviteV1', () =>  {
+describe('Testing channelInviteV1', () => {
+  const authUserID1 = requestAuthRegister('test1@gmail.com', '123abc!@#', 'Test1', 'Smith');
+  const authUserID2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+  const channelID = requestChannelCreate(authUserID1.authUserId, 'Channel1', true);
 
+  test('Valid inputs', () => {
     const authUserID1 = requestAuthRegister('test1@gmail.com', '123abc!@#', 'Test1', 'Smith');
     const authUserID2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
     const channelID = requestChannelCreate(authUserID1.authUserId, 'Channel1', true);
+    const validInput = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
+    expect(validInput).toStrictEqual({});
+  });
 
-    test ('Valid inputs', () => {
-        const authUserID1 = requestAuthRegister('test1@gmail.com', '123abc!@#', 'Test1', 'Smith');
-        const authUserID2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-        const channelID = requestChannelCreate(authUserID1.authUserId, 'Channel1', true);
-        const validInput = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-        expect(validInput).toStrictEqual({});
-    });
+  test('Invalid channelID', () => {
+    const invalidChannelID = requestChannelInvite(authUserID1.authUserId, -1, authUserID2.authUserId);
+    expect(invalidChannelID).toStrictEqual({ error: 'error' });
+  });
 
-    test ('Invalid channelID', () => {
-        const invalidChannelID = requestChannelInvite(authUserID1.authUserId, -1, authUserID2.authUserId);
-        expect(invalidChannelID).toStrictEqual({ error: 'error' });
-    });
+  test('Invalid userID', () => {
+    const invalidUserID = requestChannelInvite(authUserID1.authUserId, channelID.channelId, -1);
+    expect(invalidUserID).toStrictEqual({ error: 'error' });
+  });
 
-    test ('Invalid userID', () => {
-        const invalidUserID = requestChannelInvite(authUserID1.authUserId, channelID.channelId, -1);
-        expect(invalidUserID).toStrictEqual({ error: 'error' });
-    });
+  test('User is already a member', () => {
+    const channelJoin = requestChannelJoin(authUserID2.authUserId, channelID.channelId);
+    const alreadyMember = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
+    expect(alreadyMember).toStrictEqual({ error: 'error' });
+  });
 
-    test ('User is already a member', () => {
-        const channelJoin = requestChannelJoin(authUserID2.authUserId, channelID.channelId);
-        const alreadyMember = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-        expect(alreadyMember).toStrictEqual({ error: 'error' });
-    });
-
-    test ('Authorised user is not a member', () => {
-        const notMember = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
-        expect(notMember).toStrictEqual({ error: 'error' });
-    })
-})
+  test('Authorised user is not a member', () => {
+    const notMember = requestChannelInvite(authUserID1.authUserId, channelID.channelId, authUserID2.authUserId);
+    expect(notMember).toStrictEqual({ error: 'error' });
+  });
+});
 
 // Tests for channelMessagesV1
 
