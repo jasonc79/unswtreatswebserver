@@ -7,9 +7,11 @@ import cors from 'cors';
 import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-// import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
-
+import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
+import { channelJoinV1 } from './channel';
+import { dmCreateV1 } from './dm';
 import { clearV1 } from './other';
+
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -73,6 +75,17 @@ app.get('/channels/listall/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
     return res.json(channelsListallV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ================================================================ //
+// Channel functions
+app.post('/channel/join/v2', (req, res, next) => {
+  try {
+    const { token, channelId } = req.body;
+    return res.json(channelJoinV1(token, channelId));
   } catch (err) {
     next(err);
   }
@@ -160,7 +173,81 @@ app.get('/users/all/v1', (req, res, next) => {
 //         next (err);
 //       }
 //   });
+// Message functions
 
+app.post('/message/send/v1', (req, res, next) => {
+  try {
+    const { token, channelId, message } = req.body;
+    return res.json(messageSendV1(token, channelId, message));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.put('/message/edit/v1', (req, res, next) => {
+  try {
+    const { token, messageId, message } = req.body;
+    return res.json(messageEditV1(token, messageId, message));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/message/remove/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const messageId = req.query.messageId as string;
+    return res.json(messageRemoveV1(token, parseInt(messageId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ================================================================ //
+// dm functions
+app.post('/dm/create/v1', (req, res, next) => {
+  try {
+    const { token, uIds } = req.body;
+    return res.json(dmCreateV1(token, uIds));
+  } catch (err) {
+    next(err);
+  }
+});
+
+/*
+app.get('/dm/details/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const dmId = req.query.dmId as string;
+    console.log(dmId);
+
+    return res.json(dmDetailsV1(token, parseInt(dmId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dm/list/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+
+    return res.json(dmListV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/dm/remove/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const dmId = req.query.dmId as string;
+
+    return res.json(dmRemoveV1(token, parseInt(dmId)));
+  } catch (err) {
+    next(err);
+  }
+});
+*/
 // ================================================================ //
 // Other functions
 

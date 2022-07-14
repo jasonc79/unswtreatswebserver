@@ -1,5 +1,6 @@
+
 import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
-import { checkValidId, returnValidId, checkValidToken } from './helper';
+import { returnValidId, checkValidToken, checkValidUser } from './helper';
 import validator from 'validator';
 
 /*
@@ -24,7 +25,7 @@ Return Value:
 */
 
 function userProfileV1(token: string, uId: number) : error | userReturn {
-  if (!checkValidId(uId) || !checkValidToken(token)) {
+  if (!checkValidUser(uId) || !checkValidToken(token)) {
     return errorMsg;
   }
   const user = returnValidId(uId);
