@@ -9,7 +9,7 @@ import { channelJoinV1 } from './channel';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
 import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
-import { dmCreateV1 } from './dm';
+import { dmCreateV1, dmLeaveV1 } from './dm';
 import { clearV1 } from './other';
 
 // Set up web app, use JSON
@@ -248,6 +248,16 @@ app.delete('/dm/remove/v1', (req, res, next) => {
   }
 });
 */
+
+app.post('/dm/leave/v1', (req, res, next) => {
+  try {
+    const { token, dmId } = req.body;
+    return res.json(dmLeaveV1(token, dmId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
 // Other functions
 
