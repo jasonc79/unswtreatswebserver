@@ -114,7 +114,33 @@ const dmListV1 = (token: string): dms | error => {
 };
 
 const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
-  return {};
+  if (!checkValidDm) {
+    return errorMsg; 
+  }
+
+  const dm = returnValidDm(dmId); 
+  for (const owner of dm.owners) {
+    if (returnValidUser(token).uId !== owner.uId) {
+      return errorMsg; 
+    }
+  }
+
+  let isMember = false; 
+  for (const member of dm.members) {
+    if (returnValidUser(token).uId !== member.uId) {
+      isMember = true; 
+    }
+  }
+  if (isMember === false) {
+    return errorMsg; 
+  }
+
+  const data = getData(); 
+  data.dms = data.dms.filter((item) => {
+    return item !== dm; 
+  });  
+  setData(data); 
+  return {}; 
 };
 
 export { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 };

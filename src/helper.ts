@@ -187,6 +187,17 @@ function isOwner(token: string, channelId: number) : boolean {
   return false;
 }
 
+function isMemberDm(token: string, dmId: number): boolean {
+  const uId = getIdfromToken(token); 
+  const dm = returnValidDm(dmId); 
+  for (const member of dm.members) {
+    if (uId === member.uId) {
+      return true; 
+    }
+  }
+  return false; 
+}
+
 export {
   checkValidUser,
   checkValidChannel,
