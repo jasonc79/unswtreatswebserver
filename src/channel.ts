@@ -63,6 +63,20 @@ Return Value:
     Returns {error: 'error'} on a private channel and auth user is not a global owner
     Returns {} on no error
 */
+/**
+ * channelJoinV1
+ * Adds the current user to the channel
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel beign accessed
+ * 
+ * Return Values:
+ * @returns { error } 
+ *    if token is invalid
+ *    if the cahnnelId is invalid
+ * @returns {} if there is no error
+ */
 function channelJoinV1(token: string, channelId: number): (error | object) {
   // Check if channelId and token is valid
   if (!checkValidToken(token) || !checkValidChannel(channelId)) {
