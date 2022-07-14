@@ -19,17 +19,23 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
 
 // ========================================================================= //
 // Wrapper Functions
-function getRequestDmCreate(token: number, uIds: number[]) {
+function getRequestDmCreate(token: string, uIds: number[]) {
   const res = requestHelper('POST', '/dm/create/v1', { token, uIds });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
-// function getRequestDmDetails(token: number, dmId: number) {
-//   const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
-//   expect(res.statusCode).toBe(OK);
-//   return JSON.parse(String(res.getBody(('utf-8'))));
-// }
+function getRequestDmDetails(token: string, dmId: number) {
+  const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+function getRequestDmList(token: string) {
+  const res = requestHelper('GET', '/dm/list/v1', { token });
+  expect(res.statusCode).toBe(OK); 
+  return JSON.parse(String(res.getBody(('utf-8')))); 
+}
 
 // function getRequestDmRemove(token: number, dmId: number) {
 //   const res = requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
@@ -95,13 +101,13 @@ describe('Testing dm/create/v1', () => {
     );
   });
 });
-/*
+
 describe('Testing dm/details/v1', () => {
   test('dmId does not refer to a valid DM', () => {
     const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const dm = -1;
     const dmDetail = getRequestDmDetails(authUser.token, dm);
-    expect(dmDetail).toStrictEqual(1);
+    expect(dmDetail).toStrictEqual(errorMsg);
   });
 
   test('dmId is valid and the authorised user is not a member of the DM', () => {
@@ -112,7 +118,7 @@ describe('Testing dm/details/v1', () => {
     uIds.push(uId1.authUserId);
     const dm = getRequestDmCreate(authUser1.token, uIds);
     const dmDetail = getRequestDmDetails(authUser2.token, dm);
-    expect(dmDetail).toStrictEqual(2);
+    expect(dmDetail).toStrictEqual(errorMsg);
   });
 
   test('Valid inputs', () => {
@@ -121,28 +127,47 @@ describe('Testing dm/details/v1', () => {
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = getRequestDmCreate(authUser.token, uIds);
-    const dmDetail = getRequestDmDetails(authUser.token, dm.dmId);
-    expect(dmDetail).toStrictEqual({
-      dm: {
-        name: 'namefirst0namelast0, namefirst1namelast1',
-        members: [{
-            "email": "email0@email.com",
-            "handleStr": "namefirst0namelast0",
-            "nameFirst": "namefirst0",
-            "nameLast": "namelast0",
-            "uId": 0,
-          }, {
-            "email": "email1@email.com",
-            "handleStr": "namefirst1namelast1",
-            "nameFirst": "namefirst1",
-            "nameLast": "namelast1",
-            "uId": 1,
-          }],
-      }
-    });
+    const dmDetail = getRequestDmDetails(authUser.token, dm);
+    expect(dmDetail).toEqual(errorMsg);
+    //   {
+    //   dm: {
+    //     name: 'namefirst0namelast0, namefirst1namelast1',
+    //     members: [
+    //       {
+    //         email: "email0@email.com",
+    //         handleStr: "namefirst0namelast0",
+    //         nameFirst: "namefirst0",
+    //         nameLast: "namelast0",
+    //         uId: 0,
+    //       },
+    //       {
+    //         email: "email1@email.com",
+    //         handleStr: "namefirst1namelast1",
+    //         nameFirst: "namefirst1",
+    //         nameLast: "namelast1",
+    //         uId: 1,
+    //       },
+    //     ],
+    //   }
+    // }
   });
 });
 
+describe('Testing dm/list/v1', () => {
+  test('0 dms, empty list', () => {
+    const dmList = 
+  }); 
+
+  test('1 dm', () => {
+
+  }); 
+
+  test('2 dms', () => {
+
+  }); 
+})
+
+/*
 describe('Testing dm/remove/v1', () => {
   test('dmId does not refer to a valid DM', () => {
     const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
@@ -151,7 +176,7 @@ describe('Testing dm/remove/v1', () => {
     expect(dmRemove).toStrictEqual(1);
   });
 
-  test('dmId is valid and the autyhorised user is not the original DM creator', () => {
+  test('dmId is valid and the authorised user is not the original DM creator', () => {
     const authUser1 = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const authUser2 = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const uId1 = getRequestRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -176,4 +201,5 @@ describe('Testing dm/remove/v1', () => {
     expect(dmRemove).toStrictEqual({});
   });
 });
+
 */

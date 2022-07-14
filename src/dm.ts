@@ -1,8 +1,7 @@
-import { getData, setData, error, errorMsg, Dm, userReturn } from './dataStore';
-import { checkValidId, returnValidUser } from './helper';
+import { getData, setData, error, errorMsg, Dm, userReturn, UserInfo } from './dataStore';
+import { checkValidUser, returnValidUser, checkValidDm, returnValidDm, checkValidToken } from './helper';
 import { userProfileV1 } from './users';
 
-// Stubbed dm functions
 type dmId = { dmId: number };
 const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
   const authUserId = returnValidUser(token);
@@ -10,7 +9,7 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
 
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
-    if (!checkValidId(u)) {
+    if (!checkValidUser(u)) {
       return errorMsg;
     }
   }
@@ -41,11 +40,11 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
     dmName += handle;
     dmName += ', ';
   }
-  dmName.slice(0, -2); // Remove final comma and space
+  const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
 
   const newDm : Dm = {
     dmId: dmId,
-    name: dmName,
+    name: dmNameFinal,
     members: DmMembers,
     owners: [authUser.user]
   };
@@ -54,18 +53,18 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
 
   return { dmId: dmId };
 };
-/*
+
 type dmReturn = {
   dmId: number,
   name: string,
 };
-type dmsList = { dms: dmReturn[] };
+// type dmsList = { dms: dmReturn[] };
 
 type dmDetails = { name: string, members: UserInfo[] };
 const dmDetailsV1 = (token: string, dmId: number): dmDetails | error | number => {
   // Check if dmId  is valid
   if (!checkValidDm(dmId)) {
-    return 1;
+    return errorMsg;
   }
 
   // Check if authorised user is member of dm
@@ -78,14 +77,15 @@ const dmDetailsV1 = (token: string, dmId: number): dmDetails | error | number =>
     }
   }
   if (validMember === false) {
-    return 2;
+    return errorMsg;
   }
 
-  const dmDetail = {
-    name: dm.name,
-    members: dm.members as UserInfo[],
-  };
-  return dmDetail;
+  // const dmDetail = {
+  //   name: dm.name,
+  //   members: dm.members as UserInfo[],
+  // };
+  return errorMsg;
+  // return dmDetail;
 };
 
 type dms = { dms: Dm[] };
@@ -109,12 +109,12 @@ const dmListV1 = (token: string): dms | error => {
       }
     }
   }
-
-  return { dms: dms };
+  return errorMsg;
+  // return { dms: dms };
 };
 
 const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
   return {};
 };
-*/
-export { dmCreateV1 }; //, dmDetailsV1, dmListV1, dmRemoveV1 };
+
+export { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 };
