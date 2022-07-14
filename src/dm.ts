@@ -1,56 +1,120 @@
-// import { getData, setData, error, errorMsg, authUserId, token, uId, Dm, User } from './dataStore';
-// import { checkValidId, checkValidToken, returnValidUser } from './helper';
-// import { userProfileV1 } from './users';
-import { uId, error } from './dataStore';
+import { getData, setData, error, errorMsg, Dm, userReturn } from './dataStore';
+import { checkValidId, returnValidUser } from './helper';
+import { userProfileV1 } from './users';
 
 // Stubbed dm functions
-type dmId = string; // number;
-const dmCreateV1 = (token: string, uIds: uId[]): dmId | error => {
-  // const authUserId = returnValidUser(token);
-  // const authUser = userProfileV1(token, authUserId.uId);
-  // // Error cases
-  //     // Any uId in uIds does not refer to a valid user
-  //     // There are duplicate uIds in uIds
-  // for (const u of uIds) {
-  //     if (!checkValidId(u.uId)) {
-  //         return errorMsg;
-  //     }
-  // }
+type dmId = { dmId: number };
+const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
+  const authUserId = returnValidUser(token);
+  const authUser = userProfileV1(token, authUserId.uId) as userReturn;
 
-  // const data = getData();
-  // const dmId = data.dms.length;
+  // Any uId in uIds does not refer to a valid user
+  for (const u of uIds) {
+    if (!checkValidId(u)) {
+      return errorMsg;
+    }
+  }
+  // There are duplicate uIds in uIds
+  const uniqueIds = Array.from(new Set(uIds));
+  if (uIds.length !== uniqueIds.length) {
+    return errorMsg;
+  }
 
-  // const sorted = uIds.sort();
-  // let dmName = "";
-  // for (const u of sorted) {
-  //     let userHandle = userProfileV1(token, u.uId);
-  //     if (userHandle != errorMsg) {
-  //         dmName += userHandle.handleStr; // Bcos of error type
-  //         dmName += ',';
-  //     }
-  // };
-  // const newDm : Dm = {
-  //     dmId: dmId,
-  //     name: dmName,
-  //     members: uIds,
-  //     owners: [ authUserId ]
-  // };
-  // return { dmId: dmId };
-  return 'token' + 'uIds';
+  const data = getData();
+  const dmId = data.dms.length;
+
+  const DmMembers = [];
+  for (const uId of uIds) {
+    const DmMember = userProfileV1(token, uId) as userReturn;
+    DmMembers.push(DmMember.user);
+  }
+  DmMembers.push(authUser.user);
+
+  const DmHandles = [];
+  for (const member of DmMembers) {
+    DmHandles.push(member.handleStr);
+  }
+  const sortedHandles = DmHandles.sort();
+
+  let dmName = '';
+  for (const handle of sortedHandles) {
+    dmName += handle;
+    dmName += ', ';
+  }
+  dmName.slice(0, -2); // Remove final comma and space
+
+  const newDm : Dm = {
+    dmId: dmId,
+    name: dmName,
+    members: DmMembers,
+    owners: [authUser.user]
+  };
+  data.dms.push(newDm);
+  setData(data);
+
+  return { dmId: dmId };
+};
+/*
+type dmReturn = {
+  dmId: number,
+  name: string,
+};
+type dmsList = { dms: dmReturn[] };
+
+type dmDetails = { name: string, members: UserInfo[] };
+const dmDetailsV1 = (token: string, dmId: number): dmDetails | error | number => {
+  // Check if dmId  is valid
+  if (!checkValidDm(dmId)) {
+    return 1;
+  }
+
+  // Check if authorised user is member of dm
+  const dm = returnValidDm(dmId);
+  const authUser = returnValidUser(token);
+  let validMember = false;
+  for (const member of dm.members) {
+    if (member.uId === authUser.uId) {
+      validMember = true;
+    }
+  }
+  if (validMember === false) {
+    return 2;
+  }
+
+  const dmDetail = {
+    name: dm.name,
+    members: dm.members as UserInfo[],
+  };
+  return dmDetail;
 };
 
-type dmDetails = string; // { name: string, members: User[] };
-const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
-  return 'token' + 'dmId';
-};
-
-type dms = string; // { dms: Dm[] };
+type dms = { dms: Dm[] };
 const dmListV1 = (token: string): dms | error => {
-  return 'token';
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+
+  const data = getData();
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
+  const dms = [];
+
+  for (const dm of data.dms) {
+    for (const member of dm.members) {
+      if (member.uId === user.user.uId) {
+        dms.push({
+          dmId: dm.dmId,
+          name: dm.name,
+        });
+      }
+    }
+  }
+
+  return { dms: dms };
 };
 
 const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
   return {};
 };
-
-export { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1 };
+*/
+export { dmCreateV1 }; //, dmDetailsV1, dmListV1, dmRemoveV1 };

@@ -71,7 +71,7 @@ app.get('/user/profile/v2', (req, res, next) => {
 
 // ================================================================ //
 // dm functions
-app.post('/dm/create/v2', (req, res, next) => {
+app.post('/dm/create/v1', (req, res, next) => {
   try {
     const { token, uIds } = req.body;
     return res.json(dmCreateV1(token, uIds));
@@ -79,6 +79,41 @@ app.post('/dm/create/v2', (req, res, next) => {
     next(err);
   }
 });
+
+/*
+app.get('/dm/details/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const dmId = req.query.dmId as string;
+    console.log(dmId);
+
+    return res.json(dmDetailsV1(token, parseInt(dmId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/dm/list/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+
+    return res.json(dmListV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/dm/remove/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const dmId = req.query.dmId as string;
+
+    return res.json(dmRemoveV1(token, parseInt(dmId)));
+  } catch (err) {
+    next(err);
+  }
+});
+*/
 // ================================================================ //
 // other functions
 
