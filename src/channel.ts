@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, returnIsMember, returnIsOwner, isMember, isOwner, returnValidId, checkValidUser } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser } from './helper';
 import { userProfileV1 } from './users';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
@@ -254,12 +254,6 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   const tempuId = returnValidUser(token);
   const user = userProfileV1(token, uId) as userReturn;
   const user2 = userProfileV1(token, tempuId.uId) as userReturn;
-  const tempUser = returnValidId(uId);
-  // if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
-  //     !returnIsOwner(uId, channelId) || !returnIsOwner(user.user.uId, channelId)) {
-  //   return errorMsg;
-  // }
-
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
       !isOwner(tempUser.token, channelId) || !isOwner(token, channelId)) {
     return errorMsg;

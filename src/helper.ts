@@ -169,31 +169,6 @@ function isOwner(token: string, channelId: number) : boolean {
   return false;
 }
 
-
-
-function returnIsMember(uId: number, channelId: number): boolean {
-  const data: Data = getData();
-  const currChannel = returnValidChannel(channelId);
-  for (const member of currChannel.allMembers) {
-    if (uId === member.uId) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function returnIsOwner(uId: number, channelId: number): boolean {
-  const data: Data = getData();
-  const currChannel = returnValidChannel(channelId);
-  for (const member of currChannel.ownerMembers) {
-    if (uId === member.uId) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
 export {
   checkValidUser,
   checkValidChannel,
@@ -208,6 +183,4 @@ export {
   getChannelfromMessage,
   isMember,
   isOwner,
-  returnIsMember,
-  returnIsOwner,
 };
