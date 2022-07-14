@@ -1,6 +1,6 @@
 import express from 'express';
 import { echo } from './echo';
-import morgan, { token } from 'morgan';
+import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
 
@@ -90,7 +90,7 @@ app.get('/user/profile/v2', (req, res, next) => {
 });
 app.put('/user/profile/setname/v1', (req, res, next) => {
   try {
-    const {token, nameFirst, nameLast} = req.body;
+    const { token, nameFirst, nameLast } = req.body;
     return res.json(userSetNameV1(token, nameFirst, nameLast));
   } catch (err) {
     next(err);
@@ -98,7 +98,7 @@ app.put('/user/profile/setname/v1', (req, res, next) => {
 });
 app.put('/user/profile/setemail/v1', (req, res, next) => {
   try {
-    const {token, email} = req.body;
+    const { token, email } = req.body;
     return res.json(userSetEmailV1(token, email));
   } catch (err) {
     next(err);
@@ -106,7 +106,7 @@ app.put('/user/profile/setemail/v1', (req, res, next) => {
 });
 app.put('/user/profile/sethandle/v1', (req, res, next) => {
   try {
-    const {token, handleStr} = req.body;
+    const { token, handleStr } = req.body;
     return res.json(userSetHandleV1(token, handleStr));
   } catch (err) {
     next(err);
