@@ -1,14 +1,7 @@
-import { error, errorMsg, Channel, userReturn, channelId, getData, setData, Message, UserInfo } from './dataStore';
-import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken, returnIsMember, returnIsOwner } from './helper';
+import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
+import { getData, setData } from './dataStore';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember } from './helper';
 import { userProfileV1 } from './users';
-import { channelsListV1 } from './channels';
-
-// UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
-/*
-import { userReturn, ChannelInfo } from './dataStore';
-import { userProfileV1 } from './users';
-type channelsList = { channels: ChannelInfo[] };
-*/
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
 
@@ -90,6 +83,20 @@ Return Value:
     Returns {error: 'error'} on a private channel and auth user is not a global owner
     Returns {} on no error
 */
+/**
+ * channelJoinV1
+ * Adds the current user to the channel
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel beign accessed
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the cahnnelId is invalid
+ * @returns {} if there is no error
+ */
 function channelJoinV1(token: string, channelId: number): (error | object) {
   // Check if channelId and token is valid
   if (!checkValidToken(token) || !checkValidChannel(channelId)) {
@@ -98,7 +105,7 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
   const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
 
-  if ((channel.isPublic === false && user.permissionId === 2) || returnIsMember(user.uId, channelId)) {
+  if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
     return errorMsg;
   }
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
@@ -176,7 +183,6 @@ Return Value:
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
-
 function channelMessagesV2(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
   const uId = returnValidUser(token);
 
@@ -208,9 +214,9 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
     messages.push(channelMsg[i]);
   }
   return {
-    messages: messages,
-    start: start,
-    end: final,
+    messages: [],
+    start: 1,
+    end: 1,
   };
 }
 
