@@ -1,4 +1,3 @@
-
 import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser } from './helper';
 import validator from 'validator';

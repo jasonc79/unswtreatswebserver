@@ -5,10 +5,10 @@ import config from './config.json';
 import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
+import { channelJoinV1 } from './channel';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
 import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
-import { channelJoinV1 } from './channel';
 import { dmCreateV1 } from './dm';
 import { clearV1 } from './other';
 
