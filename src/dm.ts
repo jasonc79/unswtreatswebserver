@@ -2,6 +2,19 @@ import { getData, setData, error, errorMsg, Dm, userReturn, UserInfo } from './d
 import { checkValidUser, returnValidUser, checkValidDm, returnValidDm, checkValidToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
 
+/*
+Creates a DM where uIds contains the user(s) that this DM is directed to. 
+The user with the token is the owner of the DM. 
+
+Arguments:
+    token (string)              - A unique identifier for the authorised user's current session
+    uIds (number[])             - An array of user's uIds, not including the creator of the DM
+
+Return Value:
+    Returns {error: 'error'}    when any uId in uIds does not refer to a valid user
+    Returns {error: 'error'}    there are duplicate 'uId's in uIds
+    Returns { dmId } on no error
+ */
 type dmId = { dmId: number };
 const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
   const authUserId = returnValidUser(token);
@@ -49,6 +62,18 @@ type dmReturn = {
   name: string,
 };
 
+/*
+Given a DM with ID dmId that the authorised user is a member of, provide basic details about the DM. 
+
+Arguments:
+    token (string)              - A unique identifier for the authorised user's current session
+    dmId (number)               - A unique identifier for a DM
+
+Return Value:
+    Returns {error: 'error'}    when dmId does not refer to a valid DM
+    Returns {error: 'error'}    when dmId is valid and the authorised user is not a member of the DM
+    Returns { name, members } on no error
+ */
 type dmDetails = { name: string, members: UserInfo[] };
 const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
   // Check if dmId  is valid
@@ -69,6 +94,15 @@ const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
   return dmDetail;
 };
 
+/*
+Returns the array of DMs that the user is a member of.
+    
+Arguments:
+    token (string)              - A unique identifier for the authorised user's current session
+
+Return Value:
+    Returns { } on no error
+ */
 type dms = { dms: Dm[] };
 const dmListV1 = (token: string): dms | error => {
   if (!checkValidToken(token)) {
@@ -93,6 +127,20 @@ const dmListV1 = (token: string): dms | error => {
   return { dms: dms };
 };
 
+/*
+Remove an existing DM, so all members are no longer in the DM. 
+This can only be done by the original creator of the DM.
+
+Arguments:
+    token (string)              - A unique identifier for the authorised user's current session
+    dmId (number)               - A unique identifier for a DM
+
+Return Value:
+    Returns {error: 'error'}    when dmId does not refer to a valid DM
+    Returns {error: 'error'}    when dmId is valid and the authorised user is not the original DM creator
+    Returns {error: 'error'}    when dmId is valid and the authorised user is no longer in the DM
+    Returns { } on no error
+ */
 const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
   if (!checkValidDm(dmId) || !checkValidToken(token)) {
     return errorMsg; 

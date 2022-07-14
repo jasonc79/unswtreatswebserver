@@ -176,17 +176,16 @@ describe('Testing dm/list/v1', () => {
   }); 
 
   test('2 dms', () => {
-    const authUser1 = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
+    const authUser = getRequestRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const uId1 = getRequestRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds1 = [];
     uIds1.push(uId1.authUserId);
     const dm1 = getRequestDmCreate(authUser1.token, uIds1);
 
-    const authUser2 = getRequestRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
     const uId2 = getRequestRegister('email3@email.com', 'password3', 'nameFirst3', 'nameLast3');
     const uIds2 = [];
     uIds2.push(uId2.authUserId);
-    const dm2 = getRequestDmCreate(authUser2.token, uIds2);
+    const dm2 = getRequestDmCreate(authUser.token, uIds2);
 
     const dmList = getRequestDmList(authUser1.token); 
     expect(dmList).toStrictEqual([
