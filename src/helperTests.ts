@@ -6,12 +6,11 @@ const port = config.port;
 const url = config.url;
 
 // Return types
-export type authUser = {
+export type authUserReturn = {
   token: string,
   authUserId: number
 }
 export const errorMsg = { error: 'error' };
-
 
 function requestHelper(method: HttpVerb, path: string, payload: object) {
   let qs = {};
@@ -75,7 +74,25 @@ export function requestUserProfile(token: string, uId: number) {
 }
 
 export function requestAllUsers(token: string) {
-  const res =  requestHelper('GET', '/users/all/v1', { token });
+  const res = requestHelper('GET', '/users/all/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestUserSetName(token: string, nameFirst: string, nameLast: string) {
+  const res = requestHelper('PUT', '/user/profile/setname/v1', { token, nameFirst, nameLast });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestUserEmail(token: string, email: string) {
+  const res = requestHelper('PUT', '/user/profile/setemail/v1', { token, email });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestUserHandle(token: string, handleStr: string) {
+  const res = requestHelper('PUT', '/user/profile/sethandle/v1', { token, handleStr });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }

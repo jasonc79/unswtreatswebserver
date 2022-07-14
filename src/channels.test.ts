@@ -1,13 +1,12 @@
-import { authUser, requestAuthRegister, errorMsg, requestClear } from './helperTests';
+import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
 import { requestChannelsList, requestChannelsListAll, requestChannelCreate } from './helperTests';
-import config from './config.json';
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
-let authUser: authUser;
+let authUser: authUserReturn;
 
 beforeEach(() => {
   requestClear();
