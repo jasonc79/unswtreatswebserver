@@ -19,6 +19,21 @@ function checkValidChannel(id: number): boolean {
   }
   return false;
 }
+// function checkValidId(id: number, property: string) : boolean {
+//   const data: Data = getData();
+//   for (const item of data[property]) {
+//     if (property === 'users') {
+//       if (item.uId === id) {
+//         return true;
+//       }
+//     } else if (property === 'channels') {
+//       if (item.channelId === id) {
+//         return true;
+//       }
+//     }
+//   }
+//   return false;
+// }
 
 function checkValidToken(token: token): boolean {
   const data: Data = getData();
@@ -61,8 +76,8 @@ function returnIsMember(uId: number, channelId: number): boolean {
   const data: Data = getData();
   const currChannel = returnValidChannel(channelId);
   for (const member of currChannel.allMembers) {
-    if (user.uId === member.uId) {
-      isMember = true;
+    if (uId === member.uId) {
+      return true;
     }
   }
   return false;
@@ -72,8 +87,8 @@ function returnIsOwner(uId: number, channelId: number): boolean {
   const data: Data = getData();
   const currChannel = returnValidChannel(channelId);
   for (const member of currChannel.ownerMembers) {
-    if (user.uId === member.uId) {
-      isMember = true;
+    if (uId === member.uId) {
+      return true;
     }
   }
   return false;
