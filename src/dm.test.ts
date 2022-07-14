@@ -25,6 +25,11 @@ function getRequestDmCreate(token: number, uIds: number[]) {
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
+function getRequestSendDm(token: string, dmId: number, message: string) {
+  const res = requestHelper('POST', '/message/senddm/v1', { token, dmId, message });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
 // function getRequestDmDetails(token: number, dmId: number) {
 //   const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
 //   expect(res.statusCode).toBe(OK);
@@ -177,3 +182,52 @@ describe('Testing dm/remove/v1', () => {
   });
 });
 */
+describe('Testing messageSendDmV1', () => {
+  test('Valid Dm send', () => {
+    const authUser1 = getRequestRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = getRequestRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const dm = getRequestDmCreate(authUser1.token, authUser2.uId);
+    const sendDm = getRequestSendDm(authUser1.token, dm, 'help');
+    expect(sendDm).toStrictEqual({ sendDm });   
+  });
+  test('Invalid Dm', () => {
+    const authUser1 = getRequestRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = getRequestRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    getRequestDmCreate(authUser1.token, authUser2.uId);
+    const sendDm = getRequestSendDm(authUser1.token, 4, 'help');
+    expect(sendDm).toStrictEqual(errorMsg);
+
+  });
+  test('Message length too short < 1 character', () => {
+    const authUser1 = getRequestRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = getRequestRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const dm = getRequestDmCreate(authUser1.token, authUser2.uId);
+    const sendDm = getRequestSendDm(authUser1.token, dm, '');
+    expect(sendDm).toStrictEqual(errorMsg);
+  });
+  test('Message length too long > 1000 characters', () => {
+    const authUser1 = getRequestRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = getRequestRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const dm = getRequestDmCreate(authUser1.token, authUser2.uId);
+    const sendDm = getRequestSendDm(authUser1.token, dm, 'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\
+    rrrrrrrr');
+    expect(sendDm).toStrictEqual(errorMsg);
+  });
+  test('dmId is valid, but authUser is not member of Dm', () => {
+    const authUser1 = getRequestRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = getRequestRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const authUser3 = getRequestRegister('email3@gmail.com', 'password3', 'firstname3', 'lastname3');
+    const dm = getRequestDmCreate(authUser1.token, authUser2.uId);
+    const sendDm = getRequestSendDm(authUser3.token, dm, 'help');
+    expect(sendDm).toStrictEqual(errorMsg);    
+  });
+});
