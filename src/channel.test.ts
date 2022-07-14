@@ -21,6 +21,7 @@ describe('Testing channelMessagesV1', () => {
       })
     );
   });
+  /*
   test('Contains messages', () => {
     // Waiting for message/send to finish writing this test.
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
@@ -32,7 +33,7 @@ describe('Testing channelMessagesV1', () => {
         end: -1,
       })
     );
-  });
+  }); */
   test('Start is greater than messages', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
