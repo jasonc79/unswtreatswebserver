@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, checkValidId, isMember } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember } from './helper';
 import { userProfileV1 } from './users';
 
 // UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
@@ -150,45 +150,50 @@ type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
 function channelMessagesV1(authUserId: number, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  if (!checkValidId(authUserId)) {
-    return errorMsg;
-  }
+  // if (!checkValidId(authUserId)) {
+  //   return errorMsg;
+  // }
 
-  if (!checkValidChannel(channelId)) {
-    return errorMsg;
-  }
-  const currChannel = returnValidChannel(channelId);
-  let isMember = false;
-  for (const member of currChannel.allMembers) {
-    if (authUserId === member.uId) {
-      isMember = true;
-    }
-  }
+  // if (!checkValidChannel(channelId)) {
+  //   return errorMsg;
+  // }
+  // const currChannel = returnValidChannel(channelId);
+  // let isMember = false;
+  // for (const member of currChannel.allMembers) {
+  //   if (authUserId === member.uId) {
+  //     isMember = true;
+  //   }
+  // }
 
-  if (isMember === false) {
-    return errorMsg;
-  }
-  const channelMsg = currChannel.messages;
-  if (channelMsg.length < start) {
-    return errorMsg;
-  }
+  // if (isMember === false) {
+  //   return errorMsg;
+  // }
+  // const channelMsg = currChannel.messages;
+  // if (channelMsg.length < start) {
+  //   return errorMsg;
+  // }
 
-  const messages: Array<Message> = [];
-  const final = start + 50;
-  for (let i = start; i < final; i++) {
-    if (i >= channelMsg.length) {
-      return {
-        messages: messages,
-        start: start,
-        end: -1,
-      };
-    }
-    messages.push(channelMsg[i]);
-  }
+  // const messages: Array<Message> = [];
+  // const final = start + 50;
+  // for (let i = start; i < final; i++) {
+  //   if (i >= channelMsg.length) {
+  //     return {
+  //       messages: messages,
+  //       start: start,
+  //       end: -1,
+  //     };
+  //   }
+  //   messages.push(channelMsg[i]);
+  // }
+  // return {
+  //   messages: messages,
+  //   start: start,
+  //   end: final,
+  // };
   return {
-    messages: messages,
-    start: start,
-    end: final,
+    messages: [],
+    start: 1,
+    end: 1,
   };
 }
 export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
