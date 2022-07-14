@@ -56,7 +56,9 @@ function requestMessageEdit(token: string, messageId: number, message: string) {
 }
 
 function requestMessageRemove(token: string, messageId: number) {
-  return requestHelper('DELETE', '/message/remove/v1', { token, messageId });
+  const res = requestHelper('DELETE', '/message/remove/v1', { token, messageId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
 }
 
 function requestClear() {
