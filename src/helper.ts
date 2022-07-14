@@ -1,4 +1,5 @@
-import { Channel, getData, User, Data, token, Message } from './dataStore';
+import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
+
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise
  * property : users | channels
@@ -36,6 +37,16 @@ function checkValidToken(token: token) : boolean {
   return false;
 }
 
+function checkValidDm(id: number): boolean {
+  const data: Data = getData();
+  for (const dm of data.dms) {
+    if (dm.dmId === id) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * returns true if the message exists in some channel, and false otherwise
  */
@@ -48,7 +59,6 @@ function checkValidMessage(messageId: number) : boolean {
       }
     }
   }
-  return false;
 }
 
 /**
@@ -98,6 +108,15 @@ function returnValidUser(token: string) : User {
   for (const user of data.users) {
     if (user.token === token) {
       return user;
+    }
+  }
+}
+
+function returnValidDm(id: number): Dm {
+  const data: Data = getData();
+  for (const dm of data.dms) {
+    if (dm.dmId === id) {
+      return dm;
     }
   }
 }
@@ -172,11 +191,13 @@ export {
   checkValidUser,
   checkValidChannel,
   checkValidToken,
-  checkValidMessage,
-  checkMessageSender,
+  checkValidDm,
   returnValidId,
   returnValidChannel,
   returnValidUser,
+  returnValidDm,
+  checkValidMessage,
+  checkMessageSender,
   returnValidMessage,
   getIdfromToken,
   getChannelfromMessage,
