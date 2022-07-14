@@ -1,5 +1,5 @@
 import { getData, setData, error, errorMsg, Dm, userReturn } from './dataStore';
-import { checkValidId, returnValidUser } from './helper';
+import { checkValidUser, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
 
 // Stubbed dm functions
@@ -10,7 +10,7 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
 
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
-    if (!checkValidId(u)) {
+    if (!checkValidUser(u)) {
       return errorMsg;
     }
   }
