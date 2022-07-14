@@ -8,21 +8,22 @@ type channelReturn = {
 };
 type channelsList = { channels: channelReturn[] };
 
-/*
-channelsCreateV1 creates a new channel which is added to the dataStore
-The channel is named the given name and created if the name is greater than 0 and less than 21 characters long
-
-Arguments:
-    token (string)     - holds the session token for the user
-    name (string)           - contains the string which is set to be the channel name
-    idPublic (boolean)      - value determining if the channel will be private or public
-
-Return Value:
-    Returns { channelId : channelId } on no errors, where channelId is a number
-    Returns { error: 'error' } on an invalid authUserId and if the name is less than 1
-        or greater than 20 characters long
-*/
-
+/**
+ * channelsCreateV1
+ * creates a new channel is named the given name and created if the name is 
+ * greater than 0 and less than 21 characters long
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} name contains the string which is set to be the channel name
+ * @param {boolean} isPublic determines if the channel will be private or public
+ * 
+ * Return Value:
+ * @returns { error } 
+ *    if the token is invalid
+ *    if the name is less than 1 or greater than 20 characters
+ * @returns { channelId : channelId } on no errors, where channelId is a number
+ */
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;
@@ -33,8 +34,6 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
 
   const data = getData();
   const channelId = data.channels.length;
-  // const uId = returnValidUser(token).uId;
-  // const user = userProfileV1(token, uId) as userReturn;
   const newChannel : Channel = {
     channelId: channelId,
     name: name,

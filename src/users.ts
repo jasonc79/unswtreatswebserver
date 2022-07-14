@@ -2,27 +2,21 @@ import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo 
 import { returnValidId, checkValidToken, checkValidUser } from './helper';
 import validator from 'validator';
 
-/*
-userProfileV1 checks if authUserId and uId are valid and then returns an object containing
-an array of objects containing the user's details
-
-Arguments:
-    authUserId (number)     - holds the id of the user that is searching for the infomation
-    uId (number)            - holds the id of the user that's details are being searched for
-
-Return Value:
-    Returns
-        { users:
-            uId: user.uId,
-            email: user.email,
-            nameFirst: user.nameFirst,
-            nameLast: user.nameLast,
-            handleStr: user.handleStr,
-        }
-        on if authUserId and uId are valid
-    Returns { error: 'error' } on an invalid authUserId or uId
-*/
-
+/**
+ * userProfileV1 
+ * returns an object containing the user's details
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} uId is the id of the user beign accessed
+ * 
+ * Return Values:
+ * @returns { error }
+ *    if token is inValid
+ *    if uId is invalid
+ * @returns { users: userReturn } when no errors, where userReturn contains
+ *    uId, email, nameFirst, nameLast and handleStr
+ */
 function userProfileV1(token: string, uId: number) : error | userReturn {
   if (!checkValidUser(uId) || !checkValidToken(token)) {
     return errorMsg;
@@ -133,6 +127,19 @@ function userSetHandleV1(token: string, handleStr: string) {
   return {};
 }
 
+/**
+ * usersAllV1
+ * returns an array with details about all users
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * 
+ * Return Value:
+ * @returns { error } 
+ *    if token is invalid
+ * @returns { users: userReturn[] } when there are no errors, where userReturn contains
+ *    uId, email, nameFirst, nameLast and handleStr
+ */
 function usersAllV1(token: string) : error | allUserReturn {
   if (!checkValidToken(token)) {
     return errorMsg;

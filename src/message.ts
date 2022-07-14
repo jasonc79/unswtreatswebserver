@@ -24,7 +24,7 @@ type messageId = { messageId: number };
 
 /**
  * messageSendV1
- * Sends a message to a specified channel
+ * Sends a message to a specified channel and returns the id of the message 
  *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
@@ -35,6 +35,7 @@ type messageId = { messageId: number };
  * @returns { error }
  *    if the token is invalid
  *    if the channelId is invalid
+ *    if the user is not in the channel
  * @returns { messageId: messageId } if a message is sent without any errors
  */
 function messageSendV1(token: string, channelId: number, message: string) : messageId | error {
@@ -58,6 +59,22 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   return { messageId: newMessage.messageId };
 }
 
+/**
+ * messageSenddmV1
+ * Sends a message to a specified dm and returns the id of the message 
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} dmId is the id of the dm beign accessed
+ * @param {string} message is the message the user wants to send
+ * 
+ * Return Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if the dmId is invalid
+ *    if the user is not in the dm
+ * @returns { messageId: messageId } if a message is sent without any errors
+ */
 function messageSenddmV1(token: string, dmId: number, message: string) : messageId | error {
   if (!checkValidToken(token) || !checkValidDm(dmId) || !isMemberDm(token, dmId)) {
     return errorMsg;
@@ -91,7 +108,7 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
  *
  * Returns Values:
  * @returns { error }
- *    if message is invalid
+ *    if messageId is invalid
  *    if the sender is not the current user
  *    if the token is invalid
  *    if the current user doesn't have permission to edit messages
@@ -143,9 +160,10 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
  *
  * Return Values:
  * @returns { error }
- *    if token is invalid
- *    if the message is invalid
- *
+ *    if messageId is invalid
+ *    if the sender is not the current user
+ *    if the token is invalid
+ *    if the current user doesn't have permission to edit messages
  * @returns {} if message is removed with no errors
  */
 function messageRemoveV1(token: string, messageId: number) : object | error {

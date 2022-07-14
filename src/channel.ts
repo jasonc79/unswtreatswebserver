@@ -63,6 +63,7 @@ Return Value:
     Returns {error: 'error'} on a private channel and auth user is not a global owner
     Returns {} on no error
 */
+
 /**
  * channelJoinV1
  * Adds the current user to the channel
@@ -78,17 +79,17 @@ Return Value:
  * @returns {} if there is no error
  */
 function channelJoinV1(token: string, channelId: number): (error | object) {
-  // Check if channelId and token is valid
   if (!checkValidToken(token) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
+
   const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
 
+  // check if user has permissions to join
   if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
     return errorMsg;
   }
-  // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
   const data = getData();
   const newUser = userProfileV1(token, user.uId) as userReturn;
   channel.allMembers.push(newUser.user);
