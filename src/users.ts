@@ -120,7 +120,7 @@ function userSetHandleV1(token: string, handleStr: string) {
   }
   const data = getData();
   for (const user of data.users) {
-    if (token !== user.token && handleStr !== user.handleStr) {
+    if (token !== user.token && handleStr === user.handleStr) {
       return errorMsg;
     }
   }
