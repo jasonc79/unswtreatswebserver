@@ -1,139 +1,153 @@
-import request, { HttpVerb } from 'sync-request';
-import config from './config.json';
+import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
+import { requestUserSetName, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile } from './helperTests';
 
-const OK = 200;
-const port = config.port;
-const url = config.url;
-const errorMsg = { error: 'error' };
+const email = 'email@gmail.com';
+const password = 'password';
+const nameFirst = 'firstname';
+const nameLast = 'lastname';
+const handleStr = 'firstnamelastname';
 
-function requestHelper(method: HttpVerb, path: string, payload: object) {
-  let qs = {};
-  let json = {};
-  if (['GET', 'DELETE'].includes(method)) {
-    qs = payload;
-  } else {
-    json = payload;
-  }
-  return request(method, url + ':' + port + path, { qs, json });
-}
+const email2 = 'email2@gmail.com';
+const password2 = 'password2';
+const nameFirst2 = 'firstname2';
+const nameLast2 = 'lastname2';
+const handleStr2 = 'firstname2lastname2';
 
-// ========================================================================= //
-// Wrapper Functions
+const email3 = 'email3@gmail.com';
+const password3 = 'password3';
+const nameFirst3 = 'firstname3';
+const nameLast3 = 'lastname3';
+const handleStr3 = 'firstname3lastname3';
 
-function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
-  return requestHelper('POST', '/auth/register/v2', {
-    email: email,
-    password: password,
-    nameFirst: nameFirst,
-    nameLast: nameLast
-  });
-}
-
-function requestUserProfile(token: string, uId: number) {
-  return requestHelper('GET', '/user/profile/v2', { token, uId });
-}
-
-function requestAllUsers(token: string) {
-  return requestHelper('GET', '/users/all/v1', { token });
-}
-function requestClear() {
-  return requestHelper('DELETE', '/clear/v1', {});
-}
+let authUser: authUserReturn;
 
 beforeEach(() => {
   requestClear();
+  authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
 describe('Testing userProfileV1', () => {
   test('Valid uId', () => {
-    const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
-    const res2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const uId = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
-    const res3 = requestUserProfile(authUser.token, uId.authUserId);
-    const profile = JSON.parse(String(res3.getBody(('utf-8'))));
-    expect(res3.statusCode).toBe(OK);
+    const uId = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+    const profile = requestUserProfile(authUser.token, uId.authUserId);
     expect(profile).toStrictEqual({
       user: {
         uId: uId.authUserId,
-        email: 'email2@gmail.com',
-        nameFirst: 'firstname2',
-        nameLast: 'lastname2',
-        handleStr: 'firstname2lastname2',
+        email: email2,
+        nameFirst: nameFirst2,
+        nameLast: nameLast2,
+        handleStr: handleStr2,
       }
     });
   });
   test('Invalid uId', () => {
-    const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
     const uId = authUser.authUserId + 1;
-    const res2 = requestUserProfile(authUser.token, uId);
-    const profile = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
+    const profile = requestUserProfile(authUser.token, uId);
     expect(profile).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetNameV1', () => {
+  test('Valid Name', () => {
+    const setNameValidator = requestUserSetName(authUser.token, 'Dan', 'Smith');
+    expect(setNameValidator).toStrictEqual({});
+  });
+
+  test('Invalid Name', () => {
+    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const nameFirst = 'A';
+    const nameLast = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const setNameValidator = requestUserSetName(authUser.token, nameFirst, nameLast);
+    expect(setNameValidator).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetEmailV1', () => {
+  test('Valid Email', () => {
+    const setEmailValidator = requestUserEmail(authUser.token, 'email@gmail.com');
+    expect(setEmailValidator).toStrictEqual({});
+  });
+  test('Invalid Email', () => {
+    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const setEmailValidator = requestUserEmail(authUser1.token, 'email@gmail,com');
+    expect(setEmailValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Email - Already being used by another user', () => {
+    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
+    const setEmailValidator = requestUserEmail(authUser1.token, 'email1@gmail.com');
+    expect(setEmailValidator).toStrictEqual(errorMsg);
+  });
+});
+
+describe('Testing userSetHandleV1', () => {
+  test('Valid Handle', () => {
+    const setHandleValidator = requestUserHandle(authUser.token, 'dansmith');
+    expect(setHandleValidator).toStrictEqual({});
+  });
+  test('Invalid Handle - Length too short', () => {
+    const setHandleValidator = requestUserHandle(authUser.token, '3r');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Handle - Length too long', () => {
+    const setHandleValidator = requestUserHandle(authUser.token, '3r4ef3r4ef3r4ef3r4efu');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Handle - contains characters that are non-alphanumeric', () => {
+    const setHandleValidator = requestUserHandle(authUser.token, '@#^@&#*&$');
+    expect(setHandleValidator).toStrictEqual(errorMsg);
+  });
+  test('Invalid Email - Already being used by another user', () => {
+    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
+    const sethandleValidator = requestUserEmail(authUser1.token, 'jasonchen');
+    expect(sethandleValidator).toStrictEqual(errorMsg);
   });
 });
 
 describe('Testing usersAllV1', () => {
   describe('Valid Token', () => {
     test('one user', () => {
-      const res1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-      expect(res1.statusCode).toBe(OK);
-      const res2 = requestAllUsers(authUser.token);
-      const users = JSON.parse(String(res2.getBody(('utf-8'))));
-      expect(res2.statusCode).toBe(OK);
+      const users = requestAllUsers(authUser.token);
       expect(users).toStrictEqual({
         users: [
           {
             uId: authUser.authUserId,
-            email: 'email1@gmail.com',
-            nameFirst: 'firstname1',
-            nameLast: 'lastname1',
-            handleStr: 'firstname1lastname1',
+            email: email,
+            nameFirst: nameFirst,
+            nameLast: nameLast,
+            handleStr: handleStr
           }
         ]
       });
     });
 
     test('multiple users', () => {
-      const res1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-      const authUser1 = JSON.parse(String(res1.getBody(('utf-8'))));
-      expect(res1.statusCode).toBe(OK);
-      const res2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-      const authUser2 = JSON.parse(String(res2.getBody(('utf-8'))));
-      expect(res2.statusCode).toBe(OK);
-      const res3 = requestAuthRegister('email3@gmail.com', 'password3', 'firstname3', 'lastname3');
-      const authUser3 = JSON.parse(String(res3.getBody(('utf-8'))));
-      expect(res3.statusCode).toBe(OK);
-      const res4 = requestAllUsers(authUser1.token);
-      const users = JSON.parse(String(res4.getBody(('utf-8'))));
-      expect(res4.statusCode).toBe(OK);
+      const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+      const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
+      const users = requestAllUsers(authUser.token);
       expect(users).toStrictEqual({
         users: [
           {
-            uId: authUser1.authUserId,
-            email: 'email1@gmail.com',
-            nameFirst: 'firstname1',
-            nameLast: 'lastname1',
-            handleStr: 'firstname1lastname1',
+            uId: authUser.authUserId,
+            email: email,
+            nameFirst: nameFirst,
+            nameLast: nameLast,
+            handleStr: handleStr
           },
           {
             uId: authUser2.authUserId,
-            email: 'email2@gmail.com',
-            nameFirst: 'firstname2',
-            nameLast: 'lastname2',
-            handleStr: 'firstname2lastname2',
+            email: email2,
+            nameFirst: nameFirst2,
+            nameLast: nameLast2,
+            handleStr: handleStr2,
           },
           {
             uId: authUser3.authUserId,
-            email: 'email3@gmail.com',
-            nameFirst: 'firstname3',
-            nameLast: 'lastname3',
-            handleStr: 'firstname3lastname3',
+            email: email3,
+            nameFirst: nameFirst3,
+            nameLast: nameLast3,
+            handleStr: handleStr3,
           }
         ]
       });
@@ -141,13 +155,8 @@ describe('Testing usersAllV1', () => {
   });
 
   test('Invalid uId', () => {
-    const res1 = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-    expect(res1.statusCode).toBe(OK);
     const uId = authUser.authUserId + 1;
-    const res2 = requestUserProfile(authUser.token, uId);
-    const profile = JSON.parse(String(res2.getBody(('utf-8'))));
-    expect(res2.statusCode).toBe(OK);
+    const profile = requestUserProfile(authUser.token, uId);
     expect(profile).toStrictEqual(errorMsg);
   });
 });
