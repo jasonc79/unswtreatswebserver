@@ -3,13 +3,13 @@ import { returnValidId, checkValidToken, checkValidUser } from './helper';
 import validator from 'validator';
 
 /**
- * userProfileV1 
+ * userProfileV1
  * returns an object containing the user's details
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {number} uId is the id of the user beign accessed
- * 
+ *
  * Return Values:
  * @returns { error }
  *    if token is inValid
@@ -130,12 +130,12 @@ function userSetHandleV1(token: string, handleStr: string) {
 /**
  * usersAllV1
  * returns an array with details about all users
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
- * 
+ *
  * Return Value:
- * @returns { error } 
+ * @returns { error }
  *    if token is invalid
  * @returns { users: userReturn[] } when there are no errors, where userReturn contains
  *    uId, email, nameFirst, nameLast and handleStr

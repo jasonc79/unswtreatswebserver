@@ -24,7 +24,7 @@ type messageId = { messageId: number };
 
 /**
  * messageSendV1
- * Sends a message to a specified channel and returns the id of the message 
+ * Sends a message to a specified channel and returns the id of the message
  *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
@@ -61,13 +61,13 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
 
 /**
  * messageSenddmV1
- * Sends a message to a specified dm and returns the id of the message 
- * 
+ * Sends a message to a specified dm and returns the id of the message
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {number} dmId is the id of the dm beign accessed
  * @param {string} message is the message the user wants to send
- * 
+ *
  * Return Values:
  * @returns { error }
  *    if the token is invalid
