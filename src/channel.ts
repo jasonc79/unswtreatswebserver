@@ -1,5 +1,4 @@
-import { error, errorMsg, UserInfo, Message } from './dataStore';
-import { getData, setData } from './dataStore';
+import { error, errorMsg, Channel, userReturn, channelId, getData, setData, Message, UserInfo } from './dataStore';
 import { checkValidChannel, returnValidChannel, returnValidId, checkValidId, returnValidUser, checkValidToken, returnIsMember, returnIsOwner } from './helper';
 import { userProfileV1 } from './users';
 import { channelsListV1 } from './channels';
@@ -36,7 +35,7 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
 
   let isMember = false;
   for (const member of currChannel.allMembers) {
-    if (user.uId === member.uId) {
+    if (user.user.uId === member.uId) {
       isMember = true;
     }
   }
@@ -45,11 +44,36 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
     return errorMsg;
   }
 
+  const owners = [];
+  const members = [];
+
+  for (const owner of currChannel.ownerMembers) {
+    const tempUser = {
+      uId: owner.uId,
+      email: owner.email,
+      handleStr: owner.handleStr,
+      nameFirst: owner.nameFirst,
+      nameLast: owner.nameLast,
+    }
+    owners.push(tempUser);
+  }
+
+  for (const member of currChannel.allMembers) {
+    const tempUser = {
+      uId: member.uId,
+      email: member.email,
+      handleStr: member.handleStr,
+      nameFirst: member.nameFirst,
+      nameLast: member.nameLast,
+    }
+    members.push(tempUser);
+  }
+
   const channelDetail = {
-    name: channel.name,
-    isPublic: channel.isPublic,
-    ownerMembers: channel.ownerMembers,
-    allMembers: channel.allMembers
+    name: currChannel.name,
+    isPublic: currChannel.isPublic,
+    ownerMembers: owners,
+    allMembers: members
   };
   return channelDetail;
 }
@@ -66,23 +90,25 @@ Return Value:
     Returns {error: 'error'} on a private channel and auth user is not a global owner
     Returns {} on no error
 */
-function channelJoinV1(authUserId: number, channelId: number): (error | object) {
-  /* // Check if channelId and authUserId is valid
-  if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+function channelJoinV1(token: string, channelId: number): (error | object) {
+  // Check if channelId and token is valid
+  if (!checkValidToken(token) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
-  const user = returnValidId(authUserId);
+  const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
-  if (channel.isPublic === false && user.permissionId === 2) {
+
+  if ((channel.isPublic === false && user.permissionId === 2) || returnIsMember(user.uId, channelId)) {
     return errorMsg;
   }
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
   const data = getData();
-  const newUser = userProfileV1(authUserId, authUserId) as userReturn;
+  const newUser = userProfileV1(token, user.uId) as userReturn;
   channel.allMembers.push(newUser.user);
-  setData(data); */
+  setData(data);
   return {};
 }
+
 
 /*
 Invites a user with ID uId to join a channel with ID channelId.
@@ -152,23 +178,25 @@ type messagesOver50 = { messages: Message[], start: number, end: number };
 
 
 function channelMessagesV2(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  //uId becomes valid user from returnValidUser
   const uId = returnValidUser(token);
+
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
-  const currChannel = returnValidChannel(channelId);
+
   if (!returnIsMember(uId.uId, channelId)) {
     return errorMsg;
   }
 
+  const currChannel = returnValidChannel(channelId);
   const channelMsg = currChannel.messages;
+  const messages: Array<Message> = [];
+  const final = start + 50;
+
   if (channelMsg.length < start) {
     return errorMsg;
   }
 
-  const messages: Array<Message> = [];
-  const final = start + 50;
   for (let i = start; i < final; i++) {
     if (i >= channelMsg.length) {
       return {
@@ -186,6 +214,7 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
   };
 }
 
+
 function channelLeaveV1(token: string, channelId: number): (error | {}) {
   const data = getData();
   const uId = returnValidUser(token);
@@ -194,22 +223,9 @@ function channelLeaveV1(token: string, channelId: number): (error | {}) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
-  let i = 0
-  if (returnIsOwner(uId.uId, channelId)) {
-    let j = 0
-    for (const member of currChannel.ownerMembers) {
-      if (member.uId = uId.uId) {
-        currChannel.ownerMembers.splice(j, 1)
-      }
-      j++;
-    }
-  }
-  for (const member of currChannel.allMembers) {
-    if (member.uId = uId.uId) {
-      currChannel.allMembers.splice(i, 1)
-    }
-    i++;
-  }
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId != user.user.uId);
+  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId != user.user.uId);
+  setData(data);
   return {};
 }
 
@@ -218,33 +234,33 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   const tempuId = returnValidUser(token);
   const user = userProfileV1(token, tempuId.uId) as userReturn;
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
-      !returnIsOwner(user.user.uId, channelId) || !returnIsMember(uId, channelId)) {
+      !returnIsOwner(user.user.uId, channelId) || !returnIsMember(uId, channelId) || returnIsOwner(uId, channelId)) {
     return errorMsg;
   }
+  const newOwnerProfile = userProfileV1(token, uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
-  currChannel.ownerMembers.push(user);
+  currChannel.ownerMembers.push(newOwnerProfile.user);
+  currChannel.allMembers.push(newOwnerProfile.user);
   return {};
 }
 
 function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | {}) {
   const data = getData();
   const tempuId = returnValidUser(token);
-  const user = userProfileV1(token, tempuId.uId) as userReturn;
+  const user = userProfileV1(token, uId) as userReturn;
+  const user2 = userProfileV1(token, tempuId.uId) as userReturn;
+
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidId(uId) ||
       !returnIsOwner(uId, channelId) || !returnIsOwner(user.user.uId, channelId)) {
     return errorMsg;
   }
+
   const currChannel = returnValidChannel(channelId);
   if (currChannel.ownerMembers.length === 1) {
-    return errorMsg
+    return errorMsg;
   }
-  const i = 0
-  for (const member of currChannel.allMembers) {
-    if (member.uId = uId) {
-      currChannel.allMembers.splice(i, 1)
-    }
-    i++;
-  }
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId != user.user.uId);
+  return {};
 }
 
-export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV2 };
+export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1 };
