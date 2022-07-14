@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
-import { requestChannelsList, requestChannelsListAll, requestChannelCreate, requestDmCreate, requestDmLeave } from './helperTests';
+import { requestDmCreate, requestDmLeave } from './helperTests';
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
@@ -186,12 +186,11 @@ describe('Testing dm/leave/v1', () => {
       expect(dmLeave).toStrictEqual({});
     });
     test('user leaves dm (not creator)', () => {
-      const authUser1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const dmLeave = requestDmLeave(authUser1.token, dm.dmId);
+      const dmLeave = requestDmLeave(uId1.token, dm.dmId);
       expect(dmLeave).toStrictEqual({});
     });
   });

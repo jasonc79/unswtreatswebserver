@@ -68,13 +68,13 @@ export function requestChannelsListAll(token: string) {
 }
 
 // Dm functions
-export function requestDmCreate(token: number, uIds: number[]) {
+export function requestDmCreate(token: string, uIds: number[]) {
   const res = requestHelper('POST', '/dm/create/v1', { token, uIds });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
-export function requestDmLeave(token: number, dmId: number) {
+export function requestDmLeave(token: string, dmId: number) {
   const res = requestHelper('POST', '/dm/leave/v1', { token, dmId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody(('utf-8'))));

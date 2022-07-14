@@ -1,5 +1,5 @@
 import { getData, setData, error, errorMsg, Dm, userReturn } from './dataStore';
-import { checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
+import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
 
 // Stubbed dm functions
@@ -119,20 +119,22 @@ const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error 
 */
 
 const dmLeaveV1 = (token: string, dmId: number) : error | object => {
-  if (!checkValidDm(getIdfromToken(token)) || !isMemberDm(token, dmId)) {
+  if (!checkValidToken(token) || !checkValidDm(dmId) || !isMemberDm(token, dmId)) {
     return errorMsg;
   }
+  const data = getData();
   const dm = returnValidDm(dmId);
   const user = userProfileV1(token, getIdfromToken(token)) as userReturn;
   dm.members = dm.members.filter((item) => {
-    return item !== user.user;
+    return item.uId !== user.user.uId;
   });
   if (isOwnerDm(token, dmId)) {
     dm.owners = dm.owners.filter((item) => {
-      return item !== user.user;
+      return item.uId !== user.user.uId;
     });
+    setData(data);
   }
   return {};
-}
+};
 
 export { dmCreateV1, dmLeaveV1 }; //, dmDetailsV1, dmListV1, dmRemoveV1 };

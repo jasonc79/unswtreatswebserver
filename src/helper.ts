@@ -188,27 +188,26 @@ function isOwner(token: string, channelId: number) : boolean {
 }
 
 function isMemberDm(token: string, dmId: number): boolean {
-  const uId = getIdfromToken(token); 
-  const dm = returnValidDm(dmId); 
+  const uId = getIdfromToken(token);
+  const dm = returnValidDm(dmId);
   for (const member of dm.members) {
     if (uId === member.uId) {
-      return true; 
+      return true;
     }
   }
-  return false; 
+  return false;
 }
 
 function isOwnerDm(token: string, dmId: number): boolean {
-  const uId = getIdfromToken(token); 
-  const dm = returnValidDm(dmId); 
+  const uId = getIdfromToken(token);
+  const dm = returnValidDm(dmId);
   for (const owner of dm.owners) {
     if (uId === owner.uId) {
       return true;
     }
   }
-  return false; 
+  return false;
 }
-
 
 export {
   checkValidUser,
