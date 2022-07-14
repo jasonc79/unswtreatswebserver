@@ -1,5 +1,6 @@
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
+import { removeSavedFile } from './helperTests';
 
 const OK = 200;
 const port = config.port;
@@ -66,6 +67,7 @@ function requestClear() {
 }
 
 beforeEach(() => {
+  removeSavedFile();
   requestClear();
 });
 

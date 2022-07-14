@@ -1,5 +1,6 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
 import { requestDmCreate, requestDmLeave } from './helperTests';
+import { removeSavedFile } from './helperTests';
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
@@ -24,6 +25,7 @@ let authUser: authUserReturn;
 // }
 
 beforeEach(() => {
+  removeSavedFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });

@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data, token, Dm, Message, error, errorMsg } from './dataStore';
+import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
 
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise

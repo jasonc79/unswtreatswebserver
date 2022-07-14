@@ -1,5 +1,5 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
-import { checkValidToken, getIdfromToken } from './helper';
+import { checkValidToken } from './helper';
 import validator from 'validator';
 
 /*
@@ -102,7 +102,6 @@ const authLogoutV1 = (token: token) : object | error => {
   if (!checkValidToken) {
     return errorMsg;
   }
-  const authUser = getIdfromToken(token);
   const data = getData();
   for (const user of data.users) {
     for (let i = 0; i < user.token.length; i++) {

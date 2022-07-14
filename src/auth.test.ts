@@ -1,6 +1,7 @@
-import { requestAuthRegister, requestAuthLogin, requestAuthLogout, errorMsg, requestClear } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, errorMsg } from './helperTests';
 import { requestUserProfile } from './helperTests';
 import { requestChannelCreate } from './helperTests';
+import { requestClear, removeSavedFile } from './helperTests';
 
 const email0 = 'email@gmail.com';
 const password0 = 'password';
@@ -16,6 +17,7 @@ const longName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy';
 const exactly50CharName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx';
 
 beforeEach(() => {
+  removeSavedFile();
   requestClear();
 });
 
@@ -254,4 +256,3 @@ describe('Testing auth/logout/v2', () => {
     expect(channel).toStrictEqual(errorMsg);
   });
 });
-
