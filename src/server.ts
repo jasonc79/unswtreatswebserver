@@ -5,11 +5,12 @@ import config from './config.json';
 import cors from 'cors';
 
 import { authRegisterV1, authLoginV1 } from './auth';
+import { channelJoinV1 } from './channel';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-// import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
-
+import { messageSendV1, messageEditV1, messageRemoveV1 } from './message';
 import { clearV1 } from './other';
+
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -79,6 +80,17 @@ app.get('/channels/listall/v2', (req, res, next) => {
 });
 
 // ================================================================ //
+// Channel functions
+app.post('/channel/join/v2', (req, res, next) => {
+  try {
+    const { token, channelId } = req.body;
+    return res.json(channelJoinV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ================================================================ //
 // User functions
 app.get('/user/profile/v2', (req, res, next) => {
   try {
@@ -124,34 +136,35 @@ app.get('/users/all/v1', (req, res, next) => {
 });
 
 // ================================================================ //
-// message functions
+// Message functions
 
-// app.post('/message/send/v1', (req, res, next) => {
-//   try {
-//     const { token, channelId, message } = req.body;
-//     return res.json(messageSendV1(token, channelId, message));
-//   } catch (err) {
-//     next (err);
-//   }
-// });
+app.post('/message/send/v1', (req, res, next) => {
+  try {
+    const { token, channelId, message } = req.body;
+    return res.json(messageSendV1(token, channelId, message));
+  } catch (err) {
+    next(err);
+  }
+});
 
-// app.put('/message/edit/v1', (req, res, next) => {
-//   try {
-//     const { token, messageId, message } = req.body;
-//     return res.json(messageEditV1(token, messageId, message));
-//   } catch (err) {
-//     next (err);
-//   }
-// });
+app.put('/message/edit/v1', (req, res, next) => {
+  try {
+    const { token, messageId, message } = req.body;
+    return res.json(messageEditV1(token, messageId, message));
+  } catch (err) {
+    next(err);
+  }
+});
 
-// app.delete('/message/remove/v1', (req, res, next) => {
-//   try {
-//     const { token, messageId } = req.body;
-//     return res.json(messageRemoveV1(token, messageId));
-//   } catch (err) {
-//     next (err);
-//   }
-// });
+app.delete('/message/remove/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const messageId = req.query.messageId as string;
+    return res.json(messageRemoveV1(token, parseInt(messageId)));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ================================================================ //
 // Other functions
