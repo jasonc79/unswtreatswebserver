@@ -1,3 +1,7 @@
+test('remove test', () => {
+  expect(1 + 1).toEqual(2);
+});
+
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
 
@@ -20,6 +24,42 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
 // ========================================================================= //
 // Wrapper Functions
 
+function requestChannelMessages(token: string, channelId: number, start: number) {
+  const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestChannelAddOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestChannelRemoveOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestChannelLeave(token: string, channelId: number) {
+  const res = requestHelper('POST', '/channel/leave/v1', { token, channelId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestChannelDetails(token: string, channelId: number) {
+  const res = requestHelper('GET', '/channel/details/v2', { token, channelId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+function requestUserProfile(token: string, uId: number) {
+  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
 function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });
   expect(res.statusCode).toBe(OK);
@@ -34,7 +74,7 @@ function requestAuthRegister(email: string, password: string, nameFirst: string,
     nameLast: nameLast
   });
   expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
+  return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
 function requestChannelJoin(token: string, channelId: number) {
@@ -42,12 +82,352 @@ function requestChannelJoin(token: string, channelId: number) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
+
 function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
 }
 
 beforeEach(() => {
   requestClear();
+});
+
+describe('Testing channelMessagesV1', () => {
+  test('Empty messages', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+    expect(messages).toStrictEqual(
+      expect.objectContaining({
+        messages: [],
+        start: 0,
+        end: -1,
+      })
+    );
+  });
+  // test('Contains messages', () => {
+  //   // Waiting for message/send to finish writing this test.
+  //   const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+  //   const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
+  //   expect(res1.statusCode).toBe(OK);
+  //   const res2 = requestChannelCreate(authUser.token, 'correct name', true);
+  //   const channel = JSON.parse(String(res2.getBody(('utf-8'))));
+  //   expect(res2.statusCode).toBe(OK);
+  //   const res3 = requestChannelMessages(authUser.token, channel, 1);
+  //   const messages = JSON.parse(String(res3.getBody(('utf-8'))));
+  //   expect(messages).toStrictEqual(
+  //     expect.objectContaining({
+  //       messages: [],
+  //       start: 0,
+  //       end: -1,
+  //     })
+  //   );
+  // });
+  test('Start is greater than messages', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 1);
+    expect(messages).toStrictEqual(errorMsg);
+  });
+  test('ChannelId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const messages = requestChannelMessages(authUser.token, channel.channelId + 1, 0);
+    expect(messages).toStrictEqual(errorMsg);
+  });
+  test('ChannelId is valid but user is not part of channel', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const messages = requestChannelMessages(authUser2.token, channel.channelId, 1);
+    expect(messages).toStrictEqual(errorMsg);
+  });
+});
+
+/// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+describe('Testing channelDetailsV2', () => {
+  test('Success', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
+    const details = requestChannelDetails(authUser.token, channel.channelId);
+    expect(details).toStrictEqual(
+      expect.objectContaining({
+        name: 'correct name',
+        isPublic: true,
+        allMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        }],
+        ownerMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        }],
+      })
+    );
+  });
+  test('ChannelId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelDetails(authUser.token, channel.channelId + 1);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('ChannelId is valid but user is not part of channel', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelDetails(authUser2.token, channel.channelId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+});
+
+/// //////////////////////////////////////////////////////////////////////////
+
+describe('Testing channelLeaveV1', () => {
+  test('Pass scenario', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    requestChannelLeave(authUser.token, channel.channelId);
+    const userInfo = requestUserProfile(authUser2.token, authUser2.authUserId);
+    const channeldetails = requestChannelDetails(authUser2.token, channel.channelId);
+    expect(channeldetails).toStrictEqual(
+      expect.objectContaining({
+        name: 'correct name',
+        isPublic: true,
+        ownerMembers: [],
+        allMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        }],
+      })
+    );
+  });
+  test('ChannelId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelLeave(authUser.token, channel.channelId + 1);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('ChannelId is valid but user is not part of channel', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelLeave(authUser2.token, channel.channelId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+});
+
+/// ////////////////////////////////////////////////////////////////////////////////////////////////
+
+describe('Testing channelAddOwnerV1', () => {
+  test('Pass scenario', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
+    const userInfo2 = requestUserProfile(authUser2.token, authUser2.authUserId);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const channeldetails2 = requestChannelDetails(authUser2.token, channel.channelId);
+    expect(channeldetails2).toStrictEqual(
+      expect.objectContaining({
+        name: 'correct name',
+        isPublic: true,
+        ownerMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        }],
+        allMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        },
+        {
+          uId: userInfo2.user.uId,
+          email: userInfo2.user.email,
+          handleStr: userInfo2.user.handleStr,
+          nameFirst: userInfo2.user.nameFirst,
+          nameLast: userInfo2.user.nameLast
+        }],
+      })
+    );
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    expect(details).toStrictEqual({});
+    const channeldetails = requestChannelDetails(authUser2.token, channel.channelId);
+    expect(channeldetails).toStrictEqual(
+      expect.objectContaining({
+        name: 'correct name',
+        isPublic: true,
+        ownerMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        },
+        {
+          uId: userInfo2.user.uId,
+          email: userInfo2.user.email,
+          handleStr: userInfo2.user.handleStr,
+          nameFirst: userInfo2.user.nameFirst,
+          nameLast: userInfo2.user.nameLast
+        }],
+        allMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        },
+        {
+          uId: userInfo2.user.uId,
+          email: userInfo2.user.email,
+          handleStr: userInfo2.user.handleStr,
+          nameFirst: userInfo2.user.nameFirst,
+          nameLast: userInfo2.user.nameLast
+        }],
+      })
+    );
+  });
+  test('ChannelId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId + 1, authUser2.authUserId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('uId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId + 1);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('uId is not part of channel', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('uId is already owner', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, authUser.authUserId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+  test('token is not owner', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const details = requestChannelAddOwner(authUser2.token, channel.channelId, authUser.authUserId);
+    expect(details).toStrictEqual(errorMsg);
+  });
+});
+
+/// /////////////////////////////////
+
+describe('Testing channelRemoveOwnerV1', () => {
+  //
+  test('Pass scenario', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    expect(details).toStrictEqual({});
+    const RemoveOwner = requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser.authUserId);
+    expect(RemoveOwner).toStrictEqual({});
+    const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
+    const userInfo2 = requestUserProfile(authUser2.token, authUser2.authUserId);
+    const channeldetails = requestChannelDetails(authUser2.token, channel.channelId);
+    expect(channeldetails).toStrictEqual(
+      expect.objectContaining({
+        name: 'correct name',
+        isPublic: true,
+        ownerMembers: [{
+          uId: userInfo2.user.uId,
+          email: userInfo2.user.email,
+          handleStr: userInfo2.user.handleStr,
+          nameFirst: userInfo2.user.nameFirst,
+          nameLast: userInfo2.user.nameLast
+        }],
+        allMembers: [{
+          uId: userInfo.user.uId,
+          email: userInfo.user.email,
+          handleStr: userInfo.user.handleStr,
+          nameFirst: userInfo.user.nameFirst,
+          nameLast: userInfo.user.nameLast
+        },
+        {
+          uId: userInfo2.user.uId,
+          email: userInfo2.user.email,
+          handleStr: userInfo2.user.handleStr,
+          nameFirst: userInfo2.user.nameFirst,
+          nameLast: userInfo2.user.nameLast
+        }],
+      })
+    );
+  });
+  test('ChannelId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId + 1, authUser2.authUserId);
+    expect(RemoveOwner).toStrictEqual(errorMsg);
+  });
+  test('uId is invalid', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser2.authUserId + 9);
+    expect(RemoveOwner).toStrictEqual(errorMsg);
+  });
+  test('uId is not part of channel', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const authUser3 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser3.authUserId);
+    expect(RemoveOwner).toStrictEqual(errorMsg);
+  });
+  test('uId is only owner', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser.authUserId);
+    expect(RemoveOwner).toStrictEqual(errorMsg);
+  });
+  test('token is not owner', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const RemoveOwner = requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser2.authUserId);
+    expect(RemoveOwner).toStrictEqual(errorMsg);
+  });
 });
 
 // Tests for channelInviteV1
