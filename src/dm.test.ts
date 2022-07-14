@@ -31,11 +31,11 @@ function getRequestDmDetails(token: string, dmId: number) {
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
-function getRequestDmList(token: string) {
-  const res = requestHelper('GET', '/dm/list/v1', { token });
-  expect(res.statusCode).toBe(OK); 
-  return JSON.parse(String(res.getBody(('utf-8')))); 
-}
+// function getRequestDmList(token: string) {
+//   const res = requestHelper('GET', '/dm/list/v1', { token });
+//   expect(res.statusCode).toBe(OK); 
+//   return JSON.parse(String(res.getBody(('utf-8')))); 
+// }
 
 // function getRequestDmRemove(token: number, dmId: number) {
 //   const res = requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
@@ -153,19 +153,19 @@ describe('Testing dm/details/v1', () => {
   });
 });
 
-describe('Testing dm/list/v1', () => {
-  test('0 dms, empty list', () => {
-    const dmList = 
-  }); 
+// describe('Testing dm/list/v1', () => {
+//   test('0 dms, empty list', () => {
+//     const dmList = 
+//   }); 
 
-  test('1 dm', () => {
+//   test('1 dm', () => {
 
-  }); 
+//   }); 
 
-  test('2 dms', () => {
+//   test('2 dms', () => {
 
-  }); 
-})
+//   }); 
+// })
 
 /*
 describe('Testing dm/remove/v1', () => {
