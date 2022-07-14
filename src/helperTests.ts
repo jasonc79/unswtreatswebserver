@@ -47,6 +47,7 @@ export function requestAuthLogin(email: string, password: string) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
+
 // Channels functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });
@@ -66,7 +67,20 @@ export function requestChannelsListAll(token: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-// User
+// Dm functions
+export function requestDmCreate(token: string, uIds: number[]) {
+  const res = requestHelper('POST', '/dm/create/v1', { token, uIds });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmLeave(token: string, dmId: number) {
+  const res = requestHelper('POST', '/dm/leave/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+// User functions
 export function requestUserProfile(token: string, uId: number) {
   const res = requestHelper('GET', '/user/profile/v2', { token, uId });
   expect(res.statusCode).toBe(OK);
@@ -97,7 +111,7 @@ export function requestUserHandle(token: string, handleStr: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-// Other
+// Other functions
 export function requestClear() {
   const res = requestHelper('DELETE', '/clear/v1', {});
   expect(res.statusCode).toBe(OK);
