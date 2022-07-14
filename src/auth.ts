@@ -1,6 +1,7 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
-import { checkValidToken } from './helper';
+import { checkValidToken, getIdfromToken } from './helper';
 import validator from 'validator';
+import fs from 'fs';
 
 /*
 Create an account for a new user. Additionally, it generates a handle
@@ -45,7 +46,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     nameLast: nameLast,
     handleStr: handle,
     password: password,
-    token: token,
+    token: [token],
     permissionId: 2,
   };
   // Global owner
@@ -76,7 +77,8 @@ Return Value:
 */
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-
+  let data = getData(); 
+  let token = generateToken();
   if (!user) {
     return errorMsg;
   }
@@ -85,11 +87,33 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
     return errorMsg;
   }
 
+  for (let user of data.users) {
+    if (user.email === email && user.password === password) {
+      user.token.push(token);
+    }
+  }
+  setData(data);
   return {
-    token: user.token,
+    token: token,
     authUserId: user.uId
   };
 };
+
+const authLogoutV1 = (token: token) : object | error => {
+  if (!checkValidToken) {
+    return errorMsg;
+  }
+  const authUser = getIdfromToken(token);
+  let data = getData();
+  for (const user of data.users) {
+    for (let i = 0; i < user.token.length; i++) {
+      if (user.token[i] === token) {
+        user.token.splice(i, 1);
+      }
+    }
+  }
+  return {};
+}
 
 // HELPER FUNCTIONS
 
@@ -187,4 +211,6 @@ const generateToken = () : token => {
   return token;
 };
 
-export { authLoginV1, authRegisterV1 };
+export { authLoginV1, authRegisterV1, authLogoutV1 };
+
+

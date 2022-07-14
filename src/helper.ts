@@ -108,9 +108,12 @@ function returnValidChannel(id: number) : Channel {
 function returnValidUser(token: string) : User {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user;
+    for (const userToken of user.token) {
+      if (userToken === token) {
+        return user;
+      }
     }
+    
   }
 }
 
@@ -141,8 +144,8 @@ function returnValidMessage(messageId: number) : Message {
 function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
-    for (const token of user.token) {
-      if (user.token === token) {
+    for (const userToken of user.token) {
+      if (userToken === token) {
         return user.uId;
       }
     }
