@@ -156,9 +156,9 @@ const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error 
   }
 
   const data = getData();
-  const dm = returnValidDm(dmId);
+  const dmDetails = returnValidDm(dmId);
   data.dms = data.dms.filter((item) => {
-    return item !== dm;
+    return item !== dmDetails;
   });
   setData(data);
   return {};
