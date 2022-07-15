@@ -25,9 +25,9 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
 }
 
 export function removeFile() {
-    if (fs.existsSync('data.json')) {
+  if (fs.existsSync('data.json')) {
     fs.unlinkSync('data.json');
-    }
+  }
 }
 
 // ========================================================================= //

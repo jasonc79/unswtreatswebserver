@@ -15,6 +15,11 @@ beforeEach(() => {
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
+
 describe('Testing for channelsListallV1', () => {
   test('Correct return, no channels', () => {
     expect(requestChannelsListAll(authUser.token)).toEqual({

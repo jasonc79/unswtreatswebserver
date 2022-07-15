@@ -10,6 +10,11 @@ beforeEach(() => {
   authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
+
 describe('Testing channelMessagesV1', () => {
   test('Empty messages', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true);

@@ -28,6 +28,11 @@ beforeEach(() => {
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
+
 describe('Testing userProfileV1', () => {
   test('Valid uId', () => {
     const uId = requestAuthRegister(email2, password2, nameFirst2, nameLast2);

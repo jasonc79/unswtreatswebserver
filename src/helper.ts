@@ -253,3 +253,23 @@ export function isOwnerDm(token: string, dmId: number): boolean {
   }
   return false;
 }
+
+export function isMemberFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.allMembers) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isOwnerFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.ownerMembers) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}

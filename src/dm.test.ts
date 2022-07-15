@@ -28,6 +28,11 @@ beforeEach(() => {
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
+
 function generateUserIds() {
   const uId = requestAuthRegister(uIdEmail, uIdPassword, uIdFirst, uIdLast);
   const uId2 = requestAuthRegister(uId2Email, uId2Password, uId2First, uId2Last);

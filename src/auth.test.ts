@@ -20,6 +20,10 @@ beforeEach(() => {
   requestClear();
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
 // ========================================================================= //
 // Testing handle
 function testHandle(password: string, email: string, nameFirst: string, nameLast: string) {

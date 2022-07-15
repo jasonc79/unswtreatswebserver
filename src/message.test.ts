@@ -15,6 +15,11 @@ beforeEach(() => {
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
+afterEach(() => {
+  removeFile();
+  requestClear();
+});
+
 describe('Testing messageSendV1', () => {
   describe('error', () => {
     test('invalid token', () => {
