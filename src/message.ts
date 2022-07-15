@@ -45,14 +45,18 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
     return errorMsg;
   }
   const data = getData();
-  const channel = returnValidChannel(channelId);
+  const cuurentChannel = returnValidChannel(channelId);
   const newMessage = {
     messageId: Math.floor(Math.random() * Date.now()),
     uId: getIdfromToken(token),
     message: message,
     timeSent: Math.floor((new Date()).getTime() / 1000),
   };
-  channel.messages.push(newMessage);
+  for (const channel of data.channels) {
+    if (channel.channelId === cuurentChannel.channelId) {
+      channel.messages.push(newMessage);
+    }
+  }
   setData(data);
 
   return { messageId: newMessage.messageId };
@@ -66,16 +70,21 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
     return errorMsg;
   }
   const data = getData();
-  const dm = returnValidDm(dmId);
+  const cuurentDm = returnValidDm(dmId);
   const newMessage = {
     messageId: Math.floor(Math.random() * Date.now()),
     uId: getIdfromToken(token),
     message: message,
     timeSent: Math.floor((new Date()).getTime() / 1000),
   };
-  dm.messages.push(newMessage);
-  setData(data);
 
+  for (const dm of data.dms) {
+    if (dm.dmId === cuurentDm.dmId) {
+      dm.messages.push(newMessage);
+    }
+  }
+  setData(data);
+  
   return { messageId: newMessage.messageId };
 }
 
@@ -98,37 +107,35 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
  * @returns {} if pass with no errors
  */
 function messageEditV1(token: string, messageId: number, message: string) : object | error {
-  if (message.length > 1000 ||
-      !checkValidToken(token)) {
+  if (message.length > 1000 || !checkValidToken(token)) {
     return errorMsg;
   }
-
   const data = getData();
 
-  if (checkValidDmMessage(messageId) &&
-      checkDmMessageSender(token, messageId) &&
-      isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
-    if (message.length === 0) {
-      messageRemoveV1(token, messageId);
+  if (checkValidDmMessage(messageId) && isMemberDm(token, getDmfromMessage(messageId).dmId)) {
+    if (checkDmMessageSender(token, messageId) && isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
+      if (message.length === 0) {
+        messageRemoveV1(token, messageId);
+        setData(data);
+        return {};
+      }
+      const messageDetails = returnValidMessagefromDm(messageId);
+      messageDetails.message = message;
       setData(data);
       return {};
     }
-    const messageDetails = returnValidMessagefromDm(messageId);
-    messageDetails.message = message;
-    setData(data);
-    return {};
-  } else if (checkValidChannelMessage(messageId) &&
-      checkChannelMessageSender(token, messageId) &&
-      isOwner(token, getChannelfromMessage(messageId).channelId)) {
-    if (message.length === 0) {
-      messageRemoveV1(token, messageId);
+  } else if (checkValidChannelMessage(messageId) && isOwner(token, getChannelfromMessage(messageId).channelId)) {
+    if (checkChannelMessageSender(token, messageId)) {
+      if (message.length === 0) {
+        messageRemoveV1(token, messageId);
+        setData(data);
+        return {};
+      }
+      const messageDetails = returnValidMessagefromChannel(messageId);
+      messageDetails.message = message;
       setData(data);
       return {};
     }
-    const messageDetails = returnValidMessagefromChannel(messageId);
-    messageDetails.message = message;
-    setData(data);
-    return {};
   }
   return errorMsg;
 }
