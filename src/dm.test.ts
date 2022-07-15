@@ -1,5 +1,4 @@
-import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
-import { requestDmCreate, requestDmLeave } from './helperTests';
+import { authUserReturn, requestAuthRegister, errorMsg, requestClear, requestDmCreate, requestDmLeave, requestDmMessages, requestMessageSenddm } from './helperTests';
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
@@ -198,13 +197,12 @@ describe('Testing dm/leave/v1', () => {
 
 describe('Testing dmMessagesV1', () => {
   test('Empty messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const uIds = [];
-    uIds.push(authUser.authUserId);
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    const messages = requestChannelMessages(authUser.token, dm.dmId, 0);
+    expect(dm).toStrictEqual({dmId: dm.dmId})
+    const messages = requestDmMessages(authUser2.token, dm.dmId, 0);
     expect(messages).toStrictEqual(
       expect.objectContaining({
         messages: [],
@@ -214,31 +212,40 @@ describe('Testing dmMessagesV1', () => {
     );
   });
   test('Contains 50 messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    expect(dm).toStrictEqual({dmId: dm.dmId})
     for (let i = 0; i < 60; i++) {
-      requestMessageSend(authUser.token, channel.channelId, 'message');
+      requestMessageSenddm(authUser.token, dm.dmId, 'message');
     }
-    const messages = requestChannelMessages(authUser.token, channel.channelId, 5);
+    const messages = requestDmMessages(authUser2.token, dm.dmId, 5);
     expect(messages.end).toStrictEqual(55);
   });
   test('Start is greater than messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel.channelId, 1);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    const messages = requestDmMessages(authUser.token, dm.dmId, 1);
     expect(messages).toStrictEqual(errorMsg);
   });
   test('ChannelId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel.channelId + 1, 0);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    const messages = requestDmMessages(authUser.token, dm.dmId + 1, 0);
     expect(messages).toStrictEqual(errorMsg);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser2.token, channel.channelId, 1);
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    const authUser3 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const messages = requestDmMessages(authUser3.token, dm.dmId, 0);
     expect(messages).toStrictEqual(errorMsg);
   });
 });
