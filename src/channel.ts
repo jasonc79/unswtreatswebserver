@@ -295,7 +295,10 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   const user = userProfileV1(token, uId) as userReturn;
   // const user2 = userProfileV1(token, tempuId.uId) as userReturn;
   const tempUser = returnValidId(uId);
-  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
+  if (!isOwner(tempUser.token, channelId) && isGlobalOwner(tempUser.token, channelId)) {
+    return errorMsg;
+  }
+  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) || 
       !isOwner(tempUser.token, channelId) || !isOwner(token, channelId)) {
     return errorMsg;
   }
