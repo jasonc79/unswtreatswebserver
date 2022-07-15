@@ -10,7 +10,7 @@ import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandle
 import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
 import { dmCreateV1, dmLeaveV1 } from './dm';
 import { clearV1 } from './other';
-import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1 } from './channel';
+import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1, channelInviteV1 } from './channel';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -107,6 +107,15 @@ app.post('/channel/leave/v1', (req, res, next) => {
   try {
     const { token, channelId } = req.body;
     return res.json(channelLeaveV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/channel/invite/v2', (req, res, next) => {
+  try {
+    const { token, channelId, uId } = req.body;
+    return res.json(channelInviteV1(token, channelId, uId));
   } catch (err) {
     next(err);
   }

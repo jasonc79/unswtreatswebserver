@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { userProfileV1 } from './users';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
@@ -128,8 +128,12 @@ Return Value:
     Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
     Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
     Returns {} on no error
- */
-function channelInviteV1(authUserId: number, channelId: number, uId: number): (error | object) {
+
+*/
+function channelInviteV1(token: string, channelId: number, uId: number): (error | object) {
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
   // Checking if channelID and uId are valid
   const data = getData();
   const channel = returnValidChannel(channelId);
@@ -138,6 +142,7 @@ function channelInviteV1(authUserId: number, channelId: number, uId: number): (e
     return errorMsg;
   }
   // Checking if uId and authUserID are members
+  const authUserId = getIdfromToken(token);
   let uIdMember = false;
   let authUserIdMember = false;
   for (const member of channel.allMembers) {
@@ -157,6 +162,7 @@ function channelInviteV1(authUserId: number, channelId: number, uId: number): (e
 }
 
 /*
+
 This function checks if authUserId, channelId are valid then starting from start
 returns 50 messages from a specified channel. If there are less than start+50
 messages it returns -1 in the "end: "
