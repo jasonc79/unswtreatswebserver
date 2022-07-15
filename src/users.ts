@@ -39,18 +39,17 @@ function userProfileV1(token: string, uId: number) : error | userReturn {
   };
 }
 
-/*
-Update the authorised user's first and last name
-
-Arguments:
-    token (string)     -  The token of the user
-    nameFirst (string) - The first name of the user
-    nameLast (string)  - The last name of the user
-
-Return Value:
-    Returns {error: 'error'}  on invalid email
-    Returns {error: 'error'}  when email is already being used by another user
-    Returns {} on no error
+/** Update the authorised user's first and last name
+*
+* Arguments:
+*     @param {string} token is the token of the user
+*     @param {string} nameFirst is the first name of the user
+*     @param {string} nameLast is the last name of the user
+* Return Value:
+*     @returns { error }
+*         on invalid token
+*         when first of last name is greater than 50 or less than 1 character
+*     @returns {} if name is sent without errors
 */
 
 function userSetNameV1(token: string, nameFirst: string, nameLast: string) : object | error {
@@ -69,18 +68,21 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
   setData(data);
   return {};
 }
-/*
-Update the authorised user's email address
 
-Arguments:
-    token (string)     -  The token of the user
-    email (string)     - The email of the user
+/** Update the authorised user's email address
+*
+* Arguments:
+*     @param {string} token is the token of the user
+*     @param {string} email is the email of the user
+*
+* Return Value:
+*     @returns { error }
+          on invalid token
+*         on invalid email
+*         when hemail is already being used by another user
+*     @returns {} if email is sent without errors
+*/
 
-Return Value:
-    Returns {error: 'error'}  on invalid email
-    Returns {error: 'error'}  when email is already being used by another user
-    Returns {} on no error
- */
 function userSetEmailV1(token: string, email: string) {
   if (!validator.isEmail(email)) {
     return errorMsg;
@@ -100,19 +102,21 @@ function userSetEmailV1(token: string, email: string) {
   return {};
 }
 
-/*
-Update the authorised user's handle (i.e. display name)
+/** Update the authorised user's handle (i.e. display name)
+*
+* Arguments:
+*     @param {string} token is the token of the user
+*     @param {string} handleStr is the handle string of the user
+*
+* Return Value:
+*     @returns { error }
+          on invalid token
+*         on invalid user handle
+*         when handle length is less than 3 or greater than 3 characters
+*         on handle without non-alphanumeric characters
+*     @returns {} if handleStr is sent without errors
+*/
 
-Arguments:
-    token (string)     -  The token of the user
-    handleStr (string)  - The handle string of the user
-
-Return Value:
-    Returns {error: 'error'}  on invalid user handle
-    Returns {error: 'error'}  when handle length is less than 3 or greater than 3 characters
-    Returns {error: 'error'}  on handle without non-alphanumeric characters
-    Returns {} on no error
- */
 function userSetHandleV1(token: string, handleStr: string) {
   const handleLength = handleStr.length;
   if (handleLength > 20 || handleLength < 3 || handleStr.match(/^[0-9A-Za-z]+$/) === null) {
