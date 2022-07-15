@@ -67,7 +67,7 @@ export function requestChannelsListAll(token: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-// Dm functions
+// Channel functions
 export function requestChannelJoin(token: string, channelId: number) {
   const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
   expect(res.statusCode).toBe(OK);
@@ -83,6 +83,24 @@ export function requestDmCreate(token: string, uIds: number[]) {
 
 export function requestDmLeave(token: string, dmId: number) {
   const res = requestHelper('POST', '/dm/leave/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmDetails(token: string, dmId: number) {
+  const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmList(token: string) {
+  const res = requestHelper('GET', '/dm/list/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmRemove(token: string, dmId: number) {
+  const res = requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
