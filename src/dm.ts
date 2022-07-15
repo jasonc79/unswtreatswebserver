@@ -115,7 +115,7 @@ const dmListV1 = (token: string): dmReturn | error => {
   const data = getData();
   const user = returnValidUser(token);
   const dms: DmInfo[] = [];
-  
+
   for (const dm of data.dms) {
     for (const member of dm.members) {
       if (member.uId === user.uId) {

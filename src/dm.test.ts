@@ -1,30 +1,30 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
-import { requestDmCreate, requestDmLeave, requestDmList, requestDmDetails, requestDmRemove } from './helperTests';
+import { requestDmCreate, requestDmList } from './helperTests';
+// import { requestDmLeave, requestDmDetails, requestDmRemove } from './helperTests';
 
 const email = 'email@email.com';
 const password = 'password';
 const nameFirst = 'first';
 const nameLast = 'last';
-const handleStr = 'firstlast';
+// const handleStr = 'firstlast';
 
-const email2 = 'email2@email.com';
-const password2 = 'password2';
-const nameFirst2 = 'first2';
-const nameLast2 = 'last2';
+// const email2 = 'email2@email.com';
+// const password2 = 'password2';
+// const nameFirst2 = 'first2';
+// const nameLast2 = 'last2';
 
 const uIdEmail = 'uid@email.com';
 const uIdPassword = 'password2';
 const uIdFirst = 'uid1First';
 const uIdLast = 'uid1Last';
-const uIdHandleStr = 'uid1firstuid1last';
+// const uIdHandleStr = 'uid1firstuid1last';
 
 const uId2Email = 'uid2@email.com';
 const uId2Password = 'password2';
 const uId2First = 'uid2First';
 const uId2Last = 'uid2Last';
-const uId2HandleStr = 'uid2firstuid2last';
+// const uId2HandleStr = 'uid2firstuid2last';
 const handleStr23 = 'firstlast, uid1firstuid1last, uid2firstuid2last';
-
 
 let authUser: authUserReturn;
 
@@ -47,7 +47,7 @@ function generateUserIds() {
 describe('Testing dm/create/v1', () => {
   test('Any uId in uIds does not refer to a valid user', () => {
     const uId = authUser.authUserId + 1;
-    const uIds = []; 
+    const uIds = [];
     uIds.push(uId);
     const dm = requestDmCreate(authUser.token, uIds);
     expect(dm).toStrictEqual(errorMsg);
@@ -122,14 +122,14 @@ describe('Testing dm/details/v1', () => {
 describe('Testing dm/list/v1', () => {
   test('0 dms, empty list', () => {
     const dmList = requestDmList(authUser.token);
-    expect(dmList).toStrictEqual({dms:[]});
+    expect(dmList).toStrictEqual({ dms: [] });
   });
 
   test('1 dm', () => {
     const uIds = generateUserIds();
     const dm = requestDmCreate(authUser.token, uIds);
     const dmList = requestDmList(authUser.token);
-    expect(dmList).toStrictEqual({ 
+    expect(dmList).toStrictEqual({
       dms: [{
         dmId: dm.dmId,
         name: handleStr23,
@@ -147,8 +147,8 @@ describe('Testing dm/list/v1', () => {
     const dm2 = requestDmCreate(authUser.token, uIds2);
 
     const dmList = requestDmList(authUser.token);
-    expect(dmList).toStrictEqual({ 
-      dms : [{
+    expect(dmList).toStrictEqual({
+      dms: [{
         dmId: dm1.dmId,
         name: handleStr23,
       },
@@ -160,6 +160,7 @@ describe('Testing dm/list/v1', () => {
   });
 });
 
+/*
 describe('Testing dm/remove/v1', () => {
   test('dmId does not refer to a valid DM', () => {
     const dm = -1;
@@ -196,7 +197,7 @@ describe('Testing dm/remove/v1', () => {
     expect(dmRemove).toStrictEqual({});
   });
 });
-
+*/
 /*
 describe('Testing dm/leave/v1', () => {
   describe('errors', () => {
