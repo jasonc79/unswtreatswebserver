@@ -90,7 +90,11 @@ describe('Testing messageSenddmV1', () => {
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('dmId is invalid', () => {
-      const messageId = requestMessageSenddm(authUser.token, 1, 'message');
+      const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+      const uIds = [];
+      uIds.push(uId1.authUserId);
+      const dm = requestDmCreate(authUser.token, uIds);
+      const messageId = requestMessageSenddm(authUser.token, dm.dmId + 1, 'message');
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('length of message is less than 1', () => {
