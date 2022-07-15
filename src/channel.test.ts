@@ -4,7 +4,7 @@ test('remove test', () => {
 
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
-import {requestMessageSend} from './helperTests';
+import { requestMessageSend } from './helperTests';
 
 const OK = 200;
 const port = config.port;
@@ -112,8 +112,7 @@ describe('Testing channelMessagesV1', () => {
       requestMessageSend(authUser.token, channel.channelId, 'message');
     }
     const messages = requestChannelMessages(authUser.token, channel.channelId, 5);
-    console.log(messages.end)
-    expect(messages.end).toStrictEqual(55)
+    expect(messages.end).toStrictEqual(55);
   });
   test('Start is greater than messages', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
