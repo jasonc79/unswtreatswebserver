@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, Dm, userReturn, UserInfo, dmReturn } from './dataStore';
+import { getData, setData, error, errorMsg, Dm, DmInfo, userReturn, UserInfo, dmReturn } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
 
@@ -107,16 +107,14 @@ const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
  * Return Values:
  * @returns { } on no error
  */
-type dms = { dms: dmReturn[] };
-const dmListV1 = (token: string): dms | error => {
+const dmListV1 = (token: string): dmReturn | error => {
   if (!checkValidToken(token)) {
     return errorMsg;
   }
 
   const data = getData();
   const user = returnValidUser(token);
-  const dms = [];
-  console.log(data.dms);
+  const dms: DmInfo[] = [];
   
   for (const dm of data.dms) {
     for (const member of dm.members) {
