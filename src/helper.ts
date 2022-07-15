@@ -240,7 +240,7 @@ export function isGlobalOwner(token: string, channelId: number) : boolean {
   const channel = returnValidChannel(channelId);
   for (const user of channel.ownerMembers) {
     const item = returnValidId(user.uId);
-    if (item.permissionId === 2) {
+    if (uId === user.uId && item.permissionId === 2) {
       return true;
     }
   }

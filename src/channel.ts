@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, isGlobalOwner, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { userProfileV1 } from './users';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
