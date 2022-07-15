@@ -233,7 +233,7 @@ export function isOwner(token: string, channelId: number) : boolean {
 }
 
 export function isGlobalOwner(token: string) : boolean {
-  const user = returnValidUser(token)
+  const user = returnValidUser(token);
   if (user.permissionId === 1) {
     return true;
   }

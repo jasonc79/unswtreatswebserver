@@ -255,9 +255,6 @@ function channelLeaveV1(token: string, channelId: number): (error | object) {
  */
 function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | object) {
   const data = getData();
-  // const tempuId = returnValidUser(token);
-  // const user = userProfileV1(token, tempuId.uId) as userReturn;
-  const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
   !isOwner(token, channelId) || !isMemberFromId(uId, channelId) || isOwnerFromId(uId, channelId)) {
     return errorMsg;

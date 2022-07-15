@@ -1,5 +1,5 @@
 import { getData, setData, error, errorMsg, Dm, userReturn, Message } from './dataStore';
-import { checkValidToken, checkValidUser, returnValidUser, isMemberDmFromId, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
+import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
 
 // Stubbed dm functions
