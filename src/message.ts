@@ -179,11 +179,12 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
       for (const dm of data.dms) {
         if (dm.dmId === currentDm.dmId) {
           dm.messages = dm.messages.filter((item) => {
-            return item !== messageDetails;
+            if (item.messageId !== messageDetails.messageId) {
+              return item;
+            }
           });
         }
       }
-      console.log(data);
       setData(data);
       return {};
     }
@@ -194,11 +195,12 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
       for (const channel of data.channels) {
         if (channel.channelId === currentChannel.channelId) {
           channel.messages = channel.messages.filter((item) => {
-            return item !== messageDetails;
+            if (item.messageId !== messageDetails.messageId) {
+              return item;
+            }
           });
         }
       }
-      console.log(data);
       setData(data);
       return {};
     }
