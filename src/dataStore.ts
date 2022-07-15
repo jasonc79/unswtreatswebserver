@@ -44,7 +44,15 @@ interface Dm {
   name: string,
   members: UserInfo[],
   owners: UserInfo[],
+  messages: Message[],
 }
+
+interface DmInfo {
+  dmId: number,
+  name: string,
+}
+
+type dmReturn = { dms: DmInfo[] };
 
 // CHANNEL TYPES AND INTERFACES
 type channelId = { channelId: number };
@@ -119,6 +127,6 @@ function loadData() {
   }
 }
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm };
+export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };

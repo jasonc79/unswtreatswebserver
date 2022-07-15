@@ -68,13 +68,24 @@ export function requestChannelCreate(token: string, name: string, isPublic: bool
   return JSON.parse(String(res.getBody()));
 }
 
+export function requestChannelInvite(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/invite/v2', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
 export function requestChannelJoin(token: string, channelId: number) {
   const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
-
 // Channels functions
+
+export function requestChannelMessages(token: string, channelId: number, start: number) {
+  const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
 
 export function requestChannelsList(token: string) {
   const res = requestHelper('GET', '/channels/list/v2', { token });
@@ -84,6 +95,30 @@ export function requestChannelsList(token: string) {
 
 export function requestChannelsListAll(token: string) {
   const res = requestHelper('GET', '/channels/listall/v2', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelAddOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelRemoveOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelLeave(token: string, channelId: number) {
+  const res = requestHelper('POST', '/channel/leave/v1', { token, channelId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelDetails(token: string, channelId: number) {
+  const res = requestHelper('GET', '/channel/details/v2', { token, channelId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
@@ -99,6 +134,30 @@ export function requestDmLeave(token: string, dmId: number) {
   const res = requestHelper('POST', '/dm/leave/v1', { token, dmId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmDetails(token: string, dmId: number) {
+  const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmList(token: string) {
+  const res = requestHelper('GET', '/dm/list/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmRemove(token: string, dmId: number) {
+  const res = requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmMessages(token: string, dmId: number, start: number) {
+  const res = requestHelper('GET', '/dm/messages/v1', { token, dmId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
 }
 
 // User functions
@@ -128,6 +187,31 @@ export function requestUserEmail(token: string, email: string) {
 
 export function requestUserHandle(token: string, handleStr: string) {
   const res = requestHelper('PUT', '/user/profile/sethandle/v1', { token, handleStr });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+// Message functions
+export function requestMessageSend(token: string, channelId: number, message: string) {
+  const res = requestHelper('POST', '/message/send/v1', { token, channelId, message });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestMessageSenddm(token: string, dmId: number, message: string) {
+  const res = requestHelper('POST', '/message/senddm/v1', { token, dmId, message });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestMessageEdit(token: string, messageId: number, message: string) {
+  const res = requestHelper('PUT', '/message/edit/v1', { token, messageId, message });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestMessageRemove(token: string, messageId: number) {
+  const res = requestHelper('DELETE', '/message/remove/v1', { token, messageId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
