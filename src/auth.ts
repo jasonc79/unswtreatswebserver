@@ -20,7 +20,6 @@ Return Value:
     Returns {authUserId: authUserId} on no error
  */
 const authRegisterV1 = (email: string, password: string, nameFirst: string, nameLast: string): authUserId | error => {
-  console.log(email, password);
   // Error Checking
   if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
     return errorMsg;
