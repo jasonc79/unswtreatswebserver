@@ -1,5 +1,6 @@
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
+import fs from 'fs';
 
 const OK = 200;
 const port = config.port;
@@ -21,6 +22,12 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
     json = payload;
   }
   return request(method, url + ':' + port + path, { qs, json });
+}
+
+export function removeFile() {
+  if (fs.existsSync('data.json')) {
+    fs.unlinkSync('data.json');
+  }
 }
 
 // ========================================================================= //
@@ -48,6 +55,11 @@ export function requestAuthLogin(email: string, password: string) {
   return JSON.parse(String(res.getBody()));
 }
 
+export function requestAuthLogout(token: string) {
+  const res = requestHelper('POST', '/auth/logout/v1', { token: token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
 // Channels functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });

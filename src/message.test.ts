@@ -1,5 +1,6 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, errorMsg, requestClear } from './helperTests';
 import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
+import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
 
@@ -9,8 +10,14 @@ const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
 beforeEach(() => {
+  removeFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
+});
+
+afterEach(() => {
+  removeFile();
+  requestClear();
 });
 
 describe('Testing messageSendV1', () => {

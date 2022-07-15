@@ -1,12 +1,11 @@
 import { getData, setData, Data } from './dataStore';
+/**
+ * clearV1
+ * Resets the internal data of the application to its initial state
+ *
+ * @returns {} when no error
+ */
 
-/*
-Clears the users and channels array in datastore
-
-Return Value:
-    Returns {} on successful clear
-
-*/
 function clearV1(): object {
   const data: Data = getData();
   data.users = [];

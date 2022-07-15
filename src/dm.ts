@@ -217,6 +217,26 @@ const generateDmName = (DmMembers: UserInfo[]): string => {
   return dmNameFinal;
 };
 
+/**
+ * dmMessagesV1
+ * Given a DM with ID dmId that the authorised user is a member of,
+ * return up to 50 messages between index "start" and "start + 50".
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} dmId is the id of the dm being accessed
+ * @param {number} start where messages will start printing from
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the dmId is invalid
+ *    start is greater than number of messages
+ *    token is not part of dm
+ * @returns { messagesUnder50 } if there is no error and if less than 50 messages
+ * @returns { messagesOver50 } if there is no error and there is 50 messages
+ */
+
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 function dmMessagesV1(token: string, dmId: number, start: number): (error | messagesUnder50 | messagesOver50) {

@@ -225,10 +225,7 @@ export function isOwner(token: string, channelId: number) : boolean {
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
   for (const user of channel.ownerMembers) {
-    const item = returnValidId(user.uId);
     if (uId === user.uId) {
-      return true;
-    } else if (item.permissionId === 2) {
       return true;
     }
   }
@@ -251,6 +248,26 @@ export function isOwnerDm(token: string, dmId: number): boolean {
   const dm = returnValidDm(dmId);
   for (const owner of dm.owners) {
     if (uId === owner.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isMemberFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.allMembers) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isOwnerFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.ownerMembers) {
+    if (uId === user.uId) {
       return true;
     }
   }
