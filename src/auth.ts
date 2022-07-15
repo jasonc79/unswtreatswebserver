@@ -31,6 +31,8 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     return errorMsg;
   }
   email = email.toLowerCase();
+  nameFirst = nameFirst.toLowerCase();
+  nameLast = nameLast.toLowerCase();
   const data = getData();
   const handle = createHandle(nameFirst, nameLast);
   const token = generateToken();
