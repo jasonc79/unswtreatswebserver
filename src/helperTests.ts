@@ -67,9 +67,38 @@ export function requestChannelsListAll(token: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-// Dm functions
 export function requestChannelJoin(token: string, channelId: number) {
   const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelMessages(token: string, channelId: number, start: number) {
+  const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelAddOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelRemoveOwner(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelLeave(token: string, channelId: number) {
+  const res = requestHelper('POST', '/channel/leave/v1', { token, channelId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelDetails(token: string, channelId: number) {
+  const res = requestHelper('GET', '/channel/details/v2', { token, channelId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }

@@ -1,92 +1,9 @@
-test('remove test', () => {
-  expect(1 + 1).toEqual(2);
-});
-
-import request, { HttpVerb } from 'sync-request';
-import config from './config.json';
-import { requestMessageSend } from './helperTests';
-
-const OK = 200;
-const port = config.port;
-const url = config.url;
-const errorMsg = { error: 'error' };
-
-function requestHelper(method: HttpVerb, path: string, payload: object) {
-  let qs = {};
-  let json = {};
-  if (['GET', 'DELETE'].includes(method)) {
-    qs = payload;
-  } else {
-    json = payload;
-  }
-  return request(method, url + ':' + port + path, { qs, json });
-}
-
-// ========================================================================= //
-// Wrapper Functions
-
-function requestChannelMessages(token: string, channelId: number, start: number) {
-  const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelAddOwner(token: string, channelId: number, uId: number) {
-  const res = requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelRemoveOwner(token: string, channelId: number, uId: number) {
-  const res = requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelLeave(token: string, channelId: number) {
-  const res = requestHelper('POST', '/channel/leave/v1', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelDetails(token: string, channelId: number) {
-  const res = requestHelper('GET', '/channel/details/v2', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestUserProfile(token: string, uId: number) {
-  const res = requestHelper('GET', '/user/profile/v2', { token, uId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestChannelCreate(token: string, name: string, isPublic: boolean) {
-  const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string) {
-  const res = requestHelper('POST', '/auth/register/v2', {
-    email: email,
-    password: password,
-    nameFirst: nameFirst,
-    nameLast: nameLast
-  });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody(('utf-8'))));
-}
-
-function requestChannelJoin(token: string, channelId: number) {
-  const res = requestHelper('POST', '/channel/join/v2', { token, channelId });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-function requestClear() {
-  return requestHelper('DELETE', '/clear/v1', {});
-}
+import {
+  requestAuthRegister, errorMsg, requestClear,
+  requestChannelCreate, requestChannelJoin, requestChannelRemoveOwner,
+  requestChannelAddOwner, requestChannelDetails, requestUserProfile,
+  requestChannelLeave, requestChannelMessages, requestMessageSend
+} from './helperTests';
 
 beforeEach(() => {
   requestClear();
