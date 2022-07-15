@@ -121,11 +121,30 @@ export function requestDmLeave(token: string, dmId: number) {
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
+export function requestDmDetails(token: string, dmId: number) {
+  const res = requestHelper('GET', '/dm/details/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmList(token: string) {
+  const res = requestHelper('GET', '/dm/list/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
+export function requestDmRemove(token: string, dmId: number) {
+  const res = requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody(('utf-8'))));
+}
+
 export function requestDmMessages(token: string, dmId: number, start: number) {
   const res = requestHelper('GET', '/dm/messages/v1', { token, dmId, start });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
+
 // User functions
 export function requestUserProfile(token: string, uId: number) {
   const res = requestHelper('GET', '/user/profile/v2', { token, uId });
