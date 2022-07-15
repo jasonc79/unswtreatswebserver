@@ -4,6 +4,7 @@ test('remove test', () => {
 
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
+import {requestMessageSend} from './helperTests';
 
 const OK = 200;
 const port = config.port;
@@ -104,24 +105,16 @@ describe('Testing channelMessagesV1', () => {
       })
     );
   });
-  // test('Contains messages', () => {
-  //   // Waiting for message/send to finish writing this test.
-  //   const res1 = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-  //   const authUser = JSON.parse(String(res1.getBody(('utf-8'))));
-  //   expect(res1.statusCode).toBe(OK);
-  //   const res2 = requestChannelCreate(authUser.token, 'correct name', true);
-  //   const channel = JSON.parse(String(res2.getBody(('utf-8'))));
-  //   expect(res2.statusCode).toBe(OK);
-  //   const res3 = requestChannelMessages(authUser.token, channel, 1);
-  //   const messages = JSON.parse(String(res3.getBody(('utf-8'))));
-  //   expect(messages).toStrictEqual(
-  //     expect.objectContaining({
-  //       messages: [],
-  //       start: 0,
-  //       end: -1,
-  //     })
-  //   );
-  // });
+  test('Contains 50 messages', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
+    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    for (let i = 0; i < 60; i++) {
+      requestMessageSend(authUser.token, channel.channelId, 'message');
+    }
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 5);
+    console.log(messages.end)
+    expect(messages.end).toStrictEqual(55)
+  });
   test('Start is greater than messages', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);

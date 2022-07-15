@@ -211,9 +211,9 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
     messages.push(channelMsg[i]);
   }
   return {
-    messages: [],
-    start: 1,
-    end: 1,
+    messages: messages,
+    start: start,
+    end: final,
   };
 }
 
