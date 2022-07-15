@@ -55,14 +55,8 @@ export function requestChannelCreate(token: string, name: string, isPublic: bool
   return JSON.parse(String(res.getBody()));
 }
 
-export function requestChannelsList(token: string) {
-  const res = requestHelper('GET', '/channels/list/v2', { token });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-export function requestChannelsListAll(token: string) {
-  const res = requestHelper('GET', '/channels/listall/v2', { token });
+export function requestChannelInvite(token: string, channelId: number, uId: number) {
+  const res = requestHelper('POST', '/channel/invite/v2', { token, channelId, uId });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
@@ -72,9 +66,20 @@ export function requestChannelJoin(token: string, channelId: number) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
-
 export function requestChannelMessages(token: string, channelId: number, start: number) {
   const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelsList(token: string) {
+  const res = requestHelper('GET', '/channels/list/v2', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelsListAll(token: string) {
+  const res = requestHelper('GET', '/channels/listall/v2', { token });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
