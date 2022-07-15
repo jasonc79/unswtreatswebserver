@@ -235,6 +235,17 @@ export function isOwner(token: string, channelId: number) : boolean {
   return false;
 }
 
+export function isGlobalOwner(token: string, channelId: number) : boolean {
+  const uId = getIdfromToken(token);
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.ownerMembers) {
+    const item = returnValidId(user.uId);
+    if (uId === user.uId && item.permissionId === 2) {
+      return true;
+    }
+  }
+}
+
 export function isMemberDm(token: string, dmId: number): boolean {
   const uId = getIdfromToken(token);
   const dm = returnValidDm(dmId);
