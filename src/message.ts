@@ -84,7 +84,6 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
     }
   }
   setData(data);
-  
   return { messageId: newMessage.messageId };
 }
 
@@ -116,11 +115,16 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
     if (checkDmMessageSender(token, messageId) && isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
       if (message.length === 0) {
         messageRemoveV1(token, messageId);
-        setData(data);
         return {};
       }
       const messageDetails = returnValidMessagefromDm(messageId);
-      messageDetails.message = message;
+      for (const dm of data.dms) {
+        for (const note of dm.messages) {
+          if (note.messageId === messageDetails.messageId) {
+            note.message = message;
+          }
+        }
+      }
       setData(data);
       return {};
     }
@@ -132,7 +136,13 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
         return {};
       }
       const messageDetails = returnValidMessagefromChannel(messageId);
-      messageDetails.message = message;
+      for (const channel of data.channels) {
+        for (const note of channel.messages) {
+          if (note.messageId === messageDetails.messageId) {
+            note.message = message;
+          }
+        }
+      }
       setData(data);
       return {};
     }
@@ -162,26 +172,36 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
 
   const data = getData();
 
-  if (checkValidDmMessage(messageId) &&
-      checkDmMessageSender(token, messageId) &&
-      isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
-    const dm = getDmfromMessage(messageId);
-    const messageDetails = returnValidMessagefromDm(messageId);
-    dm.messages = dm.messages.filter((item) => {
-      return item !== messageDetails;
-    });
-    setData(data);
-    return {};
-  } else if (checkValidChannelMessage(messageId) &&
-      checkChannelMessageSender(token, messageId) &&
-      isOwner(token, getChannelfromMessage(messageId).channelId)) {
-    const channel = getChannelfromMessage(messageId);
-    const messageDetails = returnValidMessagefromChannel(messageId);
-    channel.messages = channel.messages.filter((item) => {
-      return item !== messageDetails;
-    });
-    setData(data);
-    return {};
+  if (checkValidDmMessage(messageId) && isMemberDm(token, getDmfromMessage(messageId).dmId)) {
+    if (checkDmMessageSender(token, messageId) && isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
+      const currentDm = getDmfromMessage(messageId);
+      const messageDetails = returnValidMessagefromDm(messageId);
+      for (const dm of data.dms) {
+        if (dm.dmId === currentDm.dmId) {
+          dm.messages = dm.messages.filter((item) => {
+            return item !== messageDetails;
+          });
+        }
+      }
+      console.log(data);
+      setData(data);
+      return {};
+    }
+  } else if (checkValidChannelMessage(messageId) && isOwner(token, getChannelfromMessage(messageId).channelId)) {
+    if (checkChannelMessageSender(token, messageId)) {
+      const currentChannel = getChannelfromMessage(messageId);
+      const messageDetails = returnValidMessagefromChannel(messageId);
+      for (const channel of data.channels) {
+        if (channel.channelId === currentChannel.channelId) {
+          channel.messages = channel.messages.filter((item) => {
+            return item !== messageDetails;
+          });
+        }
+      }
+      console.log(data);
+      setData(data);
+      return {};
+    }
   }
   return errorMsg;
 }
