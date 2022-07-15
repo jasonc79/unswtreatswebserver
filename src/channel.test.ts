@@ -1,9 +1,11 @@
+import { removeSavedFile, requestClear } from './helperTests';
 import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails, requestMessageSend } from './helperTests';
-import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestUserProfile, errorMsg } from './helperTests';
 
 let authUser: authUserReturn;
 
 beforeEach(() => {
+  removeSavedFile();
   requestClear();
   authUser = requestAuthRegister('email1@gmail.com', 'password1', 'firstname1', 'lastname1');
 });

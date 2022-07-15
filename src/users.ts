@@ -61,9 +61,11 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
   }
   const data = getData();
   for (const user of data.users) {
-    if (token === user.token) {
-      user.nameFirst = nameFirst;
-      user.nameLast = nameLast;
+    for (const userToken of user.token) {
+      if (userToken === token) {
+        user.nameFirst = nameFirst;
+        user.nameLast = nameLast;
+      }
     }
   }
   setData(data);
@@ -87,13 +89,17 @@ function userSetEmailV1(token: string, email: string) {
   }
   const data = getData();
   for (const user of data.users) {
-    if (token !== user.token && email === user.email) {
-      return errorMsg;
+    for (const userToken of user.token) {
+      if (token !== userToken && email === user.email) {
+        return errorMsg;
+      }
     }
   }
   for (const user of data.users) {
-    if (token === user.token) {
-      user.email = email;
+    for (const userToken of user.token) {
+      if (token === userToken) {
+        user.email = email;
+      }
     }
   }
   setData(data);
@@ -120,13 +126,17 @@ function userSetHandleV1(token: string, handleStr: string) {
   }
   const data = getData();
   for (const user of data.users) {
-    if (token !== user.token && handleStr === user.handleStr) {
-      return errorMsg;
+    for (const userToken of user.token) {
+      if (token !== userToken && handleStr === user.handleStr) {
+        return errorMsg;
+      }
     }
   }
   for (const user of data.users) {
-    if (token === user.token) {
-      user.handleStr = handleStr;
+    for (const userToken of user.token) {
+      if (token === userToken) {
+        user.handleStr = handleStr;
+      }
     }
   }
   setData(data);

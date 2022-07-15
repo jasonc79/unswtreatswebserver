@@ -1,5 +1,6 @@
 import request, { HttpVerb } from 'sync-request';
 import config from './config.json';
+import fs from 'fs';
 
 const OK = 200;
 const port = config.port;
@@ -21,6 +22,12 @@ function requestHelper(method: HttpVerb, path: string, payload: object) {
     json = payload;
   }
   return request(method, url + ':' + port + path, { qs, json });
+}
+
+export function removeSavedFile() {
+  fs.readdirSync('./')
+    .filter(file => /^data[a-zA-Z0-9]+\.json$/.test(file))
+    .forEach(file => fs.unlinkSync('./' + file));
 }
 
 // ========================================================================= //
@@ -48,7 +55,13 @@ export function requestAuthLogin(email: string, password: string) {
   return JSON.parse(String(res.getBody()));
 }
 
-// Channels functions
+export function requestAuthLogout(token: string) {
+  const res = requestHelper('POST', '/auth/logout/v1', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+// Channel functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean) {
   const res = requestHelper('POST', '/channels/create/v2', { token, name, isPublic });
   expect(res.statusCode).toBe(OK);
@@ -66,6 +79,8 @@ export function requestChannelJoin(token: string, channelId: number) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
+// Channels functions
+
 export function requestChannelMessages(token: string, channelId: number, start: number) {
   const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
   expect(res.statusCode).toBe(OK);

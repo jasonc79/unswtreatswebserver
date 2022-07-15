@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 // USER TYPES AND INTERFACES
 type uId = { uId: number };
 type token = string;
@@ -12,7 +14,7 @@ interface User {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
-  token: token,
+  token: token[],
   password: string,
   permissionId: number,
 }
@@ -80,6 +82,7 @@ type Data = {
 
 // CONSTANTS //
 const errorMsg = { error: 'error' };
+const fileName = 'data.json';
 
 let data: Data = {
   users: [],
@@ -104,14 +107,25 @@ Example usage
 
 // Use get() to access the data
 function getData(): Data {
+  loadData();
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
 function setData(newData: Data) {
   data = newData;
+  saveData();
 }
 
+function saveData() {
+  fs.writeFileSync(fileName, JSON.stringify(data));
+}
+
+function loadData() {
+  if (fs.existsSync(fileName)) {
+    data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+  }
+}
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };

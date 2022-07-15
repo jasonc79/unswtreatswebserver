@@ -4,6 +4,7 @@ import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
  * returns true if the id corresponds to a valid user or channel, and false otherwise
  * property : users | channels
  */
+
 export function checkValidUser(id: number) : boolean {
   const data = getData();
   for (const item of data.users) {
@@ -30,8 +31,10 @@ export function checkValidChannel(id: number) : boolean {
 export function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return true;
+    for (const userToken of user.token) {
+      if (token === userToken) {
+        return true;
+      }
     }
   }
   return false;
@@ -131,10 +134,13 @@ export function returnValidChannel(id: number) : Channel {
 export function returnValidUser(token: string) : User {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user;
+    for (const userToken of user.token) {
+      if (userToken === token) {
+        return user;
+      }
     }
   }
+  throw new Error('User was not found in returnValidUser');
 }
 
 export function returnValidDm(id: number): Dm {
@@ -144,6 +150,7 @@ export function returnValidDm(id: number): Dm {
       return dm;
     }
   }
+  throw new Error('Dm was not found in returnValidDm');
 }
 
 /**
@@ -156,6 +163,7 @@ export function returnValidMessagefromChannel(messageId: number) : Message {
       return message;
     }
   }
+  throw new Error('Message was not found in returnValidMessage');
 }
 
 /**
@@ -176,8 +184,10 @@ export function returnValidMessagefromDm(messageId: number) : Message {
 export function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user.uId;
+    for (const userToken of user.token) {
+      if (userToken === token) {
+        return user.uId;
+      }
     }
   }
 }

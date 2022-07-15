@@ -242,9 +242,8 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   const data = getData();
   // const tempuId = returnValidUser(token);
   // const user = userProfileV1(token, tempuId.uId) as userReturn;
-  const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
-  !isOwner(token, channelId) || !isMember(tempUser.token, channelId) || isOwner(tempUser.token, channelId)) {
+  !isOwner(token, channelId) || !isMember(token, channelId) || isOwner(token, channelId)) {
     return errorMsg;
   }
   const newOwnerProfile = userProfileV1(token, uId) as userReturn;
@@ -259,9 +258,8 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   // const tempuId = returnValidUser(token);
   const user = userProfileV1(token, uId) as userReturn;
   // const user2 = userProfileV1(token, tempuId.uId) as userReturn;
-  const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
-      !isOwner(tempUser.token, channelId) || !isOwner(token, channelId)) {
+      !isOwner(token, channelId) || !isOwner(token, channelId)) {
     return errorMsg;
   }
 

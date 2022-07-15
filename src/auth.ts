@@ -43,7 +43,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     nameLast: nameLast,
     handleStr: handle,
     password: password,
-    token: token,
+    token: [token],
     permissionId: 2,
   };
   // Global owner
@@ -74,7 +74,8 @@ Return Value:
 */
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-
+  const data = getData();
+  const token = generateToken();
   if (!user) {
     return errorMsg;
   }
@@ -83,10 +84,33 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
     return errorMsg;
   }
 
+  for (const user of data.users) {
+    if (user.email === email && user.password === password) {
+      user.token.push(token);
+    }
+  }
+  setData(data);
   return {
-    token: user.token,
+    token: token,
     authUserId: user.uId
   };
+};
+
+const authLogoutV1 = (token: token) : object | error => {
+  if (!checkValidToken) {
+    return errorMsg;
+  }
+  const data = getData();
+  for (const user of data.users) {
+    for (let i = 0; i < user.token.length; i++) {
+      if (user.token[i] === token) {
+        user.token.splice(i, 1);
+      }
+    }
+    setData(data);
+  }
+
+  return {};
 };
 
 // HELPER FUNCTIONS
@@ -185,4 +209,4 @@ const generateToken = () : token => {
   return token;
 };
 
-export { authLoginV1, authRegisterV1 };
+export { authLoginV1, authRegisterV1, authLogoutV1 };

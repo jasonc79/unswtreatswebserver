@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, errorMsg, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, removeSavedFile } from './helperTests';
 
 let authUser: authUserReturn;
 
@@ -9,6 +9,7 @@ const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
 beforeEach(() => {
+  removeSavedFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
