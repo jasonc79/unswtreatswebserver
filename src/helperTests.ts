@@ -66,9 +66,20 @@ export function requestChannelJoin(token: string, channelId: number) {
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
-
 export function requestChannelMessages(token: string, channelId: number, start: number) {
   const res = requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelsList(token: string) {
+  const res = requestHelper('GET', '/channels/list/v2', { token });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
+
+export function requestChannelsListAll(token: string) {
+  const res = requestHelper('GET', '/channels/listall/v2', { token });
   expect(res.statusCode).toBe(OK);
   return JSON.parse(String(res.getBody()));
 }
@@ -97,18 +108,6 @@ export function requestChannelDetails(token: string, channelId: number) {
   return JSON.parse(String(res.getBody()));
 }
 
-export function requestChannelsList(token: string) {
-  const res = requestHelper('GET', '/channels/list/v2', { token });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
-export function requestChannelsListAll(token: string) {
-  const res = requestHelper('GET', '/channels/listall/v2', { token });
-  expect(res.statusCode).toBe(OK);
-  return JSON.parse(String(res.getBody()));
-}
-
 // Dm functions
 export function requestDmCreate(token: string, uIds: number[]) {
   const res = requestHelper('POST', '/dm/create/v1', { token, uIds });
@@ -122,6 +121,11 @@ export function requestDmLeave(token: string, dmId: number) {
   return JSON.parse(String(res.getBody(('utf-8'))));
 }
 
+export function requestDmMessages(token: string, dmId: number, start: number) {
+  const res = requestHelper('GET', '/dm/messages/v1', { token, dmId, start });
+  expect(res.statusCode).toBe(OK);
+  return JSON.parse(String(res.getBody()));
+}
 // User functions
 export function requestUserProfile(token: string, uId: number) {
   const res = requestHelper('GET', '/user/profile/v2', { token, uId });

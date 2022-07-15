@@ -16,6 +16,7 @@ Return Value:
     Returns {error: 'error'} if authorised user is not already a member of channel
     Returns {name, isPublic, ownerMembers, allMembers} on no error
 */
+
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
   const uId = returnValidUser(token);
   const user = userProfileV1(token, uId.uId) as userReturn;
@@ -217,9 +218,9 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
     messages.push(channelMsg[i]);
   }
   return {
-    messages: [],
-    start: 1,
-    end: 1,
+    messages: messages,
+    start: start,
+    end: final,
   };
 }
 

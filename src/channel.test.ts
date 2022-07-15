@@ -1,5 +1,4 @@
-
-import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails } from './helperTests';
+import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails, requestMessageSend } from './helperTests';
 import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg } from './helperTests';
 
 let authUser: authUserReturn;
@@ -21,19 +20,15 @@ describe('Testing channelMessagesV1', () => {
       })
     );
   });
-  /*
-  test('Contains messages', () => {
-    // Waiting for message/send to finish writing this test.
+  test('Contains 50 messages', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel, 1);
-    expect(messages).toStrictEqual(
-      expect.objectContaining({
-        messages: [],
-        start: 0,
-        end: -1,
-      })
-    );
-  }); */
+    for (let i = 0; i < 60; i++) {
+      requestMessageSend(authUser.token, channel.channelId, 'message');
+    }
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 5);
+    expect(messages.end).toStrictEqual(55);
+  });
   test('Start is greater than messages', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);

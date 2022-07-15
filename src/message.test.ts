@@ -90,7 +90,7 @@ describe('Testing messageSenddmV1', () => {
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('dmId is invalid', () => {
-      const messageId = requestMessageSenddm(authUser.token, 1, 'message');
+      const messageId = requestMessageSenddm(authUser.token, 404, 'message');
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('length of message is less than 1', () => {

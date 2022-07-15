@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, Dm, userReturn } from './dataStore';
+import { getData, setData, error, errorMsg, Dm, userReturn, Message } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
 
@@ -138,4 +138,41 @@ const dmLeaveV1 = (token: string, dmId: number) : error | object => {
   return {};
 };
 
-export { dmCreateV1, dmLeaveV1 }; //, dmDetailsV1, dmListV1, dmRemoveV1 };
+type messagesUnder50 = { messages: Message[], start: number, end: -1 };
+type messagesOver50 = { messages: Message[], start: number, end: number };
+function dmMessagesV1(token: string, dmId: number, start: number): (error | messagesUnder50 | messagesOver50) {
+  if (!checkValidDm(dmId) || !checkValidToken(token)) {
+    return errorMsg;
+  }
+
+  if (!isMemberDm(token, dmId)) {
+    return errorMsg;
+  }
+
+  const currDm = returnValidDm(dmId);
+  const dmMsg = currDm.messages;
+  const messages: Array<Message> = [];
+  const final = start + 50;
+
+  if (dmMsg.length < start) {
+    return errorMsg;
+  }
+
+  for (let i = start; i < final; i++) {
+    if (i >= dmMsg.length) {
+      return {
+        messages: messages,
+        start: start,
+        end: -1,
+      };
+    }
+    messages.push(dmMsg[i]);
+  }
+  return {
+    messages: messages,
+    start: start,
+    end: final,
+  };
+}
+
+export { dmCreateV1, dmLeaveV1, dmMessagesV1 }; //, dmDetailsV1, dmListV1, dmRemoveV1 };

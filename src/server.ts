@@ -8,7 +8,7 @@ import { authRegisterV1, authLoginV1 } from './auth';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
 import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
-import { dmCreateV1, dmLeaveV1 } from './dm';
+import { dmCreateV1, dmLeaveV1, dmMessagesV1 } from './dm';
 import { clearV1 } from './other';
 import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1, channelInviteV1 } from './channel';
 // Set up web app, use JSON
@@ -324,6 +324,16 @@ app.post('/dm/leave/v1', (req, res, next) => {
   }
 });
 
+app.get('/dm/messages/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    const dmId = parseInt(req.query.dmId as string);
+    const start = parseInt(req.query.start as string);
+    return res.json(dmMessagesV1(token, dmId, start));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // Other functions
 
