@@ -201,7 +201,7 @@ describe('Testing dmMessagesV1', () => {
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    expect(dm).toStrictEqual({dmId: dm.dmId})
+    expect(dm).toStrictEqual({ dmId: dm.dmId });
     const messages = requestDmMessages(authUser2.token, dm.dmId, 0);
     expect(messages).toStrictEqual(
       expect.objectContaining({
@@ -216,7 +216,7 @@ describe('Testing dmMessagesV1', () => {
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    expect(dm).toStrictEqual({dmId: dm.dmId})
+    expect(dm).toStrictEqual({ dmId: dm.dmId });
     for (let i = 0; i < 60; i++) {
       requestMessageSenddm(authUser.token, dm.dmId, 'message');
     }
