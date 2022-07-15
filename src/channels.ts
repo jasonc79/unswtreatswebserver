@@ -24,12 +24,11 @@ Return Value:
 */
 
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
-
   if (name.length < 1 || name.length > 20 || !checkValidToken(token)) {
     return errorMsg;
   }
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
 
   const data = getData();
   const channelId = data.channels.length;

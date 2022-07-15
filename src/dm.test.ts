@@ -1,33 +1,29 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear, requestDmList, requestDmCreate, requestDmMessages, requestMessageSenddm, requestDmDetails } from './helperTests';
 import { requestDmLeave, requestDmRemove } from './helperTests';
+import { removeFile } from './helperTests';
+
 // requestDmDetails
 const email = 'email@email.com';
 const password = 'password';
 const nameFirst = 'first';
 const nameLast = 'last';
-// const handleStr = 'firstlast';
-
-// const email2 = 'email2@email.com';
-// const password2 = 'password2';
-// const nameFirst2 = 'first2';
-// const nameLast2 = 'last2';
 
 const uIdEmail = 'uid@email.com';
 const uIdPassword = 'password2';
 const uIdFirst = 'uid1First';
 const uIdLast = 'uid1Last';
-// const uIdHandleStr = 'uid1firstuid1last';
 
 const uId2Email = 'uid2@email.com';
 const uId2Password = 'password2';
 const uId2First = 'uid2First';
 const uId2Last = 'uid2Last';
-// const uId2HandleStr = 'uid2firstuid2last';
+
 const handleStr23 = 'firstlast, uid1firstuid1last, uid2firstuid2last';
 
 let authUser: authUserReturn;
 
 beforeEach(() => {
+  removeFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });

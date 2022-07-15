@@ -1,5 +1,6 @@
 import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, errorMsg, requestClear } from './helperTests';
 import { requestUserProfile } from './helperTests';
+import { removeFile } from './helperTests';
 
 const email0 = 'email@gmail.com';
 const password0 = 'password';
@@ -15,6 +16,7 @@ const longName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy';
 const exactly50CharName = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx';
 
 beforeEach(() => {
+  removeFile();
   requestClear();
 });
 

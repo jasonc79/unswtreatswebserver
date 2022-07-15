@@ -18,11 +18,11 @@ Return Value:
 */
 
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
+  const uId = returnValidUser(token);
+  const user = userProfileV1(token, uId.uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
 
   let isMember = false;

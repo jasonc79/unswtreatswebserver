@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
 
-import { authRegisterV1, authLoginV1 } from './auth';
+import { authRegisterV1, authLoginV1, authLogoutV1 } from './auth';
 import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1, dmLeaveV1, dmMessagesV1 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
@@ -45,6 +45,15 @@ app.post('/auth/login/v2', (req, res, next) => {
   try {
     const { email, password } = req.body;
     return res.json(authLoginV1(email, password));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/auth/logout/v1', (req, res, next) => {
+  try {
+    const { token } = req.body;
+    return res.json(authLogoutV1(token));
   } catch (err) {
     next(err);
   }

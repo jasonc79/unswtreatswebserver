@@ -225,10 +225,7 @@ export function isOwner(token: string, channelId: number) : boolean {
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
   for (const user of channel.ownerMembers) {
-    const item = returnValidId(user.uId);
     if (uId === user.uId) {
-      return true;
-    } else if (item.permissionId === 2) {
       return true;
     }
   }

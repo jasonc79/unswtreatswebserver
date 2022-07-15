@@ -1,5 +1,6 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
 import { requestChannelsList, requestChannelsListAll, requestChannelCreate } from './helperTests';
+import { removeFile } from './helperTests';
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
@@ -9,6 +10,7 @@ const nameLast = 'Smith';
 let authUser: authUserReturn;
 
 beforeEach(() => {
+  removeFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });

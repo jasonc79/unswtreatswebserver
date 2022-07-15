@@ -74,7 +74,8 @@ Return Value:
 */
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-
+  const data = getData();
+  const token = generateToken();
   if (!user) {
     return errorMsg;
   }
@@ -83,10 +84,32 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
     return errorMsg;
   }
 
+  for (const user of data.users) {
+    if (user.email === email && user.password === password) {
+      user.token = token;
+    }
+  }
+  setData(data);
+
   return {
-    token: user.token,
+    token: token,
     authUserId: user.uId
   };
+};
+
+const authLogoutV1 = (token: token) : object | error => {
+  if (!checkValidToken) {
+    return errorMsg;
+  }
+  const data = getData();
+
+  for (const i in data.users) {
+    if (data.users[i].token === token) {
+      data.users[i].token = '-1';
+    }
+  }
+  setData(data);
+  return {};
 };
 
 // HELPER FUNCTIONS
@@ -185,4 +208,4 @@ const generateToken = () : token => {
   return token;
 };
 
-export { authLoginV1, authRegisterV1 };
+export { authLoginV1, authRegisterV1, authLogoutV1 };
