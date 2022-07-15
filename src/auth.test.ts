@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, errorMsg, requestClear } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, errorMsg, requestClear } from './helperTests';
 import { requestUserProfile } from './helperTests';
 
 const email0 = 'email@gmail.com';
@@ -241,5 +241,15 @@ describe('Testing authLoginV1', () => {
         authUserId: expect.any(Number)
       })
     );
+  });
+});
+
+describe('Testing auth/logout/v2', () => {
+  test('Testing successful logout', () => {
+    const authUser = requestAuthRegister('email@email.com', 'password', 'name', 'name2');
+    const authLogoutReturn = requestAuthLogout(authUser.token);
+    expect(authLogoutReturn).toStrictEqual({});
+    const channel = requestChannelCreate(authUser.token, 'channel', true);
+    expect(channel).toStrictEqual(errorMsg);
   });
 });
