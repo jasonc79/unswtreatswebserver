@@ -8,7 +8,7 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
 /**
  * ChannelDetailsV2
  * Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
@@ -20,13 +20,10 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
  * @returns { channelDetails } if there is no error
  */
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
   if (!checkValidChannel(channelId) || !checkValidToken(token)) {
     return errorMsg;
   }
   const currChannel = returnValidChannel(channelId);
-
 
   if (!isMember(token, channelId)) {
     return errorMsg;
@@ -101,7 +98,7 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
 
 /**
  * channelInviteV1
- * Invites a user with ID uId to join a channel with ID channelId. 
+ * Invites a user with ID uId to join a channel with ID channelId.
  *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
@@ -150,7 +147,7 @@ function channelInviteV1(token: string, channelId: number, uId: number): (error 
 
 /**
  * channelMessagesV2
- * Given a channel with ID channelId that the authorised user is a member of, return up to 50 messages 
+ * Given a channel with ID channelId that the authorised user is a member of, return up to 50 messages
  * between index "start" and "start + 50".
  *
  * Arguments:
@@ -163,6 +160,7 @@ function channelInviteV1(token: string, channelId: number, uId: number): (error 
  *    if token is invalid
  *    if the chnnelId is invalid
  *    start is greater than number of messages
+ *    token is not part of channel
  * @returns { messagesUnder50 } if there is no error and if less than 50 messages
  * @returns { messagesOver50 } if there is no error and there is 50 messages
  */
@@ -209,11 +207,11 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
 /**
  * channelLeaveV1
  * Given a channel with ID channelId that the authorised user is a member of, remove them as a member of the channel.
- * 
+ *
  * Arguments
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
- * 
+ *
  * Return values
  * @returns { error }
  *    token invalid
@@ -238,12 +236,12 @@ function channelLeaveV1(token: string, channelId: number): (error | object) {
 /**
  * channelAddOwnerV1
  * Make user with user id uId an owner of the channel.
- * 
+ *
  * Arguments
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} uId the user to become owner
- * 
+ *
  * Return values
  * @returns { error }
  *    channelId invalid
@@ -252,7 +250,7 @@ function channelLeaveV1(token: string, channelId: number): (error | object) {
  *    uId is not member
  *    token is not owner
  *    token is invalid
- * 
+ *
  * @returns { object } when no error
  */
 function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | object) {
@@ -279,7 +277,7 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} uId the user to remove owner
- * 
+ *
  * Return values
  * @returns { error }
  *    channelId invalid
@@ -288,7 +286,7 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
  *    uId is only owner
  *    token is not owner
  *    token is invalid
- * 
+ *
  * @returns { object } when no error
  */
 function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | object) {
