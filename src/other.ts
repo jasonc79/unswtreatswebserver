@@ -11,7 +11,6 @@ function clearV1(): object {
   const data: Data = getData();
   data.users = [];
   data.channels = [];
-  data.dms = [];
   setData(data);
   return {};
 }
