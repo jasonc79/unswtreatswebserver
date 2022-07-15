@@ -225,7 +225,6 @@ export function isOwner(token: string, channelId: number) : boolean {
   const uId = getIdfromToken(token);
   const channel = returnValidChannel(channelId);
   for (const user of channel.ownerMembers) {
-    const item = returnValidId(user.uId);
     if (uId === user.uId) {
       return true;
     }
@@ -234,8 +233,8 @@ export function isOwner(token: string, channelId: number) : boolean {
 }
 
 export function isGlobalOwner(token: string) : boolean {
-  const uId = checkValidUser(token);
-  if (uId.user.permissionId === 1) {
+  const user = returnValidUser(token)
+  if (user.permissionId === 1) {
     return true;
   }
   return false;
@@ -257,6 +256,46 @@ export function isOwnerDm(token: string, dmId: number): boolean {
   const dm = returnValidDm(dmId);
   for (const owner of dm.owners) {
     if (uId === owner.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isMemberFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.allMembers) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isOwnerFromId(uId: number, channelId: number) : boolean {
+  const channel = returnValidChannel(channelId);
+  for (const user of channel.ownerMembers) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isMemberDmFromId(uId: number, dmId: number) : boolean {
+  const dm = returnValidDm(dmId);
+  for (const user of dm.members) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function isOwnerDmFromId(uId: number, dmId: number) : boolean {
+  const dm = returnValidDm(dmId);
+  for (const user of dm.owners) {
+    if (uId === user.uId) {
       return true;
     }
   }

@@ -1,6 +1,6 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember, isMemberFromId, isOwnerFromId, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { userProfileV1 } from './users';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
@@ -259,7 +259,7 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   // const user = userProfileV1(token, tempuId.uId) as userReturn;
   const tempUser = returnValidId(uId);
   if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
-  !isOwner(token, channelId) || !isMember(tempUser.token, channelId) || isOwner(tempUser.token, channelId)) {
+  !isOwner(token, channelId) || !isMemberFromId(uId, channelId) || isOwnerFromId(uId, channelId)) {
     return errorMsg;
   }
   const newOwnerProfile = userProfileV1(token, uId) as userReturn;
@@ -294,12 +294,8 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   // const tempuId = returnValidUser(token);
   const user = userProfileV1(token, uId) as userReturn;
   // const user2 = userProfileV1(token, tempuId.uId) as userReturn;
-  const tempUser = returnValidId(uId);
-  if (!isOwner(tempUser.token, channelId) && isGlobalOwner(tempUser.token, channelId)) {
-    return errorMsg;
-  }
-  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) || 
-      !isOwner(tempUser.token, channelId) || !isOwner(token, channelId)) {
+  if (!checkValidChannel(channelId) || !checkValidToken(token) || !checkValidUser(uId) ||
+      !isOwnerFromId(uId, channelId) || !isOwner(token, channelId)) {
     return errorMsg;
   }
 
