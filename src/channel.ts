@@ -50,18 +50,6 @@ function channelDetailsV1(token: number, channelId: number) : (error | channelDe
   return errorMsg;
 }
 
-/*
-ChannelJoinV1 Function
-Given a channelId of a channel that the authorised user can join, adds them to that channel.
-Arguments:
-    authUserId (number) - A unique identifier for the authorised user
-    channelId (number) - A unique identifier for the channel
-Return Value:
-    Returns {error: 'error'} on invalid channel
-    Returns {error: 'error'} if authorised user is already a member of channel
-    Returns {error: 'error'} on a private channel and auth user is not a global owner
-    Returns {} on no error
-*/
 /**
  * channelJoinV1
  * Adds the current user to the channel
@@ -95,20 +83,23 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
   return {};
 }
 
-/*
-Invites a user with ID uId to join a channel with ID channelId.
-Once invited, the user is added to the channel immediately.
-
-Arguments:
-    authUserId (number)         - A unique identifier for the authorised user
-    channelId (number)          - A unique identifier for the channel
-    uId (uId)                   - The user's first name, with non-alphanumeric characters
-
-Return Value:
-    Returns {error: 'error'}    when uId does not refer to a valid user
-    Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
-    Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
-    Returns {} on no error
+/**
+ * channelInviteV1
+ *
+ * Invites a user with ID uId to join a channel with ID channelId.
+ * Once invited, the user is added to the channel immediately.
+ *
+ * Arguments:
+ * @param {string} token is a unique identifier for the authorised user's current session
+ * @param {number} channelId is a unique identifier for the channel
+ * @param {number} uId is a unique identifier for the user being invited
+ *
+ * Return Values:
+ * @returns { error: 'error' }
+ *    when uId does not refer to a valid user
+ *    when uId refers to a user who is already a member of the channel
+ *    when channelId is valid and the authorised user is not a member of the channel
+ * @returns { } on no error
  */
 function channelInviteV1(token: string, channelId: number, uId: number): (error | object) {
   // Checking if channelID and uId are valid
