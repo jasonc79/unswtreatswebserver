@@ -50,8 +50,6 @@ describe('Testing channelMessagesV1', () => {
   });
 });
 
-/// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 describe('Testing channelDetailsV2', () => {
   test('Success', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
@@ -243,10 +241,7 @@ describe('Testing channelAddOwnerV1', () => {
   });
 });
 
-/// /////////////////////////////////
-
 describe('Testing channelRemoveOwnerV1', () => {
-  //
   test('Pass scenario', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
@@ -329,7 +324,6 @@ describe('Testing channelRemoveOwnerV1', () => {
   });
 });
 
-// Tests for channelInviteV1
 describe('Testing channelInviteV1', () => {
   test('Valid inputs', () => {
     const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
@@ -380,7 +374,6 @@ describe('Testing channelJoinV1', () => {
     const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'name', false);
     const channelJoin = requestChannelJoin(authUser2.token, channel.channelId);
-    // Auth user is not channel member or global owner
     expect(channelJoin).toStrictEqual(errorMsg);
   });
   test('positive case', () => {
