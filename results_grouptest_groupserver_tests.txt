@@ -1,0 +1,60 @@
+npm verb cli [
+npm verb cli   '/import/kamen/3/cs1531/.nvm/versions/node/v16.14.2/bin/node',
+npm verb cli   '/import/kamen/3/cs1531/.nvm/versions/node/v16.14.2/bin/npm',
+npm verb cli   'run',
+npm verb cli   'test',
+npm verb cli   '--verbose',
+npm verb cli   '--testMatch',
+npm verb cli   '**/?(*.)+(test).ts'
+npm verb cli ]
+npm info using npm@8.5.0
+npm info using node@v16.14.2
+npm timing npm:load:whichnode Completed in 1ms
+npm timing config:load:defaults Completed in 4ms
+npm timing config:load:file:/import/kamen/3/cs1531/.nvm/versions/node/v16.14.2/lib/node_modules/npm/npmrc Completed in 2ms
+npm timing config:load:builtin Completed in 2ms
+npm timing config:load:cli Completed in 6ms
+npm timing config:load:env Completed in 1ms
+npm timing config:load:file:/import/kamen/3/cs1531/project-automarking/tempstore/.npmrc Completed in 0ms
+npm timing config:load:project Completed in 23ms
+npm timing config:load:file:/import/kamen/3/cs1531/.npmrc Completed in 0ms
+npm timing config:load:user Completed in 1ms
+npm timing config:load:file:/import/kamen/3/cs1531/.nvm/versions/node/v16.14.2/etc/npmrc Completed in 0ms
+npm timing config:load:global Completed in 1ms
+npm timing config:load:validate Completed in 0ms
+npm timing config:load:credentials Completed in 3ms
+npm timing config:load:setEnvs Completed in 2ms
+npm timing config:load Completed in 46ms
+npm timing npm:load:configload Completed in 47ms
+npm timing npm:load:setTitle Completed in 1ms
+npm timing config:load:flatten Completed in 7ms
+npm timing npm:load:display Completed in 15ms
+npm verb logfile /import/kamen/3/cs1531/.npm/_logs/2022-07-16T05_03_00_904Z-debug-0.log
+npm timing npm:load:logFile Completed in 15ms
+npm timing npm:load:timers Completed in 0ms
+npm timing npm:load:configScope Completed in 0ms
+npm timing npm:load Completed in 80ms
+
+> test
+> jest "**/?(*.)+(test).ts"
+
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+PASS src/dm.test.ts (10.81 s)
+PASS src/channel.test.ts (8.512 s)
+PASS src/message.test.ts (7.976 s)
+PASS src/users.test.ts
+PASS src/channels.test.ts
+PASS src/other.test.ts
+PASS src/echo.test.ts
+PASS src/auth.test.ts
+
+Test Suites: 8 passed, 8 total
+Tests:       139 passed, 139 total
+Snapshots:   0 total
+Time:        39.526 s
+Ran all test suites.
+npm timing command:run Completed in 42134ms
+npm verb exit 0
+npm timing npm Completed in 42704ms
+npm info ok 
