@@ -3,6 +3,7 @@ import { echo } from './echo';
 import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
+import errorHandler from 'middleware-http-errors';
 
 import { authRegisterV1, authLoginV1, authLogoutV1 } from './auth';
 import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1, dmLeaveV1, dmMessagesV1 } from './dm';
@@ -29,6 +30,9 @@ app.get('/echo', (req, res, next) => {
     next(err);
   }
 });
+
+// handles errors nicely
+app.use(errorHandler());
 
 // ================================================================ //
 // Auth functions
