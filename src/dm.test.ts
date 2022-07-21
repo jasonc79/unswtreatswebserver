@@ -62,6 +62,13 @@ describe('Testing dm/create/v1', () => {
     expect(dm).toStrictEqual(errorMsg);
   });
 
+  test('Invalid token', () => {
+    const uIds = generateUserIds();
+    const token = 'bad';
+    const dm = requestDmCreate(token, uIds);
+    expect(dm).toStrictEqual(errorMsg);
+  });
+
   test('Valid inputs', () => {
     const uIds = generateUserIds();
     const dm = requestDmCreate(authUser.token, uIds);
