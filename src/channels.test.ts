@@ -42,7 +42,7 @@ describe('Testing for channelsListallV1', () => {
   test('More than one channel', () => {
     const channel1 = requestChannelCreate(authUser.token, 'Channel1', true);
     const channel2 = requestChannelCreate(authUser.token, 'Channel2', true);
-
+    expect(channel1.channelId).not.toEqual(channel2.channelId);
     expect(requestChannelsListAll(authUser.token)).toEqual({
       channels: [
         {

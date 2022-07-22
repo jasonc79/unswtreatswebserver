@@ -1,4 +1,4 @@
-// import fs from 'fs';
+import fs from 'fs';
 
 // USER TYPES AND INTERFACES
 type uId = { uId: number };
@@ -89,21 +89,21 @@ let data: Data = {
   dms: [],
 };
 
-// const fileName = 'data.json';
+const fileName = 'data.json';
 
 // Use get() to access the data
 function getData(): Data {
-  // loadData();
+  loadData();
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
 function setData(newData: Data) {
   data = newData;
-  // saveData();
+  saveData();
 }
 
-/*
+
 function saveData() {
   fs.writeFileSync(fileName, JSON.stringify(data));
 }
@@ -112,7 +112,7 @@ function loadData() {
   if (fs.existsSync(fileName)) {
     data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
   }
-} */
+} 
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };

@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
 
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise
@@ -280,4 +280,15 @@ export function isGlobalOwner(token: string) : boolean {
     return true;
   }
   return false;
+}
+
+
+export function updateChannel(channelId: number, channel: Channel) {
+  let data = getData();
+  for (let i = 0 ; i < data.channels.length; i++) {
+    if (data.channels[i].channelId === channelId) {
+      data.channels[i] = channel;
+    }
+  }
+  setData(data);
 }

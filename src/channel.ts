@@ -1,6 +1,7 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
 import { getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
+import {updateChannel} from './helper';
 import { userProfileV1 } from './users';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
@@ -21,24 +22,17 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
  */
 
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
-  if (!checkValidChannel(channelId) || !checkValidToken(token)) {
+  if (!checkValidChannel(channelId)) {
     return errorMsg;
   }
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
+  else if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+  else if (!isMember(token, channelId)) {
+    return errorMsg;
+  }
+
   const currChannel = returnValidChannel(channelId);
-
-  let isMember = false;
-  for (const member of currChannel.allMembers) {
-    if (user.user.uId === member.uId) {
-      isMember = true;
-    }
-  }
-
-  if (isMember === false) {
-    return errorMsg;
-  }
-
   const owners = [];
   const members = [];
 
@@ -98,11 +92,11 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
   if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
     return errorMsg;
   }
+
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
   const data = getData();
-  const newUser = userProfileV1(token, user.uId) as userReturn;
-  channel.allMembers.push(newUser.user);
-  setData(data);
+  channel.allMembers.push(user);
+  updateChannel(channelId, channel);
   return {};
 }
 /**
@@ -233,15 +227,16 @@ function channelMessagesV2(token: string, channelId: number, start: number): (er
 
 function channelLeaveV1(token: string, channelId: number): (error | object) {
   const data = getData();
-  if (!checkValidChannel(channelId) || !checkValidToken(token) || !isMember(token, channelId)) {
+  if (!checkValidChannel(channelId)) {
+    return errorMsg;
+  } else if (!checkValidToken(token) || !isMember(token, channelId)) {
     return errorMsg;
   }
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
+  const user = returnValidUser(token);
   const currChannel = returnValidChannel(channelId);
-  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.user.uId);
-  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.user.uId);
-  setData(data);
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
+  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
+  updateChannel(channelId, currChannel);
   return {};
 }
 
@@ -268,8 +263,6 @@ function channelLeaveV1(token: string, channelId: number): (error | object) {
 
 function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | object) {
   const data = getData();
-  // const tempuId = returnValidUser(token);
-  // const user = userProfileV1(token, tempuId.uId) as userReturn;
   if (!checkValidToken(token) || !checkValidUser(uId) || !checkValidChannel(channelId)) {
     return errorMsg;
   }
@@ -282,7 +275,7 @@ function channelAddOwnerV1(token: string, channelId: number, uId: number): (erro
   const newOwnerProfile = userProfileV1(token, uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
   currChannel.ownerMembers.push(newOwnerProfile.user);
-  setData(data);
+  updateChannel(channelId, currChannel);
   return {};
 }
 
@@ -323,8 +316,9 @@ function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (e
   if (currChannel.ownerMembers.length === 1) {
     return errorMsg;
   }
+  
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.user.uId);
-  setData(data);
+  updateChannel(channelId, currChannel);
   return {};
 }
 
