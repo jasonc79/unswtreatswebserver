@@ -30,7 +30,7 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
   const data = getData();
   const user = returnValidUser(token);
   const channelId = data.channels.length;
-  
+
   const newChannel : Channel = {
     channelId: channelId,
     name: name,

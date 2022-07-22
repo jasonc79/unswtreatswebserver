@@ -103,7 +103,6 @@ function setData(newData: Data) {
   saveData();
 }
 
-
 function saveData() {
   fs.writeFileSync(fileName, JSON.stringify(data));
 }
@@ -112,7 +111,7 @@ function loadData() {
   if (fs.existsSync(fileName)) {
     data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
   }
-} 
+}
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };

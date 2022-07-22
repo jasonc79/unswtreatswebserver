@@ -282,10 +282,9 @@ export function isGlobalOwner(token: string) : boolean {
   return false;
 }
 
-
 export function updateChannel(channelId: number, channel: Channel) {
-  let data = getData();
-  for (let i = 0 ; i < data.channels.length; i++) {
+  const data = getData();
+  for (let i = 0; i < data.channels.length; i++) {
     if (data.channels[i].channelId === channelId) {
       data.channels[i] = channel;
     }

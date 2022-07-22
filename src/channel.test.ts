@@ -2,8 +2,6 @@ import { requestChannelCreate, requestChannelMessages, requestChannelInvite, req
 import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear, errorMsg } from './helperTests';
 import { removeFile } from './helperTests';
 
-import {requestChannelsListAll,requestAllUsers} from './helperTests';
-
 let authUser: authUserReturn;
 
 beforeEach(() => {
@@ -266,12 +264,12 @@ describe('Testing channelRemoveOwnerV1', () => {
     expect(details).toStrictEqual({});
     const details2 = requestChannelRemoveOwner(authUser.token, channel.channelId, removeOwner.authUserId);
     expect(details2).toStrictEqual({});
-    
+
     const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
     const removeUserInfo = requestUserProfile(removeOwner.token, removeOwner.authUserId);
     const channeldetails = requestChannelDetails(removeOwner.token, channel.channelId);
     expect(channeldetails).toStrictEqual(
-        {
+      {
         name: 'correct name',
         isPublic: true,
         ownerMembers: [{
@@ -283,19 +281,19 @@ describe('Testing channelRemoveOwnerV1', () => {
         }],
         allMembers: [
           {
-          uId: userInfo.user.uId,
-          email: userInfo.user.email,
-          handleStr: userInfo.user.handleStr,
-          nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
-        },
-        {
-          uId: removeUserInfo.user.uId,
-          email: removeUserInfo.user.email,
-          handleStr: removeUserInfo.user.handleStr,
-          nameFirst: removeUserInfo.user.nameFirst,
-          nameLast: removeUserInfo.user.nameLast
-        }],
+            uId: userInfo.user.uId,
+            email: userInfo.user.email,
+            handleStr: userInfo.user.handleStr,
+            nameFirst: userInfo.user.nameFirst,
+            nameLast: userInfo.user.nameLast
+          },
+          {
+            uId: removeUserInfo.user.uId,
+            email: removeUserInfo.user.email,
+            handleStr: removeUserInfo.user.handleStr,
+            nameFirst: removeUserInfo.user.nameFirst,
+            nameLast: removeUserInfo.user.nameLast
+          }],
       }
     );
   });
@@ -409,7 +407,7 @@ describe('Testing channelJoinV1', () => {
         ownerMembers: [
           {
             uId: authUser2.authUserId,
-            email:'email2@gmail.com',
+            email: 'email2@gmail.com',
             nameFirst: 'firstname2',
             nameLast: 'lastname2',
             handleStr: 'firstname2lastname2'
@@ -418,14 +416,14 @@ describe('Testing channelJoinV1', () => {
         allMembers: [
           {
             uId: authUser2.authUserId,
-            email:'email2@gmail.com',
+            email: 'email2@gmail.com',
             nameFirst: 'firstname2',
             nameLast: 'lastname2',
             handleStr: 'firstname2lastname2'
           },
           {
             uId: authUser.authUserId,
-            email:'email1@gmail.com',
+            email: 'email1@gmail.com',
             nameFirst: 'firstname1',
             nameLast: 'lastname1',
             handleStr: 'firstname1lastname1'
@@ -435,4 +433,3 @@ describe('Testing channelJoinV1', () => {
     );
   });
 });
-
