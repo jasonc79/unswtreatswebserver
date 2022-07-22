@@ -1,5 +1,6 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, errorMsg, requestClear } from './helperTests';
 import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
+import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
 
@@ -9,8 +10,14 @@ const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
 beforeEach(() => {
+  removeFile();
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
+});
+
+afterEach(() => {
+  removeFile();
+  requestClear();
 });
 
 describe('Testing messageSendV1', () => {
@@ -90,11 +97,7 @@ describe('Testing messageSenddmV1', () => {
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('dmId is invalid', () => {
-      const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
-      const uIds = [];
-      uIds.push(uId1.authUserId);
-      const dm = requestDmCreate(authUser.token, uIds);
-      const messageId = requestMessageSenddm(authUser.token, dm.dmId + 1, 'message');
+      const messageId = requestMessageSenddm(authUser.token, 404, 'message');
       expect(messageId).toStrictEqual(errorMsg);
     });
     test('length of message is less than 1', () => {
