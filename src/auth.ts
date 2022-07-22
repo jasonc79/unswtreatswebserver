@@ -1,5 +1,5 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
-import { checkValidToken } from './helper';
+import { checkValidToken, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
 
 /**
@@ -47,7 +47,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     nameLast: nameLast,
     handleStr: handle,
     password: password,
-    token: token,
+    token: [token],
     permissionId: 2,
   };
   // Global owner
@@ -81,7 +81,6 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
 
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-  const data = getData();
   const token = generateToken();
   if (!user) {
     return errorMsg;
@@ -90,13 +89,9 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
   if (user.password !== password) {
     return errorMsg;
   }
-
-  for (const user of data.users) {
-    if (user.email === email && user.password === password) {
-      user.token = token;
-    }
-  }
-  setData(data);
+  const uId = user.uId;
+  user.token.push(token);
+  updateUser(uId, user);
 
   return {
     token: token,
@@ -121,14 +116,10 @@ const authLogoutV1 = (token: token) : object | error => {
   if (!checkValidToken) {
     return errorMsg;
   }
-  const data = getData();
 
-  for (const i in data.users) {
-    if (data.users[i].token === token) {
-      data.users[i].token = '-1';
-    }
-  }
-  setData(data);
+  const user = returnValidUser(token);
+  user.token = user.token.filter((temp: token) => temp !== token);
+  updateUser(user.uId, user);
   return {};
 };
 
