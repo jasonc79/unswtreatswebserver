@@ -23,8 +23,10 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
     return errorMsg;
   }
+
   const authUserId = returnValidUser(token);
   const authUser = userProfileV1(token, authUserId.uId) as userReturn;
+
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
     if (!checkValidUser(u)) {
