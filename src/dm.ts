@@ -266,7 +266,7 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
         end: -1,
       };
     }
-    messages.push(dmMsg[i]);
+    messages.unshift(dmMsg[i]);
   }
   return {
     messages: messages,

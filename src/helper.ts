@@ -273,3 +273,11 @@ export function isOwnerFromId(uId: number, channelId: number) : boolean {
   }
   return false;
 }
+
+export function isGlobalOwner(token: string) : boolean {
+  const user = returnValidUser(token);
+  if (user.permissionId === 1) {
+    return true;
+  }
+  return false;
+}
