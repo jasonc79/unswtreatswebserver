@@ -20,12 +20,11 @@ import { userProfileV1 } from './users';
  */
 type dmId = { dmId: number };
 const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
-  const authUserId = returnValidUser(token);
-  const authUser = userProfileV1(token, authUserId.uId) as userReturn;
-  if (!checkValidToken) {
+  if (!checkValidToken(token)) {
     return errorMsg;
   }
-
+  const authUserId = returnValidUser(token);
+  const authUser = userProfileV1(token, authUserId.uId) as userReturn;
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
     if (!checkValidUser(u)) {
@@ -265,7 +264,7 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
         end: -1,
       };
     }
-    messages.push(dmMsg[i]);
+    messages.unshift(dmMsg[i]);
   }
   return {
     messages: messages,
