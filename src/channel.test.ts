@@ -318,7 +318,7 @@ describe('Testing channelRemoveOwnerV1', () => {
   test('uId is not part of channel', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const authUser3 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const authUser3 = requestAuthRegister('emai3@gmail.com', 'password2', 'firstname2', 'lastname2');
     const channel = requestChannelCreate(authUser.token, 'correct name', true);
     requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
     const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser3.authUserId);

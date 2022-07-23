@@ -1,5 +1,6 @@
 import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
+import {checkValidEmail} from './auth';
 import validator from 'validator';
 
 /*
@@ -79,7 +80,8 @@ Return Value:
     Returns {} on no error
  */
 function userSetEmailV1(token: string, email: string) {
-  if (!validator.isEmail(email)) {
+  email = email.toLowerCase();
+  if (!checkValidEmail(email)) {
     return errorMsg;
   } else if (!checkValidToken(token)) {
     return errorMsg;
@@ -90,6 +92,16 @@ function userSetEmailV1(token: string, email: string) {
   updateUser(user.uId, user);
   return {};
 }
+
+const checkEmailExists = (email: string) => {
+  const data = getData();
+  for (const user of data.users) {
+    if (user.email === email) {
+      return true;
+    }
+  }
+  return false;
+};
 
 /*
 Update the authorised user's handle (i.e. display name)

@@ -1,6 +1,7 @@
 import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
+import HTTPError from 'http-errors';
 
 /**
  * authRegisterV1
@@ -26,13 +27,13 @@ import validator from 'validator';
 const authRegisterV1 = (email: string, password: string, nameFirst: string, nameLast: string): authUserId | error => {
   // Error Checking
   if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
-    return errorMsg;
+    throw HTTPError(400, 'Length of name is not between 1 and 50 characters inclusive');
   }
   if (password.length < 6) {
-    return errorMsg;
+    throw HTTPError(400, 'Password length is less than 6 characters');
   }
   if (!checkValidEmail(email)) {
-    return errorMsg;
+    throw HTTPError(400, 'Email is not valid, or is already being used');
   }
   email = email.toLowerCase();
   const data = getData();
@@ -83,11 +84,11 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
   const token = generateToken();
   if (!user) {
-    return errorMsg;
+    throw HTTPError(400, 'Email does not belong to a user');
   }
 
   if (user.password !== password) {
-    return errorMsg;
+    throw HTTPError(400, 'Password is not correct');
   }
   const uId = user.uId;
   user.token.push(token);
@@ -113,10 +114,10 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
  */
 
 const authLogoutV1 = (token: token) : object | error => {
-  if (!checkValidToken) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
   }
-
+ 
   const user = returnValidUser(token);
   user.token = user.token.filter((temp: token) => temp !== token);
   updateUser(user.uId, user);
@@ -135,7 +136,7 @@ const checkNameLength = (name: string) : boolean => {
 };
 
 // Check if an email is valid. Returns true if valid and false otherwise.
-const checkValidEmail = (email: string): boolean => {
+export const checkValidEmail = (email: string): boolean => {
   if (!validator.isEmail(email)) {
     return false;
   }

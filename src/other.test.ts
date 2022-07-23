@@ -17,8 +17,7 @@ describe(('Testing clearV1'), () => {
   test('Cleared successfully', () => {
     requestAuthRegister(email0, password0, nameFirst0, nameLast0);
     const clearReturn = requestClear();
-    const authUser = requestAuthLogin(email0, password0);
-    expect(authUser).toStrictEqual(errorMsg);
+    const authUser = requestAuthLogin(email0, password0, 400);
     expect(clearReturn).toStrictEqual({});
   });
 });

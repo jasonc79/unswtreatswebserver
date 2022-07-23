@@ -36,44 +36,36 @@ function testHandle(password: string, email: string, nameFirst: string, nameLast
 
 describe('Testing auth/register/v2', () => {
   test('Invalid email (no @)', () => {
-    const authUser = requestAuthRegister('invalidEmail', password0, nameFirst0, nameLast0);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister('invalidEmail', password0, nameFirst0, nameLast0, 400);
   });
 
   test('Invalid email (nothing after @)', () => {
-    const authUser = requestAuthRegister('invalidEmail@', password0, nameFirst0, nameLast0);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister('invalidEmail@', password0, nameFirst0, nameLast0, 400);
   });
 
   test('Email already exists', () => {
-    requestAuthRegister(email0, password0, nameFirst0, nameLast0);
-    const authUser = requestAuthRegister(email0, password1, nameFirst1, nameLast1);
-    expect(authUser).toEqual(errorMsg);
+    requestAuthRegister(email0, password0, nameFirst0, nameLast0, 200);
+    requestAuthRegister(email0, password1, nameFirst1, nameLast1, 400);
   });
 
   test('Password is less than 6 characters (5 characters)', () => {
-    const authUser = requestAuthRegister(email0, 'apple', nameFirst0, nameLast0);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister(email0, 'apple', nameFirst0, nameLast0, 400);
   });
 
   test('Length of nameFirst is exactly 51 characters', () => {
-    const authUser = requestAuthRegister(email0, password0, longName, nameLast0);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister(email0, password0, longName, nameLast0, 400);
   });
 
   test('nameFirst is an empty string', () => {
-    const authUser = requestAuthRegister(email0, password0, '', nameLast0);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister(email0, password0, '', nameLast0, 400);
   });
 
   test('Length of nameLast is exactly 51 characters', () => {
-    const authUser = requestAuthRegister(email0, password0, nameFirst0, longName);
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister(email0, password0, nameFirst0, longName, 400);
   });
 
   test('nameLast is an empty string', () => {
-    const authUser = requestAuthRegister(email0, password0, nameFirst0, '');
-    expect(authUser).toEqual(errorMsg);
+    const authUser = requestAuthRegister(email0, password0, nameFirst0, '', 400);
   });
 
   test('Testing handle generation (exactly 20 characters)', () => {
@@ -228,19 +220,17 @@ describe('Testing auth/register/v2', () => {
 
 describe('Testing authLoginV1', () => {
   test('Email does not exist', () => {
-    const authUser = requestAuthLogin(email0, password0);
-    expect(authUser).toStrictEqual(errorMsg);
+    const authUser = requestAuthLogin(email0, password0, 400);
   });
 
   test('Incorrect password', () => {
-    requestAuthRegister(email0, password0, nameFirst0, nameLast0);
-    const authUser = requestAuthLogin(email0, 'wrongPassword');
-    expect(authUser).toStrictEqual(errorMsg);
+    requestAuthRegister(email0, password0, nameFirst0, nameLast0, 200);
+    const authUser = requestAuthLogin(email0, 'wrongPassword', 400);
   });
 
   test('Correct return', () => {
     requestAuthRegister(email0, password0, nameFirst0, nameLast0);
-    const authUser = requestAuthLogin(email0, password0);
+    const authUser = requestAuthLogin(email0, password0, 200);
     expect(authUser).toStrictEqual(
       expect.objectContaining({
         token: expect.any(String),
@@ -251,11 +241,16 @@ describe('Testing authLoginV1', () => {
 });
 
 describe('Testing auth/logout/v2', () => {
+  test('Testing invalid token (403)', () => {
+    requestAuthLogout('invalidToken', 403);
+  });
   test('Testing successful logout', () => {
     const authUser = requestAuthRegister('email@email.com', 'password', 'name', 'name2');
     const authLogoutReturn = requestAuthLogout(authUser.token);
     expect(authLogoutReturn).toStrictEqual({});
+    // CHANGE THIS TEST CASE WHEN CHANNEL CREATE THROWS EXCEPTIONS
     const channel = requestChannelCreate(authUser.token, 'channel', true);
     expect(channel).toStrictEqual(errorMsg);
   });
+  
 });
