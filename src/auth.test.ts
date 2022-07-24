@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, errorMsg, requestClear } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear, errorMsg } from './helperTests';
 import { requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -36,11 +36,11 @@ function testHandle(password: string, email: string, nameFirst: string, nameLast
 
 describe('Testing auth/register/v2', () => {
   test('Invalid email (no @)', () => {
-    const authUser = requestAuthRegister('invalidEmail', password0, nameFirst0, nameLast0, 400);
+    requestAuthRegister('invalidEmail', password0, nameFirst0, nameLast0, 400);
   });
 
   test('Invalid email (nothing after @)', () => {
-    const authUser = requestAuthRegister('invalidEmail@', password0, nameFirst0, nameLast0, 400);
+    requestAuthRegister('invalidEmail@', password0, nameFirst0, nameLast0, 400);
   });
 
   test('Email already exists', () => {
@@ -49,23 +49,23 @@ describe('Testing auth/register/v2', () => {
   });
 
   test('Password is less than 6 characters (5 characters)', () => {
-    const authUser = requestAuthRegister(email0, 'apple', nameFirst0, nameLast0, 400);
+    requestAuthRegister(email0, 'apple', nameFirst0, nameLast0, 400);
   });
 
   test('Length of nameFirst is exactly 51 characters', () => {
-    const authUser = requestAuthRegister(email0, password0, longName, nameLast0, 400);
+    requestAuthRegister(email0, password0, longName, nameLast0, 400);
   });
 
   test('nameFirst is an empty string', () => {
-    const authUser = requestAuthRegister(email0, password0, '', nameLast0, 400);
+    requestAuthRegister(email0, password0, '', nameLast0, 400);
   });
 
   test('Length of nameLast is exactly 51 characters', () => {
-    const authUser = requestAuthRegister(email0, password0, nameFirst0, longName, 400);
+    requestAuthRegister(email0, password0, nameFirst0, longName, 400);
   });
 
   test('nameLast is an empty string', () => {
-    const authUser = requestAuthRegister(email0, password0, nameFirst0, '', 400);
+    requestAuthRegister(email0, password0, nameFirst0, '', 400);
   });
 
   test('Testing handle generation (exactly 20 characters)', () => {
@@ -220,12 +220,12 @@ describe('Testing auth/register/v2', () => {
 
 describe('Testing authLoginV1', () => {
   test('Email does not exist', () => {
-    const authUser = requestAuthLogin(email0, password0, 400);
+    requestAuthLogin(email0, password0, 400);
   });
 
   test('Incorrect password', () => {
     requestAuthRegister(email0, password0, nameFirst0, nameLast0, 200);
-    const authUser = requestAuthLogin(email0, 'wrongPassword', 400);
+    requestAuthLogin(email0, 'wrongPassword', 400);
   });
 
   test('Correct return', () => {
@@ -252,5 +252,4 @@ describe('Testing auth/logout/v2', () => {
     const channel = requestChannelCreate(authUser.token, 'channel', true);
     expect(channel).toStrictEqual(errorMsg);
   });
-  
 });

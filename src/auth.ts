@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
+import { getData, setData, error, authUserId, token } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
 import HTTPError from 'http-errors';
@@ -117,7 +117,7 @@ const authLogoutV1 = (token: token) : object | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
- 
+
   const user = returnValidUser(token);
   user.token = user.token.filter((temp: token) => temp !== token);
   updateUser(user.uId, user);

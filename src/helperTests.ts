@@ -19,10 +19,10 @@ export const errorMsg = { error: 'error' };
 
 /**
  * requestHelper
- * 
+ *
  * @param {string } method  are the HTTP methods 'GET', 'DELETE', 'PUT', 'POST'
  * @param {string } path    the path for your http route
- * @param payload 
+ * @param payload
  * @param {number} err      is the status code of the error '400' or '403' or '200'
  *                          you may leave undefined if no error (status code 200)
  * @returns request
@@ -35,7 +35,7 @@ function requestHelper(method: HttpVerb, path: string, payload: object, err?: nu
   } else {
     json = payload;
   }
-  const res =  request(method, url + ':' + port + path, { qs, json });
+  const res = request(method, url + ':' + port + path, { qs, json });
   if (err === FORBIDDEN) {
     expect(res.statusCode).toEqual(FORBIDDEN);
   } else if (err === BAD) {
@@ -184,4 +184,4 @@ export function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
 }
 
-export {OK, BAD, FORBIDDEN}; 
+export { OK, BAD, FORBIDDEN };

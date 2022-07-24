@@ -1,7 +1,6 @@
 import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
-import {checkValidEmail} from './auth';
-import validator from 'validator';
+import { checkValidEmail } from './auth';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -92,16 +91,6 @@ function userSetEmailV1(token: string, email: string) {
   updateUser(user.uId, user);
   return {};
 }
-
-const checkEmailExists = (email: string) => {
-  const data = getData();
-  for (const user of data.users) {
-    if (user.email === email) {
-      return true;
-    }
-  }
-  return false;
-};
 
 /*
 Update the authorised user's handle (i.e. display name)
