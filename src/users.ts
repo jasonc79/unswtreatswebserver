@@ -1,6 +1,6 @@
 import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
-import validator from 'validator';
+import { checkValidEmail } from './auth';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -79,7 +79,8 @@ Return Value:
     Returns {} on no error
  */
 function userSetEmailV1(token: string, email: string) {
-  if (!validator.isEmail(email)) {
+  email = email.toLowerCase();
+  if (!checkValidEmail(email)) {
     return errorMsg;
   } else if (!checkValidToken(token)) {
     return errorMsg;

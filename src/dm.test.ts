@@ -89,12 +89,11 @@ describe('Testing dm/details/v1', () => {
   });
 
   test('dmId is valid and the authorised user is not a member of the DM', () => {
-    const authUser1 = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
-    const authUser2 = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
-    const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+    const authUser2 = requestAuthRegister('email1@email.com', 'password0', 'nameFirst0', 'nameLast0');
+    const uId1 = requestAuthRegister('email2@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds = [];
     uIds.push(uId1.authUserId);
-    const dm = requestDmCreate(authUser1.token, uIds);
+    const dm = requestDmCreate(authUser.token, uIds);
     const dmDetail = requestDmDetails(authUser2.token, dm);
     expect(dmDetail).toStrictEqual(errorMsg);
   });
@@ -303,7 +302,7 @@ describe('Testing dmMessagesV1', () => {
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    const authUser3 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const authUser3 = requestAuthRegister('emai3@gmail.com', 'password2', 'firstname2', 'lastname2');
     const messages = requestDmMessages(authUser3.token, dm.dmId, 0);
     expect(messages).toStrictEqual(errorMsg);
   });

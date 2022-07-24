@@ -61,7 +61,7 @@ describe('Testing userSetNameV1', () => {
   });
 
   test('Invalid Name', () => {
-    const authUser = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const authUser = requestAuthRegister('newEmail@gmail.com', 'password1', 'Dan', 'Smith');
     const nameFirst = 'A';
     const nameLast = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     const setNameValidator = requestUserSetName(authUser.token, nameFirst, nameLast);
@@ -71,18 +71,18 @@ describe('Testing userSetNameV1', () => {
 
 describe('Testing userSetEmailV1', () => {
   test('Valid Email', () => {
-    const setEmailValidator = requestUserEmail(authUser.token, 'email@gmail.com');
+    const setEmailValidator = requestUserEmail(authUser.token, 'newEmail@gmail.com');
     expect(setEmailValidator).toStrictEqual({});
   });
   test('Invalid Email', () => {
-    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const authUser1 = requestAuthRegister('newEmail@gmail.com', 'password1', 'Dan', 'Smith');
     const setEmailValidator = requestUserEmail(authUser1.token, 'email@gmail,com');
     expect(setEmailValidator).toStrictEqual(errorMsg);
   });
   test('Invalid Email - Already being used by another user', () => {
-    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
-    requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
-    const setEmailValidator = requestUserEmail(authUser1.token, 'email1@gmail.com');
+    const authUser1 = requestAuthRegister('newEmail@gmail.com', 'password1', 'Dan', 'Smith', 200);
+    requestAuthRegister('newEmail2@gmail.com', 'password2', 'Jason', 'Chen', 200);
+    const setEmailValidator = requestUserEmail(authUser1.token, 'newEmail2@gmail.com');
     expect(setEmailValidator).toStrictEqual(errorMsg);
   });
 });
@@ -105,7 +105,7 @@ describe('Testing userSetHandleV1', () => {
     expect(setHandleValidator).toStrictEqual(errorMsg);
   });
   test('Invalid Email - Already being used by another user', () => {
-    const authUser1 = requestAuthRegister('email@gmail.com', 'password1', 'Dan', 'Smith');
+    const authUser1 = requestAuthRegister('newemail@gmail.com', 'password1', 'Dan', 'Smith');
     requestAuthRegister('email1@gmail.com', 'password2', 'Jason', 'Chen');
     const sethandleValidator = requestUserEmail(authUser1.token, 'jasonchen');
     expect(sethandleValidator).toStrictEqual(errorMsg);

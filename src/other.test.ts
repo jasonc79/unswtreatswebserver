@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, errorMsg, requestClear, removeFile } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestClear, removeFile } from './helperTests';
 
 const email0 = 'email@gmail.com';
 const password0 = 'password';
@@ -17,8 +17,7 @@ describe(('Testing clearV1'), () => {
   test('Cleared successfully', () => {
     requestAuthRegister(email0, password0, nameFirst0, nameLast0);
     const clearReturn = requestClear();
-    const authUser = requestAuthLogin(email0, password0);
-    expect(authUser).toStrictEqual(errorMsg);
+    requestAuthLogin(email0, password0, 400);
     expect(clearReturn).toStrictEqual({});
   });
 });

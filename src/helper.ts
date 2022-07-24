@@ -1,5 +1,15 @@
 import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
 
+// INCLUDES FUNCTIONS FOR:
+// - Checking whether a function exits
+// - Returning an object
+// - Getting/returning using ids
+// - Checking whether a property is satisfied
+// - Updating objects in the datastore
+
+//= ==========================================================================//
+// CHECKING FUNCTIONS - RETURNS BOOLEAN                                      //
+//= ==========================================================================//
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise
  * property : users | channels
@@ -25,7 +35,7 @@ export function checkValidChannel(id: number) : boolean {
 }
 
 /**
- * returns true if the id corresponds to a valid token, and false otherwise
+ * returns true if the id corresponds to a valid token. Throws an error otherwise
  */
 export function checkValidToken(token: token) : boolean {
   const data: Data = getData();
@@ -102,7 +112,9 @@ export function checkDmMessageSender(token: string, messageId: number) : boolean
   }
   return false;
 }
-
+//= ==========================================================================//
+// RETURN FUNCTIONS - RETURNS AN OBJECT                                      //
+//= ==========================================================================//
 /**
  * returns the details about a user given their id
  */
@@ -175,6 +187,9 @@ export function returnValidMessagefromDm(messageId: number) : Message {
   }
 }
 
+//= ==========================================================================//
+// GET OR RETURN OBJECTS USING IDS                                                                   //
+//= ==========================================================================//
 /**
  * returns the user id given the token
  */
@@ -213,6 +228,10 @@ export function getDmfromMessage(id: number): Dm {
     }
   }
 }
+
+//= ==========================================================================//
+// CHECKING WHETHER A PROPERTY IS SATISFIED                                  //
+//= ==========================================================================//
 
 /**
  * returns true if the user is a member of the channel or an owner of a channel, and false otherwise
@@ -288,6 +307,10 @@ export function isGlobalOwner(token: string) : boolean {
   }
   return false;
 }
+
+//= ==========================================================================//
+// UPDATES THE DATASTORE                                                     //
+//= ==========================================================================//
 
 // Update a user using their uid
 export function updateUser(uId: number, user: User) {
