@@ -58,7 +58,7 @@ export function removeFile() {
 
 // Auth Functions
 export function requestAuthRegister(email: string, password: string, nameFirst: string, nameLast: string, err?: number) {
-  return requestHelper('POST', '/auth/register/v2', {
+  return requestHelper('POST', '/auth/register/v3', {
     email: email,
     password: password,
     nameFirst: nameFirst,
@@ -67,14 +67,14 @@ export function requestAuthRegister(email: string, password: string, nameFirst: 
 }
 
 export function requestAuthLogin(email: string, password: string, err?: number) {
-  return requestHelper('POST', '/auth/login/v2', {
+  return requestHelper('POST', '/auth/login/v3', {
     email: email,
     password: password,
   }, err);
 }
 
 export function requestAuthLogout(token: string, err?: number) {
-  return requestHelper('POST', '/auth/logout/v1', { token: token }, err);
+  return requestHelper('POST', '/auth/logout/v2', { token: token }, err);
 }
 // Channels functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean, err?: number) {
@@ -183,5 +183,3 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
 export function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
 }
-
-export { OK, BAD, FORBIDDEN };

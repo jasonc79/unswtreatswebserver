@@ -36,7 +36,7 @@ app.use(errorHandler());
 
 // ================================================================ //
 // Auth functions
-app.post('/auth/register/v2', (req, res, next) => {
+app.post('/auth/register/v3', (req, res, next) => {
   try {
     const { email, password, nameFirst, nameLast } = req.body;
     return res.json(authRegisterV1(email, password, nameFirst, nameLast));
@@ -45,7 +45,7 @@ app.post('/auth/register/v2', (req, res, next) => {
   }
 });
 
-app.post('/auth/login/v2', (req, res, next) => {
+app.post('/auth/login/v3', (req, res, next) => {
   try {
     const { email, password } = req.body;
     return res.json(authLoginV1(email, password));
@@ -54,7 +54,7 @@ app.post('/auth/login/v2', (req, res, next) => {
   }
 });
 
-app.post('/auth/logout/v1', (req, res, next) => {
+app.post('/auth/logout/v2', (req, res, next) => {
   try {
     const { token } = req.body;
     return res.json(authLogoutV1(token));
