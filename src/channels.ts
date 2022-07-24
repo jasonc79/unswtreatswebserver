@@ -27,19 +27,16 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
   if (name.length < 1 || name.length > 20 || !checkValidToken(token)) {
     return errorMsg;
   }
-  const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
-
   const data = getData();
+  const user = returnValidUser(token);
   const channelId = data.channels.length;
-  // const uId = returnValidUser(token).uId;
-  // const user = userProfileV1(token, uId) as userReturn;
+
   const newChannel : Channel = {
     channelId: channelId,
     name: name,
     messages: [],
-    allMembers: [user.user],
-    ownerMembers: [user.user],
+    allMembers: [user],
+    ownerMembers: [user],
     isPublic: isPublic,
   };
   data.channels.push(newChannel);

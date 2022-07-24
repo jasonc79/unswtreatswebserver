@@ -1,4 +1,4 @@
-import { Channel, getData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
 
 /**
  * returns true if the id corresponds to a valid user or channel, and false otherwise
@@ -30,8 +30,10 @@ export function checkValidChannel(id: number) : boolean {
 export function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return true;
+    for (const existToken of user.token) {
+      if (existToken === token) {
+        return true;
+      }
     }
   }
   return false;
@@ -131,10 +133,13 @@ export function returnValidChannel(id: number) : Channel {
 export function returnValidUser(token: string) : User {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user;
+    for (const existToken of user.token) {
+      if (existToken === token) {
+        return user;
+      }
     }
   }
+  throw new Error('User does not exist from token');
 }
 
 export function returnValidDm(id: number): Dm {
@@ -176,8 +181,10 @@ export function returnValidMessagefromDm(messageId: number) : Message {
 export function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
-    if (user.token === token) {
-      return user.uId;
+    for (const existToken of user.token) {
+      if (existToken === token) {
+        return user.uId;
+      }
     }
   }
 }
@@ -280,4 +287,25 @@ export function isGlobalOwner(token: string) : boolean {
     return true;
   }
   return false;
+}
+
+// Update a user using their uid
+export function updateUser(uId: number, user: User) {
+  const data = getData();
+  for (let i = 0; i < data.users.length; i++) {
+    if (data.users[i].uId === uId) {
+      data.users[i] = user;
+    }
+  }
+  setData(data);
+}
+
+export function updateChannel(channelId: number, channel: Channel) {
+  const data = getData();
+  for (let i = 0; i < data.channels.length; i++) {
+    if (data.channels[i].channelId === channelId) {
+      data.channels[i] = channel;
+    }
+  }
+  setData(data);
 }

@@ -1,5 +1,5 @@
-import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
-import { returnValidId, checkValidToken, checkValidUser } from './helper';
+import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
+import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
 
 /*
@@ -59,14 +59,11 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
   if (!checkValidToken(token) || firstNameLength > 50 || firstNameLength < 1 || lastNameLength > 50 || lastNameLength < 1) {
     return errorMsg;
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.nameFirst = nameFirst;
-      user.nameLast = nameLast;
-    }
-  }
-  setData(data);
+
+  const user = returnValidUser(token);
+  user.nameFirst = nameFirst;
+  user.nameLast = nameLast;
+  updateUser(user.uId, user);
   return {};
 }
 /*
@@ -84,19 +81,13 @@ Return Value:
 function userSetEmailV1(token: string, email: string) {
   if (!validator.isEmail(email)) {
     return errorMsg;
+  } else if (!checkValidToken(token)) {
+    return errorMsg;
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token !== user.token && email === user.email) {
-      return errorMsg;
-    }
-  }
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.email = email;
-    }
-  }
-  setData(data);
+
+  const user = returnValidUser(token);
+  user.email = email;
+  updateUser(user.uId, user);
   return {};
 }
 
@@ -117,19 +108,18 @@ function userSetHandleV1(token: string, handleStr: string) {
   const handleLength = handleStr.length;
   if (handleLength > 20 || handleLength < 3 || handleStr.match(/^[0-9A-Za-z]+$/) === null) {
     return errorMsg;
+  } else if (!checkValidToken(token)) {
+    return errorMsg;
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token !== user.token && handleStr === user.handleStr) {
-      return errorMsg;
-    }
+  const user = returnValidUser(token);
+  // Cannot update handle str (same handlestr)
+  if (handleStr.localeCompare(user.handleStr) === 0) {
+    return errorMsg;
   }
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.handleStr = handleStr;
-    }
-  }
-  setData(data);
+
+  user.handleStr = handleStr;
+  updateUser(user.uId, user);
+
   return {};
 }
 
