@@ -93,7 +93,7 @@ app.post('/channel/join/v2', (req, res, next) => {
 
 // ================================================================ //
 // User functions
-app.get('/user/profile/v2', (req, res, next) => {
+app.get('/user/profile/v3', (req, res, next) => {
   try {
     const token = req.query.token as string;
     const uId = req.query.uId as string;
@@ -102,7 +102,7 @@ app.get('/user/profile/v2', (req, res, next) => {
     next(err);
   }
 });
-app.put('/user/profile/setname/v1', (req, res, next) => {
+app.put('/user/profile/setname/v2', (req, res, next) => {
   try {
     const { token, nameFirst, nameLast } = req.body;
     return res.json(userSetNameV1(token, nameFirst, nameLast));
@@ -110,7 +110,7 @@ app.put('/user/profile/setname/v1', (req, res, next) => {
     next(err);
   }
 });
-app.put('/user/profile/setemail/v1', (req, res, next) => {
+app.put('/user/profile/setemail/v2', (req, res, next) => {
   try {
     const { token, email } = req.body;
     return res.json(userSetEmailV1(token, email));
@@ -118,7 +118,7 @@ app.put('/user/profile/setemail/v1', (req, res, next) => {
     next(err);
   }
 });
-app.put('/user/profile/sethandle/v1', (req, res, next) => {
+app.put('/user/profile/sethandle/v2', (req, res, next) => {
   try {
     const { token, handleStr } = req.body;
     return res.json(userSetHandleV1(token, handleStr));
@@ -127,7 +127,7 @@ app.put('/user/profile/sethandle/v1', (req, res, next) => {
   }
 });
 
-app.get('/users/all/v1', (req, res, next) => {
+app.get('/users/all/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
     return res.json(usersAllV1(token));

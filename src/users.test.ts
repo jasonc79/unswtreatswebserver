@@ -84,7 +84,7 @@ describe('Testing userProfileV1', () => {
     const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
     const uId = authUser.authUserId + 1;
     const profile = requestUserProfile(authUser.token, uId);
-    expect(profile).toStrictEqual(errorMsg);
+    expect(profile).toStrictEqual(403);
   });
 });
 
@@ -100,7 +100,7 @@ describe('Testing userSetNameV1', () => {
     const nameFirst = 'A';
     const nameLast = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     const setNameValidator = requestUserSetName(authUser.token, nameFirst, nameLast);
-    expect(setNameValidator).toStrictEqual(errorMsg);
+    expect(setNameValidator).toStrictEqual(400);
   });
 });
 

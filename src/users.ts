@@ -1,6 +1,7 @@
 import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser } from './helper';
 import validator from 'validator';
+import HTTPError from 'http-errors';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -24,8 +25,11 @@ Return Value:
 */
 
 function userProfileV1(token: string, uId: number) : error | userReturn {
-  if (!checkValidUser(uId) || !checkValidToken(token)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+  if (!checkValidUser(uId)) {
+    throw HTTPError(400, 'uId does not refer to a valid user');
   }
   const user = returnValidId(uId);
   return {
@@ -55,8 +59,15 @@ function userProfileV1(token: string, uId: number) : error | userReturn {
 function userSetNameV1(token: string, nameFirst: string, nameLast: string) : object | error {
   const firstNameLength = nameFirst.length;
   const lastNameLength = nameLast.length;
-  if (!checkValidToken(token) || firstNameLength > 50 || firstNameLength < 1 || lastNameLength > 50 || lastNameLength < 1) {
-    return errorMsg;
+  // Error Checking
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+  if (firstNameLength > 50 || firstNameLength < 1) {
+    throw HTTPError(400, 'Length of nameFirst is not between 1 and 50 characters inclusive');
+  }
+  if (lastNameLength > 50 || lastNameLength < 1) {
+    throw HTTPError(400, 'Length of nameLast is not between 1 and 50 characters inclusive');
   }
   const data = getData();
   for (const user of data.users) {
@@ -84,13 +95,17 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
 */
 
 function userSetEmailV1(token: string, email: string) {
+  // Error Checking
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
   if (!validator.isEmail(email)) {
-    return errorMsg;
+    throw HTTPError(400, 'Email entered is not a valid email');
   }
   const data = getData();
   for (const user of data.users) {
     if (token !== user.token && email === user.email) {
-      return errorMsg;
+      throw HTTPError(400, 'Email address is already being used by another user');
     }
   }
   for (const user of data.users) {
@@ -119,13 +134,20 @@ function userSetEmailV1(token: string, email: string) {
 
 function userSetHandleV1(token: string, handleStr: string) {
   const handleLength = handleStr.length;
-  if (handleLength > 20 || handleLength < 3 || handleStr.match(/^[0-9A-Za-z]+$/) === null) {
-    return errorMsg;
+  // Error Checking
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+  if (handleLength > 20 || handleLength < 3) {
+    throw HTTPError(400, 'Length of handleStr is not between 3 and 20 characters inclusive');
+  }
+  if (handleStr.match(/^[0-9A-Za-z]+$/) === null) {
+    throw HTTPError(400, 'HandleStr contains characters that are not alphanumeric');
   }
   const data = getData();
   for (const user of data.users) {
     if (token !== user.token && handleStr === user.handleStr) {
-      return errorMsg;
+      throw HTTPError(400, 'The handle is already used by another user');
     }
   }
   for (const user of data.users) {
@@ -139,7 +161,7 @@ function userSetHandleV1(token: string, handleStr: string) {
 
 function usersAllV1(token: string) : error | allUserReturn {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Invalid token');
   }
   const users = getData().users;
   const userDetails: UserInfo[] = [];
