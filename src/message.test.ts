@@ -296,10 +296,17 @@ describe('Testing messageRemoveV1', () => {
       });
     });
     describe('passes', () => {
-      test('deletes message', () => {
+      test('deletes message (1 message)', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
         const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
+        expect(newMessage).toStrictEqual({});
+      });
+      test('deletes message (multiple messages)', () => {
+        const channel = requestChannelCreate(authUser.token, 'name', false);
+        const message1 = requestMessageSend(authUser.token, channel.channelId, 'message1');
+        const message2 = requestMessageSend(authUser.token, channel.channelId, 'message2');
+        const newMessage = requestMessageRemove(authUser.token, message1.messageId);
         expect(newMessage).toStrictEqual({});
       });
       test('not sender, but has owner permissions', () => {
@@ -350,13 +357,23 @@ describe('Testing messageRemoveV1', () => {
       });
     });
     describe('passes', () => {
-      test('deletes message', () => {
+      test('deletes message (only 1 message)', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
         const uIds = [];
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
+        expect(newMessage).toStrictEqual({});
+      });
+      test('deletes message (multiple messages)', () => {
+        const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+        const uIds = [];
+        uIds.push(uId1.authUserId);
+        const dm = requestDmCreate(authUser.token, uIds);
+        const message1 = requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+        const message2 = requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+        const newMessage = requestMessageRemove(authUser.token, message1.messageId);
         expect(newMessage).toStrictEqual({});
       });
       test('not sender, but has owner permissions', () => {

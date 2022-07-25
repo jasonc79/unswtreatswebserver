@@ -157,7 +157,6 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
       throw HTTPError(403, 'User is not an owner of the channel');
     }
   }
-  throw HTTPError(403, 'User is not the sender and is not an owner');
 }
 
 /**
@@ -212,7 +211,6 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
       throw HTTPError(403, 'User is not an owner of the channel');
     }
   }
-  throw HTTPError(403, 'User is not the sender and is not an owner');
 }
 
 // helper function 
@@ -240,7 +238,6 @@ function removeMessage(current, messageId, prop) {
       messageList.push(message);
     }
   }
-
   for (const dm of data.dms) {
     if (dm.dmId === current.dmId) {
       dm.messages = messageList;
