@@ -20,7 +20,42 @@ afterEach(() => {
   requestClear();
 });
 
+describe('Testing channelsCreateV1', () => {
+  describe('Error Cases', () => {
+    test('Invalid Token', () => {
+      requestChannelCreate('bad', 'correct name', true, 403);
+    });
+    test('Incorrect Name (too small)', () => {
+      requestChannelCreate(authUser.token, '', true, 400);
+    });
+    test('Incorrect Name (too large)', () => {
+      requestChannelCreate(authUser.token, 'very long channel name', true, 400);
+    });
+  });
+  describe('Pass Cases', () => {
+    test('Correct Name, is public', () => {
+      const channel = requestChannelCreate(authUser.token, 'correct name', true);
+      expect(channel).toStrictEqual(
+        expect.objectContaining({
+          channelId: expect.any(Number),
+        })
+      );
+    });
+    test('Correct Name, is private', () => {
+      const channel = requestChannelCreate(authUser.token, 'correct name', false);
+      expect(channel).toStrictEqual(
+        expect.objectContaining({
+          channelId: expect.any(Number),
+        })
+      );
+    });
+  });
+});
+
 describe('Testing for channelsListallV1', () => {
+  test('Invalid Token', () => {
+    requestChannelsListAll('bad', 403);
+  });
   test('Correct return, no channels', () => {
     expect(requestChannelsListAll(authUser.token)).toEqual({
       channels: []
@@ -58,34 +93,10 @@ describe('Testing for channelsListallV1', () => {
   });
 });
 
-describe('Testing channelsCreateV1', () => {
-  test('Correct Name, is public', () => {
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    expect(channel).toStrictEqual(
-      expect.objectContaining({
-        channelId: expect.any(Number),
-      })
-    );
-  });
-  test('Correct Name, is private', () => {
-    const channel = requestChannelCreate(authUser.token, 'correct name', false);
-    expect(channel).toStrictEqual(
-      expect.objectContaining({
-        channelId: expect.any(Number),
-      })
-    );
-  });
-  test('Incorrect Name (too small)', () => {
-    const channel = requestChannelCreate(authUser.token, '', true);
-    expect(channel).toStrictEqual(errorMsg);
-  });
-  test('Incorrect Name (too large)', () => {
-    const channel = requestChannelCreate(authUser.token, 'very long channel name', true);
-    expect(channel).toStrictEqual(errorMsg);
-  });
-});
-
 describe('Testing channelsListV1', () => {
+  test('Invalid Token', () => {
+    requestChannelsList('bad', 403);
+  });
   test('Correct return no channels', () => {
     const channelsList = requestChannelsList(authUser.token);
     expect(channelsList).toStrictEqual({ channels: [] });

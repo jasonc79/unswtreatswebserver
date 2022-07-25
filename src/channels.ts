@@ -1,6 +1,7 @@
 import { error, errorMsg, Channel, userReturn, channelId, getData, setData } from './dataStore';
 import { checkValidToken, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
+import HTTPError from 'http-errors';
 
 type channelReturn = {
   channelId: number,
@@ -24,8 +25,11 @@ type channelsList = { channels: channelReturn[] };
  * @returns { channelId } when no error
  */
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
-  if (name.length < 1 || name.length > 20 || !checkValidToken(token)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (name.length < 1 || name.length > 20) {
+    throw HTTPError(400, 'Length of name must be 1-20 inclusive');
   }
   const data = getData();
   const user = returnValidUser(token);
@@ -60,7 +64,7 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
 
 function channelsListV1(token: string) : channelsList | error {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Token is invalid');
   }
   const data = getData();
   const uId = returnValidUser(token);
@@ -96,7 +100,7 @@ function channelsListV1(token: string) : channelsList | error {
 
 function channelsListallV1(token: string) : channelsList | error {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Token is invalid');
   }
   const data = getData();
   const channelList = [];
