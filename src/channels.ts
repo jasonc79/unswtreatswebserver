@@ -1,4 +1,4 @@
-import { error, errorMsg, Channel, userReturn, channelId, getData, setData } from './dataStore';
+import { error, Channel, userReturn, channelId, getData, setData } from './dataStore';
 import { checkValidToken, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
 import HTTPError from 'http-errors';

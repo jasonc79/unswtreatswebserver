@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear, errorMsg } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear } from './helperTests';
 import { requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 

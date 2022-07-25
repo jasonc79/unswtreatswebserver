@@ -1,4 +1,4 @@
-import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, errorMsg, requestClear } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestClear } from './helperTests';
 import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -197,7 +197,7 @@ describe('Testing messageEditV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const newMessage = requestMessageEdit('bad', messageId.messageId, 'new message', 403);
+        requestMessageEdit('bad', messageId.messageId, 'new message', 403);
       });
       test('message length is over 1000', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -305,7 +305,7 @@ describe('Testing messageRemoveV1', () => {
       test('deletes message (multiple messages)', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const message1 = requestMessageSend(authUser.token, channel.channelId, 'message1');
-        const message2 = requestMessageSend(authUser.token, channel.channelId, 'message2');
+        requestMessageSend(authUser.token, channel.channelId, 'message2');
         const newMessage = requestMessageRemove(authUser.token, message1.messageId);
         expect(newMessage).toStrictEqual({});
       });
@@ -372,7 +372,7 @@ describe('Testing messageRemoveV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const message1 = requestMessageSenddm(authUser.token, dm.dmId, 'message1');
-        const message2 = requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+        requestMessageSenddm(authUser.token, dm.dmId, 'message2');
         const newMessage = requestMessageRemove(authUser.token, message1.messageId);
         expect(newMessage).toStrictEqual({});
       });

@@ -1,4 +1,4 @@
-import { error, errorMsg, getData, setData } from './dataStore';
+import { error, getData, setData } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -43,7 +43,7 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
     throw HTTPError(403, 'Token is invalid');
   }
   if (!checkValidChannel(channelId)) {
-    throw HTTPError(400,'Channel ID does not refer to a valid channel');
+    throw HTTPError(400, 'Channel ID does not refer to a valid channel');
   }
   if (!isMember(token, channelId)) {
     throw HTTPError(403, 'The authorised user is not a member of the channel');
@@ -74,7 +74,7 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
     throw HTTPError(403, 'Token is invalid');
   }
   if (!checkValidDm(dmId)) {
-    throw HTTPError(400,'Dm ID does not refer to a valid dm');
+    throw HTTPError(400, 'Dm ID does not refer to a valid dm');
   }
   if (!isMemberDm(token, dmId)) {
     throw HTTPError(403, 'The authorised user is not a member of the dm');
@@ -127,30 +127,31 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
     throw HTTPError(400, 'Length of message must be less than 1000 inclusive');
   }
   if (!checkValidDmMessage(messageId) && !checkValidChannelMessage(messageId)) {
-    throw HTTPError(400,'Message ID does not refer to a valid message');
+    throw HTTPError(400, 'Message ID does not refer to a valid message');
   }
-  let chat;
+  let dm;
+  let channel;
   if (checkValidDmMessage(messageId)) {
-    chat = getDmfromMessage(messageId);
-    if (!isMemberDm(token, chat.dmId)) {
+    dm = getDmfromMessage(messageId);
+    if (!isMemberDm(token, dm.dmId)) {
       throw HTTPError(400, 'The authorised user is not a member of the dm');
     }
   } else {
-    chat = getChannelfromMessage(messageId);
-     if (!isMember(token, chat.channelId)) {
+    channel = getChannelfromMessage(messageId);
+    if (!isMember(token, channel.channelId)) {
       throw HTTPError(400, 'The authorised user is not a member of the channel');
-     }
+    }
   }
 
   if (checkValidDmMessage(messageId)) {
-    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, chat.dmId)) {
+    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
       editMessage(token, messageId, message, 'dms');
       return {};
     } else {
       throw HTTPError(403, 'User is not an owner of the dm');
     }
   } else if (checkValidChannelMessage(messageId)) {
-    if (checkChannelMessageSender(token, messageId) || isOwner(token, chat.channelId)) {
+    if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
       editMessage(token, messageId, message, 'channels');
       return {};
     } else {
@@ -179,33 +180,65 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
     throw HTTPError(403, 'Token is invalid');
   }
   if (!checkValidDmMessage(messageId) && !checkValidChannelMessage(messageId)) {
-    throw HTTPError(400,'Message ID does not refer to a valid message');
+    throw HTTPError(400, 'Message ID does not refer to a valid message');
   }
-  let chat;
+  let dm;
+  let channel;
   if (checkValidDmMessage(messageId)) {
-    chat = getDmfromMessage(messageId);
-    if (!isMemberDm(token, chat.dmId)) {
+    dm = getDmfromMessage(messageId);
+    if (!isMemberDm(token, dm.dmId)) {
       throw HTTPError(400, 'The authorised user is not a member of the dm');
     }
   } else {
-    chat = getChannelfromMessage(messageId);
-     if (!isMember(token, chat.channelId)) {
+    channel = getChannelfromMessage(messageId);
+    if (!isMember(token, channel.channelId)) {
       throw HTTPError(400, 'The authorised user is not a member of the channel');
-     }
+    }
   }
 
+  const data = getData();
+
   if (checkValidDmMessage(messageId)) {
-    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, chat.dmId)) {
-      const current = getDmfromMessage(messageId);
-      removeMessage(current, messageId, 'dms');
+    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
+      const currentDm = getDmfromMessage(messageId);
+      const messageDetails = returnValidMessagefromDm(messageId);
+      const messageList = [];
+
+      for (const message of currentDm.messages) {
+        if (message.messageId !== messageDetails.messageId) {
+          messageList.push(message);
+        }
+      }
+
+      for (const dm of data.dms) {
+        if (dm.dmId === currentDm.dmId) {
+          dm.messages = messageList;
+        }
+      }
+      setData(data);
       return {};
     } else {
       throw HTTPError(403, 'User is not an owner of the dm');
     }
   } else if (checkValidChannelMessage(messageId)) {
-    if (checkChannelMessageSender(token, messageId) || isOwner(token, chat.channelId)) {
-      const current = getChannelfromMessage(messageId);
-      removeMessage(current, messageId, 'channels');
+    if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
+      const currentChannel = getChannelfromMessage(messageId);
+      const messageDetails = returnValidMessagefromChannel(messageId);
+
+      const messageList = [];
+
+      for (const message of currentChannel.messages) {
+        if (message.messageId !== messageDetails.messageId) {
+          messageList.push(message);
+        }
+      }
+
+      for (const channel of data.channels) {
+        if (channel.channelId === currentChannel.channelId) {
+          channel.messages = messageList;
+        }
+      }
+      setData(data);
       return {};
     } else {
       throw HTTPError(403, 'User is not an owner of the channel');
@@ -213,34 +246,28 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-// helper function 
-function editMessage(token, id, message, prop) {
+// helper function
+function editMessage(token: string, id: number, message: string, prop: string) {
   const data = getData();
   if (message.length === 0) {
     messageRemoveV1(token, id);
     return;
   }
-  for (const item of data[prop]) {
-    for (const msg of item.messages) {
-      if (msg.messageId === id) {
-        msg.message = message;
+  if (prop === 'dms') {
+    for (const item of data.dms) {
+      for (const msg of item.messages) {
+        if (msg.messageId === id) {
+          msg.message = message;
+        }
       }
     }
-  }
-  setData(data);
-}
-
-function removeMessage(current, messageId, prop) {
-  const data = getData();
-  const messageList = [];
-  for (const message of current.messages) {
-    if (message.messageId !== messageId) {
-      messageList.push(message);
-    }
-  }
-  for (const dm of data.dms) {
-    if (dm.dmId === current.dmId) {
-      dm.messages = messageList;
+  } else if (prop === 'channels') {
+    for (const item of data.channels) {
+      for (const msg of item.messages) {
+        if (msg.messageId === id) {
+          msg.message = message;
+        }
+      }
     }
   }
   setData(data);
