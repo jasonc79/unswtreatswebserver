@@ -247,17 +247,14 @@ describe('Testing channelAddOwnerV1', () => {
 describe('Testing channelRemoveOwnerV1', () => {
   //
   test('Pass scenario - 2 owners, remove 1', () => {
-    const removeOwner = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelJoin(removeOwner.token, channel.channelId);
-    const details = requestChannelAddOwner(authUser.token, channel.channelId, removeOwner.authUserId);
-    expect(details).toStrictEqual({});
-    const details2 = requestChannelRemoveOwner(authUser.token, channel.channelId, removeOwner.authUserId);
-    expect(details2).toStrictEqual({});
-
-    const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
-    const removeUserInfo = requestUserProfile(removeOwner.token, removeOwner.authUserId);
-    const channeldetails = requestChannelDetails(removeOwner.token, channel.channelId);
+    const removeOwner = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(removeOwner.token, channel.channelId, 200);
+    const details = requestChannelAddOwner(authUser.token, channel.channelId, removeOwner.authUserId, 200);
+    const details2 = requestChannelRemoveOwner(authUser.token, channel.channelId, removeOwner.authUserId, 200);
+    const userInfo = requestUserProfile(authUser.token, authUser.authUserId, 200);
+    const removeUserInfo = requestUserProfile(removeOwner.token, removeOwner.authUserId, 200);
+    const channeldetails = requestChannelDetails(removeOwner.token, channel.channelId, 200);
     expect(channeldetails).toStrictEqual(
       {
         name: 'correct name',
@@ -288,45 +285,37 @@ describe('Testing channelRemoveOwnerV1', () => {
     );
   });
   test('ChannelId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelJoin(authUser2.token, channel.channelId);
-    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
-    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId + 1, authUser2.authUserId);
-    expect(RemoveOwner).toStrictEqual(errorMsg);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(authUser2.token, channel.channelId, 200);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId, 200);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId + 1, authUser2.authUserId, 400);
   });
   test('uId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelJoin(authUser2.token, channel.channelId);
-    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
-    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser2.authUserId + 9);
-    expect(RemoveOwner).toStrictEqual(errorMsg);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(authUser2.token, channel.channelId, 200);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId, 200);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser2.authUserId + 9, 400);
   });
   test('uId is not part of channel', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const authUser3 = requestAuthRegister('emai3@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId);
-    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser3.authUserId);
-    expect(RemoveOwner).toStrictEqual(errorMsg);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const authUser3 = requestAuthRegister('emai3@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelAddOwner(authUser.token, channel.channelId, authUser2.authUserId, 200);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser3.authUserId, 400);
   });
   test('uId is only owner', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser.authUserId);
-    expect(RemoveOwner).toStrictEqual(errorMsg);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const RemoveOwner = requestChannelRemoveOwner(authUser.token, channel.channelId, authUser.authUserId, 400);
   });
   test('token is not owner', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelJoin(authUser2.token, channel.channelId);
-    const RemoveOwner = requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser2.authUserId);
-    expect(RemoveOwner).toStrictEqual(errorMsg);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(authUser2.token, channel.channelId, 200);
+    const RemoveOwner = requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser2.authUserId, 403);
   });
 });
 
