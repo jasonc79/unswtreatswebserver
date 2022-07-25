@@ -1,7 +1,7 @@
-import { error, errorMsg, userReturn, getData, setData, allUserReturn, UserInfo } from './dataStore';
-import { returnValidId, checkValidToken, checkValidUser } from './helper';
-import validator from 'validator';
+import { error, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
+import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
 import HTTPError from 'http-errors';
+import { checkValidEmail } from './auth';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -69,14 +69,11 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
   if (lastNameLength > 50 || lastNameLength < 1) {
     throw HTTPError(400, 'Length of nameLast is not between 1 and 50 characters inclusive');
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.nameFirst = nameFirst;
-      user.nameLast = nameLast;
-    }
-  }
-  setData(data);
+
+  const user = returnValidUser(token);
+  user.nameFirst = nameFirst;
+  user.nameLast = nameLast;
+  updateUser(user.uId, user);
   return {};
 }
 
@@ -95,25 +92,17 @@ function userSetNameV1(token: string, nameFirst: string, nameLast: string) : obj
 */
 
 function userSetEmailV1(token: string, email: string) {
+  email = email.toLowerCase();
   // Error Checking
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
-  if (!validator.isEmail(email)) {
+  if (!checkValidEmail(email)) {
     throw HTTPError(400, 'Email entered is not a valid email');
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token !== user.token && email === user.email) {
-      throw HTTPError(400, 'Email address is already being used by another user');
-    }
-  }
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.email = email;
-    }
-  }
-  setData(data);
+  const user = returnValidUser(token);
+  user.email = email;
+  updateUser(user.uId, user);
   return {};
 }
 
@@ -144,18 +133,15 @@ function userSetHandleV1(token: string, handleStr: string) {
   if (handleStr.match(/^[0-9A-Za-z]+$/) === null) {
     throw HTTPError(400, 'HandleStr contains characters that are not alphanumeric');
   }
-  const data = getData();
-  for (const user of data.users) {
-    if (token !== user.token && handleStr === user.handleStr) {
-      throw HTTPError(400, 'The handle is already used by another user');
-    }
+  const user = returnValidUser(token);
+  // Cannot update handle str (same handlestr)
+  if (handleStr.localeCompare(user.handleStr) === 0) {
+    throw HTTPError(400, 'The handle is already used by another user');
   }
-  for (const user of data.users) {
-    if (token === user.token) {
-      user.handleStr = handleStr;
-    }
-  }
-  setData(data);
+
+  user.handleStr = handleStr;
+  updateUser(user.uId, user);
+
   return {};
 }
 

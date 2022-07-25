@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 // USER TYPES AND INTERFACES
 type uId = { uId: number };
 type token = string;
@@ -12,7 +14,7 @@ interface User {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
-  token: token,
+  token: token[],
   password: string,
   permissionId: number,
 }
@@ -42,7 +44,15 @@ interface Dm {
   name: string,
   members: UserInfo[],
   owners: UserInfo[],
+  messages: Message[],
 }
+
+interface DmInfo {
+  dmId: number,
+  name: string,
+}
+
+type dmReturn = { dms: DmInfo[] };
 
 // CHANNEL TYPES AND INTERFACES
 type channelId = { channelId: number };
@@ -79,32 +89,31 @@ let data: Data = {
   dms: [],
 };
 
-// YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
-/*
-Example usage
-    let store = getData()
-    console.log(store) # Prints { 'names': ['Hayden', 'Tam', 'Rani', 'Giuliana', 'Rando'] }
-
-    names = store.names
-
-    names.pop()
-    names.push('Jake')
-
-    console.log(store) # Prints { 'names': ['Hayden', 'Tam', 'Rani', 'Giuliana', 'Jake'] }
-    setData(store)
-*/
+const fileName = 'data.json';
 
 // Use get() to access the data
 function getData(): Data {
+  loadData();
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
 function setData(newData: Data) {
   data = newData;
+  saveData();
+}
+
+function saveData() {
+  fs.writeFileSync(fileName, JSON.stringify(data));
+}
+
+function loadData() {
+  if (fs.existsSync(fileName)) {
+    data = JSON.parse(fs.readFileSync(fileName, 'utf8'));
+  }
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm };
+export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };

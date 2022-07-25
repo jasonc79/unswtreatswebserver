@@ -1,68 +1,69 @@
 import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
-import { getData, setData } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, returnValidUser, isMember } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
+import { updateChannel } from './helper';
 import { userProfileV1 } from './users';
-
-// UNCOMMENT WHEN implementing CHANNEL/JOIN OR CHANNELS/LIST
-/*
-import { userReturn, ChannelInfo } from './dataStore';
-import { channelsListV1 } from './channels';
-type channelsList = { channels: ChannelInfo[] };
-*/
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
 
-/*
-ChannelDetailsV1 Function
-Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
-Arguments:
-    authUserId (number) - A unique identifier for the authorised user
-    channelId (number) - A unique identifier for the channel
-Return Value:
-    Returns {error: 'error'} on invalid channel
-    Returns {error: 'error'} if authorised user is not already a member of channel
-    Returns {name, isPublic, ownerMembers, allMembers} on no error
-*/
-function channelDetailsV1(token: number, channelId: number) : (error | channelDetails) {
-  /*
-  // Check if channelId and authUserId is valid
-  if (!checkValidId(authUserId) || !checkValidChannel(channelId)) {
+/**
+ * ChannelDetailsV2
+ * Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ *
+ * @returns { error }
+ *    channelId is invalid
+ *    token is invalid
+ *    function caller isnt part of channel
+ * @returns { channelDetails } if there is no error
+ */
+
+function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
+  if (!checkValidChannel(channelId)) {
+    return errorMsg;
+  } else if (!checkValidToken(token)) {
+    return errorMsg;
+  } else if (!isMember(token, channelId)) {
     return errorMsg;
   }
-  // Check if authorised user is member of channel
-  const channelList = channelsListV1(authUserId) as channelsList;
-  let authUserValid = false;
-  for (const channels of channelList.channels) {
-    if (channelId === channels.channelId) {
-      authUserValid = true;
-    }
+
+  const currChannel = returnValidChannel(channelId);
+  const owners = [];
+  const members = [];
+
+  for (const owner of currChannel.ownerMembers) {
+    const tempUser = {
+      uId: owner.uId,
+      email: owner.email,
+      handleStr: owner.handleStr,
+      nameFirst: owner.nameFirst,
+      nameLast: owner.nameLast,
+    };
+    owners.push(tempUser);
   }
-  if (authUserValid === false) {
-    return errorMsg;
+
+  for (const member of currChannel.allMembers) {
+    const tempUser = {
+      uId: member.uId,
+      email: member.email,
+      handleStr: member.handleStr,
+      nameFirst: member.nameFirst,
+      nameLast: member.nameLast,
+    };
+    members.push(tempUser);
   }
-  const channel = returnValidChannel(channelId);
+
   const channelDetail = {
-    name: channel.name,
-    isPublic: channel.isPublic,
-    ownerMembers: channel.ownerMembers,
-    allMembers: channel.allMembers
+    name: currChannel.name,
+    isPublic: currChannel.isPublic,
+    ownerMembers: owners,
+    allMembers: members
   };
-  return channelDetail; */
-  return errorMsg;
+  return channelDetail;
 }
 
-/*
-ChannelJoinV1 Function
-Given a channelId of a channel that the authorised user can join, adds them to that channel.
-Arguments:
-    authUserId (number) - A unique identifier for the authorised user
-    channelId (number) - A unique identifier for the channel
-Return Value:
-    Returns {error: 'error'} on invalid channel
-    Returns {error: 'error'} if authorised user is already a member of channel
-    Returns {error: 'error'} on a private channel and auth user is not a global owner
-    Returns {} on no error
-*/
 /**
  * channelJoinV1
  * Adds the current user to the channel
@@ -88,126 +89,229 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
   if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
     return errorMsg;
   }
+
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
-  const data = getData();
-  const newUser = userProfileV1(token, user.uId) as userReturn;
-  channel.allMembers.push(newUser.user);
-  setData(data);
+  channel.allMembers.push(user);
+  updateChannel(channelId, channel);
   return {};
 }
-
-/*
-Invites a user with ID uId to join a channel with ID channelId.
-Once invited, the user is added to the channel immediately.
-
-Arguments:
-    authUserId (number)         - A unique identifier for the authorised user
-    channelId (number)          - A unique identifier for the channel
-    uId (uId)                   - The user's first name, with non-alphanumeric characters
-
-Return Value:
-    Returns {error: 'error'}    when uId does not refer to a valid user
-    Returns {error: 'error'}    when uId refers to a user who is already a member of the channel
-    Returns {error: 'error'}    when channelId is valid and the authorised user is not a member of the channel
-    Returns {} on no error
+/**
+ * channelInviteV1
+ * Invites a user with ID uId to join a channel with ID channelId.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ * @param {number} uId the id of the user who wants to join the channel
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the chnnelId is invalid
+ *    if uId not valid
+ *    if user is not part of channel
+ *    if user is already part of channel
+ * @returns {} if there is no error
  */
-function channelInviteV1(authUserId: number, channelId: number, uId: number): (error | object) {
-  // // Checking if channelID and uId are valid
-  // const data = getData();
-  // const channel = returnValidChannel(channelId);
-  // const user = returnValidId(uId);
-  // if (channel === undefined || user === undefined) {
-  //   return errorMsg;
-  // }
 
-  // // Checking if uId and authUserID are members
-  // let uIdMember = false;
-  // let authUserIdMember = false;
-  // for (const member of channel.allMembers) {
-  //   if (member.uId === uId) {
-  //     uIdMember = true;
-  //   } else if (member.uId === authUserId) {
-  //     authUserIdMember = true;
-  //   }
-  // }
-  // if (uIdMember === true || authUserIdMember === false) {
-  //   return errorMsg;
-  // }
+function channelInviteV1(token: string, channelId: number, uId: number): (error | object) {
+  if (!checkValidToken(token)) {
+    return errorMsg;
+  }
+  // Checking if channelID and uId are valid
+  const channel = returnValidChannel(channelId);
+  const user = returnValidId(uId);
+  if (channel === undefined || user === undefined) {
+    return errorMsg;
+  }
+  // Checking if uId and authUserID are members
+  const authUserId = getIdfromToken(token);
+  let uIdMember = false;
+  let authUserIdMember = false;
+  for (const member of channel.allMembers) {
+    if (member.uId === uId) {
+      uIdMember = true;
+    } else if (member.uId === authUserId) {
+      authUserIdMember = true;
+    }
+  }
+  if (uIdMember === true || authUserIdMember === false) {
+    return errorMsg;
+  }
 
-  // channel.allMembers.push(user);
-  // setData(data);
+  channel.allMembers.push(user);
+  updateChannel(channelId, channel);
   return {};
 }
 
-/*
-This function checks if authUserId, channelId are valid then starting from start
-returns 50 messages from a specified channel. If there are less than start+50
-messages it returns -1 in the "end: "
-
-Arguments:
-    authUserId (number)   - The userId of the user calling the function
-    channelId (number)    - The channelId that user wishes to examine
-    start(number)         - The index of messages you wish to start from
-
-Return Value:
-    Returns {error: 'error'} on invalid authUserId
-    Returns {error: 'error'} on invalid channelId
-    Returns {error: 'error'} on valid channelId but authUserId is not part of members
-    Returns {error: 'error'} on start is greater than ammount of messages in messages
-    Returns {messages: messages, start: start, end: -1} when all inputs are valid but
-    there are less than start+50 messages in messages
-    Returns {messages: messages, start: start, end: start+50} when all inputs are
-    valid and there are more or start+50 messages in messages
-*/
+/**
+ * channelMessagesV2
+ * Given a channel with ID channelId that the authorised user is a member of, return up to 50 messages
+ * between index "start" and "start + 50".
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ * @param {number} start where messages will start printing from
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the chnnelId is invalid
+ *    start is greater than number of messages
+ *    token is not part of channel
+ * @returns { messagesUnder50 } if there is no error and if less than 50 messages
+ * @returns { messagesOver50 } if there is no error and there is 50 messages
+ */
 
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
-function channelMessagesV1(authUserId: number, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  // if (!checkValidId(authUserId)) {
-  //   return errorMsg;
-  // }
+function channelMessagesV2(token: string, channelId: number, start: number): (error | messagesUnder50 | messagesOver50) {
+  // const uId = returnValidUser(token);
 
-  // if (!checkValidChannel(channelId)) {
-  //   return errorMsg;
-  // }
-  // const currChannel = returnValidChannel(channelId);
-  // let isMember = false;
-  // for (const member of currChannel.allMembers) {
-  //   if (authUserId === member.uId) {
-  //     isMember = true;
-  //   }
-  // }
+  if (!checkValidChannel(channelId) || !checkValidToken(token)) {
+    return errorMsg;
+  }
 
-  // if (isMember === false) {
-  //   return errorMsg;
-  // }
-  // const channelMsg = currChannel.messages;
-  // if (channelMsg.length < start) {
-  //   return errorMsg;
-  // }
+  if (!isMember(token, channelId)) {
+    return errorMsg;
+  }
 
-  // const messages: Array<Message> = [];
-  // const final = start + 50;
-  // for (let i = start; i < final; i++) {
-  //   if (i >= channelMsg.length) {
-  //     return {
-  //       messages: messages,
-  //       start: start,
-  //       end: -1,
-  //     };
-  //   }
-  //   messages.push(channelMsg[i]);
-  // }
-  // return {
-  //   messages: messages,
-  //   start: start,
-  //   end: final,
-  // };
+  const currChannel = returnValidChannel(channelId);
+  const channelMsg = currChannel.messages;
+  const messages: Array<Message> = [];
+  const final = start + 50;
+
+  if (channelMsg.length < start) {
+    return errorMsg;
+  }
+
+  for (let i = start; i < final; i++) {
+    if (i >= channelMsg.length) {
+      return {
+        messages: messages,
+        start: start,
+        end: -1,
+      };
+    }
+    messages.unshift(channelMsg[i]);
+  }
   return {
-    messages: [],
-    start: 1,
-    end: 1,
+    messages: messages,
+    start: start,
+    end: final,
   };
 }
-export { channelDetailsV1, channelJoinV1, channelInviteV1, channelMessagesV1 };
+
+/**
+ * channelLeaveV1
+ * Given a channel with ID channelId that the authorised user is a member of, remove them as a member of the channel.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ *
+ * Return values
+ * @returns { error }
+ *    token invalid
+ *    channelId is invalid
+ *    user is not part of channel
+ * @returns { object } on no error
+ */
+
+function channelLeaveV1(token: string, channelId: number): (error | object) {
+  if (!checkValidChannel(channelId)) {
+    return errorMsg;
+  } else if (!checkValidToken(token) || !isMember(token, channelId)) {
+    return errorMsg;
+  }
+  const user = returnValidUser(token);
+  const currChannel = returnValidChannel(channelId);
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
+  currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
+  updateChannel(channelId, currChannel);
+  return {};
+}
+
+/**
+ * channelAddOwnerV1
+ * Make user with user id uId an owner of the channel.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ * @param {number} uId the user to become owner
+ *
+ * Return values
+ * @returns { error }
+ *    channelId invalid
+ *    uId is invalid
+ *    uId is already owner
+ *    uId is not member
+ *    token is not owner
+ *    token is invalid
+ *
+ * @returns { object } when no error
+ */
+
+function channelAddOwnerV1(token: string, channelId: number, uId: number): (error | object) {
+  if (!checkValidToken(token) || !checkValidUser(uId) || !checkValidChannel(channelId)) {
+    return errorMsg;
+  }
+  if (!isOwner(token, channelId) && !isGlobalOwner(token)) {
+    return errorMsg;
+  }
+  if (isOwnerFromId(uId, channelId) || !isMemberFromId(uId, channelId)) {
+    return errorMsg;
+  }
+  const newOwnerProfile = userProfileV1(token, uId) as userReturn;
+  const currChannel = returnValidChannel(channelId);
+  currChannel.ownerMembers.push(newOwnerProfile.user);
+  updateChannel(channelId, currChannel);
+  return {};
+}
+
+/**
+ * channelRemoveOwnerV1
+ * Remove user with user id uId as an owner of the channel.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel being accessed
+ * @param {number} uId the user to remove owner
+ *
+ * Return values
+ * @returns { error }
+ *    channelId invalid
+ *    uId is invalid
+ *    uId is not owner
+ *    uId is only owner
+ *    token is not owner
+ *    token is invalid
+ *
+ * @returns { object } when no error
+ */
+
+function channelRemoveOwnerV1(token: string, channelId: number, uId: number): (error | object) {
+  if (!checkValidToken(token) || !checkValidUser(uId) || !checkValidChannel(channelId)) {
+    return errorMsg;
+  }
+  if (!isOwner(token, channelId) && !isGlobalOwner(token)) {
+    return errorMsg;
+  }
+  if (!isOwnerFromId(uId, channelId)) {
+    return errorMsg;
+  }
+  const user = userProfileV1(token, uId) as userReturn;
+  const currChannel = returnValidChannel(channelId);
+  if (currChannel.ownerMembers.length === 1) {
+    return errorMsg;
+  }
+
+  currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.user.uId);
+  updateChannel(channelId, currChannel);
+  return {};
+}
+
+export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1 };

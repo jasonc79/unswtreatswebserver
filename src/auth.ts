@@ -1,38 +1,41 @@
-import { getData, setData, error, errorMsg, authUserId, token } from './dataStore';
-import { checkValidToken } from './helper';
+import { getData, setData, error, authUserId, token } from './dataStore';
+import { checkValidToken, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
+import HTTPError from 'http-errors';
 
-/*
-Create an account for a new user. Additionally, it generates a handle
-and an authUserId which is stored as the user's details.
-
-Arguments:
-    email (string)     - The email adress of the user registering
-    password (string)  - The password of the user registering
-    nameFirst (string) - The user's first name, with non-alphanumeric characters
-    nameLast (string)  - The user's last name, with non-alphanumeric characters
-
-Return Value:
-    Returns {error: 'error'}  on invalid email
-    Returns {error: 'error'}  on a password with less than 6 characters
-    Returns {error: 'error'}  when length of nameFirst or nameLast is not
-                              between 1 and 50 characters
-    Returns {authUserId: authUserId} on no error
+/**
+ * authRegisterV1
+ * Given a user's first and last name, email address, and password, create a new account for
+ * them and return a new `authUserId`.
+ *
+ * Arguments
+ * @param email The email adress of the user registering
+ * @param password The password of the user registering
+ * @param nameFirst The user's first name, with non-alphanumeric characters
+ * @param nameLast The user's last name, with non-alphanumeric characters
+ *
+ * Return Values:
+ * @returns { error }
+ *    invalid email
+ *    email already used
+ *    pass length is invalid
+ *    firstname length invalid
+ *    lastname length invalid
+ * @returns { authUserId } when no error
  */
+
 const authRegisterV1 = (email: string, password: string, nameFirst: string, nameLast: string): authUserId | error => {
   // Error Checking
   if (!checkNameLength(nameFirst) || !checkNameLength(nameLast)) {
-    return errorMsg;
+    throw HTTPError(400, 'Length of name is not between 1 and 50 characters inclusive');
   }
   if (password.length < 6) {
-    return errorMsg;
+    throw HTTPError(400, 'Password length is less than 6 characters');
   }
   if (!checkValidEmail(email)) {
-    return errorMsg;
+    throw HTTPError(400, 'Email is not valid, or is already being used');
   }
   email = email.toLowerCase();
-  nameFirst = nameFirst.toLowerCase();
-  nameLast = nameLast.toLowerCase();
   const data = getData();
   const handle = createHandle(nameFirst, nameLast);
   const token = generateToken();
@@ -45,7 +48,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     nameLast: nameLast,
     handleStr: handle,
     password: password,
-    token: token,
+    token: [token],
     permissionId: 2,
   };
   // Global owner
@@ -61,34 +64,64 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     authUserId: user.uId
   };
 };
-/*
-This function checks if the user's email and password is valid and returns
-their authUserId to login
 
-Arguments:
-    email (string)    - The email inputted by the user
-    password (string)    - The password inputted by the user
+/**
+ * authLoginV1
+ * This function checks if the user's email and password is valid and returns their authUserId to login
+ *
+ * Arguments:
+ * @param email The email inputted by the user
+ * @param password The password inputted by the user
+ *
+ * Return Values:
+ * @returns { error }
+ *    email invalid
+ *    password incorrect
+ * @returns { authUserId } on no error
+ */
 
-Return Value:
-    Returns {error: 'error'} on an email not belonging to the user
-    Returns {error: 'error'} on an incorrect password
-    Returns {authUserId:  'authUserId'} when the email and password are valid
-*/
 const authLoginV1 = (email: string, password: string) : authUserId | error => {
   const user = checkEmailExists(email);
-
+  const token = generateToken();
   if (!user) {
-    return errorMsg;
+    throw HTTPError(400, 'Email does not belong to a user');
   }
 
   if (user.password !== password) {
-    return errorMsg;
+    throw HTTPError(400, 'Password is not correct');
   }
+  const uId = user.uId;
+  user.token.push(token);
+  updateUser(uId, user);
 
   return {
-    token: user.token,
+    token: token,
     authUserId: user.uId
   };
+};
+
+/**
+ * authLogoutV1
+ * Given an active token, invalidates the token to log the user out.
+ *
+ * Arguments:
+ * @param token tells the server who is currently accessing it
+ *
+ * Return values:
+ * @returns { error }
+ *    invalid token
+ * @returns { object } when no error
+ */
+
+const authLogoutV1 = (token: token) : object | error => {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+
+  const user = returnValidUser(token);
+  user.token = user.token.filter((temp: token) => temp !== token);
+  updateUser(user.uId, user);
+  return {};
 };
 
 // HELPER FUNCTIONS
@@ -103,7 +136,7 @@ const checkNameLength = (name: string) : boolean => {
 };
 
 // Check if an email is valid. Returns true if valid and false otherwise.
-const checkValidEmail = (email: string): boolean => {
+export const checkValidEmail = (email: string): boolean => {
   if (!validator.isEmail(email)) {
     return false;
   }
@@ -187,4 +220,4 @@ const generateToken = () : token => {
   return token;
 };
 
-export { authLoginV1, authRegisterV1 };
+export { authLoginV1, authRegisterV1, authLogoutV1 };
