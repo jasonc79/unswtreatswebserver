@@ -19,6 +19,7 @@ import {
   isMemberDm,
   isOwnerDm,
 } from './helper';
+import HTTPError from 'http-errors';
 
 type messageId = { messageId: number };
 
@@ -38,11 +39,17 @@ type messageId = { messageId: number };
  * @returns { messageId: messageId } if a message is sent without any errors
  */
 function messageSendV1(token: string, channelId: number, message: string) : messageId | error {
-  if (!checkValidToken(token) || !checkValidChannel(channelId) || !isMember(token, channelId)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidChannel(channelId)) {
+    throw HTTPError(400,'Channel ID does not refer to a valid channel');
+  }
+  if (!isMember(token, channelId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the channel');
   }
   if (message.length < 1 || message.length > 1000) {
-    return errorMsg;
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
@@ -63,12 +70,19 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
 }
 
 function messageSenddmV1(token: string, dmId: number, message: string) : messageId | error {
-  if (!checkValidToken(token) || !checkValidDm(dmId) || !isMemberDm(token, dmId)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400,'Dm ID does not refer to a valid dm');
+  }
+  if (!isMemberDm(token, dmId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the dm');
   }
   if (message.length < 1 || message.length > 1000) {
-    return errorMsg;
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
+
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
   const newMessage = {
@@ -106,48 +120,44 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
  * @returns {} if pass with no errors
  */
 function messageEditV1(token: string, messageId: number, message: string) : object | error {
-  if (message.length > 1000 || !checkValidToken(token)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
   }
-  const data = getData();
+  if (message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be less than 1000 inclusive');
+  }
+  if (!checkValidDmMessage(messageId) && !checkValidChannelMessage(messageId)) {
+    throw HTTPError(400,'Message ID does not refer to a valid message');
+  }
+  let chat;
+  if (checkValidDmMessage(messageId)) {
+    chat = getDmfromMessage(messageId);
+    if (!isMemberDm(token, chat.dmId)) {
+      throw HTTPError(400, 'The authorised user is not a member of the dm');
+    }
+  } else {
+    chat = getChannelfromMessage(messageId);
+     if (!isMember(token, chat.channelId)) {
+      throw HTTPError(400, 'The authorised user is not a member of the channel');
+     }
+  }
 
-  if (checkValidDmMessage(messageId) && isMemberDm(token, getDmfromMessage(messageId).dmId)) {
-    if (checkDmMessageSender(token, messageId) && isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
-      if (message.length === 0) {
-        messageRemoveV1(token, messageId);
-        return {};
-      }
-      const messageDetails = returnValidMessagefromDm(messageId);
-      for (const dm of data.dms) {
-        for (const note of dm.messages) {
-          if (note.messageId === messageDetails.messageId) {
-            note.message = message;
-          }
-        }
-      }
-      setData(data);
+  if (checkValidDmMessage(messageId)) {
+    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, chat.dmId)) {
+      editMessage(token, messageId, message, 'dms');
       return {};
+    } else {
+      throw HTTPError(403, 'User is not an owner of the dm');
     }
-  } else if (checkValidChannelMessage(messageId) && isOwner(token, getChannelfromMessage(messageId).channelId)) {
-    if (checkChannelMessageSender(token, messageId)) {
-      if (message.length === 0) {
-        messageRemoveV1(token, messageId);
-        setData(data);
-        return {};
-      }
-      const messageDetails = returnValidMessagefromChannel(messageId);
-      for (const channel of data.channels) {
-        for (const note of channel.messages) {
-          if (note.messageId === messageDetails.messageId) {
-            note.message = message;
-          }
-        }
-      }
-      setData(data);
+  } else if (checkValidChannelMessage(messageId)) {
+    if (checkChannelMessageSender(token, messageId) || isOwner(token, chat.channelId)) {
+      editMessage(token, messageId, message, 'channels');
       return {};
+    } else {
+      throw HTTPError(403, 'User is not an owner of the channel');
     }
   }
-  return errorMsg;
+  throw HTTPError(403, 'User is not the sender and is not an owner');
 }
 
 /**
@@ -167,54 +177,76 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
  */
 function messageRemoveV1(token: string, messageId: number) : object | error {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidDmMessage(messageId) && !checkValidChannelMessage(messageId)) {
+    throw HTTPError(400,'Message ID does not refer to a valid message');
+  }
+  let chat;
+  if (checkValidDmMessage(messageId)) {
+    chat = getDmfromMessage(messageId);
+    if (!isMemberDm(token, chat.dmId)) {
+      throw HTTPError(400, 'The authorised user is not a member of the dm');
+    }
+  } else {
+    chat = getChannelfromMessage(messageId);
+     if (!isMember(token, chat.channelId)) {
+      throw HTTPError(400, 'The authorised user is not a member of the channel');
+     }
   }
 
+  if (checkValidDmMessage(messageId)) {
+    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, chat.dmId)) {
+      const current = getDmfromMessage(messageId);
+      removeMessage(current, messageId, 'dms');
+      return {};
+    } else {
+      throw HTTPError(403, 'User is not an owner of the dm');
+    }
+  } else if (checkValidChannelMessage(messageId)) {
+    if (checkChannelMessageSender(token, messageId) || isOwner(token, chat.channelId)) {
+      const current = getChannelfromMessage(messageId);
+      removeMessage(current, messageId, 'channels');
+      return {};
+    } else {
+      throw HTTPError(403, 'User is not an owner of the channel');
+    }
+  }
+  throw HTTPError(403, 'User is not the sender and is not an owner');
+}
+
+// helper function 
+function editMessage(token, id, message, prop) {
   const data = getData();
-
-  if (checkValidDmMessage(messageId) && isMemberDm(token, getDmfromMessage(messageId).dmId)) {
-    if (checkDmMessageSender(token, messageId) && isOwnerDm(token, getDmfromMessage(messageId).dmId)) {
-      const currentDm = getDmfromMessage(messageId);
-      const messageDetails = returnValidMessagefromDm(messageId);
-      const messageList = [];
-
-      for (const message of currentDm.messages) {
-        if (message.messageId !== messageDetails.messageId) {
-          messageList.push(message);
-        }
+  if (message.length === 0) {
+    messageRemoveV1(token, id);
+    return;
+  }
+  for (const item of data[prop]) {
+    for (const msg of item.messages) {
+      if (msg.messageId === id) {
+        msg.message = message;
       }
-
-      for (const dm of data.dms) {
-        if (dm.dmId === currentDm.dmId) {
-          dm.messages = messageList;
-        }
-      }
-      setData(data);
-      return {};
-    }
-  } else if (checkValidChannelMessage(messageId) && isOwner(token, getChannelfromMessage(messageId).channelId)) {
-    if (checkChannelMessageSender(token, messageId)) {
-      const currentChannel = getChannelfromMessage(messageId);
-      const messageDetails = returnValidMessagefromChannel(messageId);
-
-      const messageList = [];
-
-      for (const message of currentChannel.messages) {
-        if (message.messageId !== messageDetails.messageId) {
-          messageList.push(message);
-        }
-      }
-
-      for (const channel of data.channels) {
-        if (channel.channelId === currentChannel.channelId) {
-          channel.messages = messageList;
-        }
-      }
-      setData(data);
-      return {};
     }
   }
-  return errorMsg;
+  setData(data);
+}
+
+function removeMessage(current, messageId, prop) {
+  const data = getData();
+  const messageList = [];
+  for (const message of current.messages) {
+    if (message.messageId !== messageId) {
+      messageList.push(message);
+    }
+  }
+
+  for (const dm of data.dms) {
+    if (dm.dmId === current.dmId) {
+      dm.messages = messageList;
+    }
+  }
+  setData(data);
 }
 
 export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 };

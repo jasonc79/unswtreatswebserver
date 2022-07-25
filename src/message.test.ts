@@ -23,31 +23,25 @@ afterEach(() => {
 describe('Testing messageSendV1', () => {
   describe('error', () => {
     test('invalid token', () => {
-      requestChannelCreate(authUser.token, 'name', false);
-      const token = 'bad';
-      const messageId = requestMessageSend(token, 1, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSend('bad', channel.channelId, 'message', 403);
     });
     test('channelId is invalid', () => {
-      const messageId = requestMessageSend(authUser.token, 1, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSend(authUser.token, 1, 'message', 400);
     });
     test('length of message is less than 1', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, '');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSend(authUser.token, channel.channelId, '', 400);
     });
     test('length of message is more than 1000', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       const message = 'a'.repeat(1001);
-      const messageId = requestMessageSend(authUser.token, channel.channelId, message);
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSend(authUser.token, channel.channelId, message, 400);
     });
     test('user is not a member of channel', () => {
       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      const messageId = requestMessageSend(authUser2.token, channel.channelId, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSend(authUser2.token, channel.channelId, 'message', 403);
     });
   });
 
@@ -92,21 +86,17 @@ describe('Testing messageSenddmV1', () => {
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const token = 'bad';
-      const messageId = requestMessageSenddm(token, dm.dmId, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSenddm('bad', dm.dmId, 'message', 403);
     });
     test('dmId is invalid', () => {
-      const messageId = requestMessageSenddm(authUser.token, 404, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSenddm(authUser.token, -7, 'message', 400);
     });
     test('length of message is less than 1', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const messageId = requestMessageSenddm(authUser.token, dm.dmId, '');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSenddm(authUser.token, dm.dmId, '', 400);
     });
     test('length of message is more than 1000', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -114,8 +104,7 @@ describe('Testing messageSenddmV1', () => {
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
       const message = 'a'.repeat(1001);
-      const messageId = requestMessageSenddm(authUser.token, dm.dmId, message);
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSenddm(authUser.token, dm.dmId, message, 400);
     });
     test('user is not a member of channel', () => {
       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
@@ -123,8 +112,7 @@ describe('Testing messageSenddmV1', () => {
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const messageId = requestMessageSenddm(authUser2.token, dm.dmId, 'message');
-      expect(messageId).toStrictEqual(errorMsg);
+      requestMessageSenddm(authUser2.token, dm.dmId, 'message', 403);
     });
   });
 
@@ -150,38 +138,32 @@ describe('Testing messageEditV1', () => {
       test('invalid token', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const token = 'bad';
-        const newMessage = requestMessageEdit(token, messageId.messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit('bad', messageId.messageId, 'new message', 403);
       });
       test('message length is over 1000', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
         const message = 'a'.repeat(1001);
-        const newMessage = requestMessageEdit(authUser.token, messageId.messageId, message);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser.token, messageId.messageId, message, 400);
       });
       test('invalid messageId for channel', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
         const messageId = message.messageId + 1;
-        const newMessage = requestMessageEdit(authUser.token, messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser.token, messageId, 'new message', 400);
       });
-      test('not sent by authUser making request', () => {
+      test('user is not in the channel', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-        const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser2.token, messageId.messageId, 'new message', 400);
       });
-      test('authUser has no owner permissions', () => {
-        const channel = requestChannelCreate(authUser.token, 'name', false);
-        const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+      test('user has no owner permissions and is not sender', () => {
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+        const channel = requestChannelCreate(authUser.token, 'name', true);
         requestChannelJoin(authUser2.token, channel.channelId);
-        const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+        requestMessageEdit(authUser2.token, messageId.messageId, 'message', 403);
       });
     });
     describe('passes', () => {
@@ -197,6 +179,14 @@ describe('Testing messageEditV1', () => {
         const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
         expect(newMessage).toStrictEqual({});
       });
+      test('not sender, but has owner permissions', () => {
+        const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+        const channel = requestChannelCreate(authUser.token, 'name', true);
+        requestChannelJoin(authUser2.token, channel.channelId);
+        const messageId = requestMessageSend(authUser2.token, channel.channelId, 'message');
+        const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
+        expect(newMessage).toStrictEqual({});
+      });
     });
   });
   describe('dm tests', () => {
@@ -207,9 +197,7 @@ describe('Testing messageEditV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const token = 'bad';
-        const newMessage = requestMessageEdit(token, messageId.messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        const newMessage = requestMessageEdit('bad', messageId.messageId, 'new message', 403);
       });
       test('message length is over 1000', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -218,8 +206,7 @@ describe('Testing messageEditV1', () => {
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const message = 'a'.repeat(1001);
-        const newMessage = requestMessageEdit(authUser.token, messageId.messageId, message);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser.token, messageId.messageId, message, 400);
       });
       test('invalid messageId for dm', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -228,27 +215,24 @@ describe('Testing messageEditV1', () => {
         const dm = requestDmCreate(authUser.token, uIds);
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const messageId = message.messageId + 1;
-        const newMessage = requestMessageEdit(authUser.token, messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser.token, messageId, 'new message', 400);
       });
-      test('not sent by authUser making request', () => {
+      test('user is not in the dm', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
         const uIds = [];
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-        const newMessage = requestMessageEdit(authUser2.token, messageId.messageId, 'new message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(authUser2.token, messageId.messageId, 'new message', 400);
       });
-      test('authUser has no owner permissions', () => {
+      test('user has no owner permissions and is not sender', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
         const uIds = [];
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const newMessage = requestMessageEdit(uId1.token, messageId.messageId, 'message');
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageEdit(uId1.token, messageId.messageId, 'message', 403);
       });
     });
     describe('passes', () => {
@@ -267,6 +251,15 @@ describe('Testing messageEditV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+        const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
+        expect(newMessage).toStrictEqual({});
+      });
+      test('not sender, but has owner permissions', () => {
+        const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+        const uIds = [];
+        uIds.push(uId1.authUserId);
+        const dm = requestDmCreate(authUser.token, uIds);
+        const messageId = requestMessageSenddm(uId1.token, dm.dmId, 'message');
         const newMessage = requestMessageEdit(authUser.token, messageId.messageId, 'new message');
         expect(newMessage).toStrictEqual({});
       });
@@ -280,37 +273,40 @@ describe('Testing messageRemoveV1', () => {
       test('invalid token', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const token = 'bad';
-        const newMessage = requestMessageRemove(token, messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove('bad', messageId, 403);
       });
       test('invalid messageId for channel', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
         const messageId = message.messageId + 1;
-        const newMessage = requestMessageRemove(authUser.token, messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove(authUser.token, messageId, 400);
       });
-      test('not sent by authUser making request', () => {
+      test('user is not in the channel', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-        const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove(authUser2.token, messageId.messageId, 400);
       });
-      test('authUser has no owner permissions', () => {
-        const channel = requestChannelCreate(authUser.token, 'name', false);
-        const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+      test('user has no owner permissions and is not sender', () => {
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+        const channel = requestChannelCreate(authUser.token, 'name', true);
         requestChannelJoin(authUser2.token, channel.channelId);
-        const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+        requestMessageRemove(authUser2.token, messageId.messageId, 403);
       });
     });
     describe('passes', () => {
       test('deletes message', () => {
         const channel = requestChannelCreate(authUser.token, 'name', false);
         const messageId = requestMessageSend(authUser.token, channel.channelId, 'message');
+        const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
+        expect(newMessage).toStrictEqual({});
+      });
+      test('not sender, but has owner permissions', () => {
+        const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+        const channel = requestChannelCreate(authUser.token, 'name', true);
+        requestChannelJoin(authUser2.token, channel.channelId);
+        const messageId = requestMessageSend(authUser2.token, channel.channelId, 'message');
         const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
         expect(newMessage).toStrictEqual({});
       });
@@ -324,9 +320,7 @@ describe('Testing messageRemoveV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const token = 'bad';
-        const newMessage = requestMessageRemove(token, messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove('bad', messageId, 403);
       });
       test('invalid messageId for channel', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -335,27 +329,24 @@ describe('Testing messageRemoveV1', () => {
         const dm = requestDmCreate(authUser.token, uIds);
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const messageId = message.messageId + 1;
-        const newMessage = requestMessageRemove(authUser.token, messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove(authUser.token, messageId, 400);
       });
-      test('not sent by authUser making request', () => {
+      test('user is not in the dm', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
         const uIds = [];
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
         const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-        const newMessage = requestMessageRemove(authUser2.token, messageId.messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove(authUser2.token, messageId.messageId, 400);
       });
-      test('authUser has no owner permissions', () => {
+      test('user has no owner permissions and is not sender', () => {
         const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
         const uIds = [];
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const newMessage = requestMessageRemove(uId1.token, messageId.messageId);
-        expect(newMessage).toStrictEqual(errorMsg);
+        requestMessageRemove(uId1.token, messageId.messageId, 403);
       });
     });
     describe('passes', () => {
@@ -365,6 +356,15 @@ describe('Testing messageRemoveV1', () => {
         uIds.push(uId1.authUserId);
         const dm = requestDmCreate(authUser.token, uIds);
         const messageId = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+        const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
+        expect(newMessage).toStrictEqual({});
+      });
+      test('not sender, but has owner permissions', () => {
+        const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+        const uIds = [];
+        uIds.push(uId1.authUserId);
+        const dm = requestDmCreate(authUser.token, uIds);
+        const messageId = requestMessageSenddm(uId1.token, dm.dmId, 'message');
         const newMessage = requestMessageRemove(authUser.token, messageId.messageId);
         expect(newMessage).toStrictEqual({});
       });
