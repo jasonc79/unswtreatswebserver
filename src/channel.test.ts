@@ -17,8 +17,8 @@ afterEach(() => {
 
 describe('Testing channelMessagesV1', () => {
   test('Empty messages', () => {
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 0, 200);
     expect(messages).toStrictEqual(
       expect.objectContaining({
         messages: [],
@@ -28,32 +28,28 @@ describe('Testing channelMessagesV1', () => {
     );
   });
   test('Contains 50 messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     for (let i = 0; i < 60; i++) {
-      requestMessageSend(authUser.token, channel.channelId, 'message');
+      requestMessageSend(authUser.token, channel.channelId, 'message', 200);
     }
-    const messages = requestChannelMessages(authUser.token, channel.channelId, 5);
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 5, 200);
     expect(messages.end).toStrictEqual(55);
   });
   test('Start is greater than messages', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel.channelId, 1);
-    expect(messages).toStrictEqual(errorMsg);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const messages = requestChannelMessages(authUser.token, channel.channelId, 1, 400);
   });
   test('ChannelId is invalid', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser.token, channel.channelId + 1, 0);
-    expect(messages).toStrictEqual(errorMsg);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const messages = requestChannelMessages(authUser.token, channel.channelId + 1, 0, 400);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1');
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const messages = requestChannelMessages(authUser2.token, channel.channelId, 1);
-    expect(messages).toStrictEqual(errorMsg);
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const messages = requestChannelMessages(authUser2.token, channel.channelId, 1, 403);
   });
 });
 
@@ -100,7 +96,7 @@ describe('Testing channelDetailsV2', () => {
 
 /// //////////////////////////////////////////////////////////////////////////
 
-describe('Testing channelLeaveV1', () => {
+describe('Testing channelLeaveV2', () => {
   test('Pass scenario, user leaves channel', () => {
     const user = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
