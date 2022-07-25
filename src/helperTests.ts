@@ -86,10 +86,10 @@ export function requestChannelInvite(token: string, channelId: number, uId: numb
 }
 
 export function requestChannelJoin(token: string, channelId: number, err?: number) {
-  return requestHelper('POST', '/channel/join/v2', { token, channelId });
+  return requestHelper('POST', '/channel/join/v3', { token, channelId });
 }
 export function requestChannelMessages(token: string, channelId: number, start: number, err?: number) {
-  return requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
+  return requestHelper('GET', '/channel/messages/v3', { token, channelId, start });
 }
 
 export function requestChannelsList(token: string, err?: number) {
@@ -101,15 +101,15 @@ export function requestChannelsListAll(token: string, err?: number) {
 }
 
 export function requestChannelAddOwner(token: string, channelId: number, uId: number, err?: number) {
-  return requestHelper('POST', '/channel/addowner/v1', { token, channelId, uId });
+  return requestHelper('POST', '/channel/addowner/v2', { token, channelId, uId });
 }
 
 export function requestChannelRemoveOwner(token: string, channelId: number, uId: number, err?: number) {
-  return requestHelper('POST', '/channel/removeowner/v1', { token, channelId, uId });
+  return requestHelper('POST', '/channel/removeowner/v2', { token, channelId, uId });
 }
 
 export function requestChannelLeave(token: string, channelId: number, err?: number) {
-  return requestHelper('POST', '/channel/leave/v1', { token, channelId });
+  return requestHelper('POST', '/channel/leave/v2', { token, channelId });
 }
 
 export function requestChannelDetails(token: string, channelId: number, err?: number) {
@@ -138,7 +138,7 @@ export function requestDmRemove(token: string, dmId: number, err?: number) {
 }
 
 export function requestDmMessages(token: string, dmId: number, start: number, err?: number) {
-  return requestHelper('GET', '/dm/messages/v1', { token, dmId, start });
+  return requestHelper('GET', '/dm/messages/v2', { token, dmId, start });
 }
 
 // User functions
