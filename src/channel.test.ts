@@ -102,12 +102,12 @@ describe('Testing channelDetailsV2', () => {
 
 describe('Testing channelLeaveV1', () => {
   test('Pass scenario, user leaves channel', () => {
-    const user = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    requestChannelJoin(user.token, channel.channelId);
-    requestChannelLeave(authUser.token, channel.channelId);
-    const userInfo = requestUserProfile(user.token, user.authUserId);
-    const channeldetails = requestChannelDetails(user.token, channel.channelId);
+    const user = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(user.token, channel.channelId, 200);
+    requestChannelLeave(authUser.token, channel.channelId, 200);
+    const userInfo = requestUserProfile(user.token, user.authUserId, 200);
+    const channeldetails = requestChannelDetails(user.token, channel.channelId, 200);
     expect(channeldetails).toStrictEqual(
       expect.objectContaining({
         name: 'correct name',
@@ -125,16 +125,19 @@ describe('Testing channelLeaveV1', () => {
   });
 
   test('ChannelId is invalid', () => {
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     const details = requestChannelLeave(authUser.token, channel.channelId + 1);
     expect(details).toStrictEqual(errorMsg);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const details = requestChannelLeave(authUser2.token, channel.channelId);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    const details = requestChannelLeave(authUser2.token, channel.channelId, 403);
     expect(details).toStrictEqual(errorMsg);
   });
+  /*
+  Add test for standup
+  */
 });
 
 /// ////////////////////////////////////////////////////////////////////////////////////////////////
