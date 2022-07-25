@@ -4,7 +4,6 @@ import { updateChannel } from './helper';
 import { userProfileV1 } from './users';
 import HTTPError from 'http-errors';
 
-
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
 
 /**
@@ -80,7 +79,7 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
  *    if the cahnnelId is invalid
  * @returns {} if there is no error
  */
-function channelJoinV2(token: string, channelId: number): (error | object) {
+function channelJoinV1(token: string, channelId: number): (error | object) {
   // Check if channelId and token is valid
   if (!checkValidToken(token) || !checkValidChannel(channelId)) {
     return errorMsg;
@@ -228,7 +227,7 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   } else if (!checkValidChannel(channelId)) {
     throw HTTPError(400, 'ChannelId does not refer to a valid channel');
   } else if (!isMember(token, channelId)) {
-    throw HTTPError(400, 'ChannelId is valid and the authorised user is not a member of the channel');
+    throw HTTPError(403, 'ChannelId is valid and the authorised user is not a member of the channel');
   }
   const user = returnValidUser(token);
   const currChannel = returnValidChannel(channelId);
@@ -333,4 +332,4 @@ function channelRemoveOwnerV2(token: string, channelId: number, uId: number): (o
   return {};
 }
 
-export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1 };
+export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV3, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2 };

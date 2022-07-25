@@ -1,6 +1,7 @@
 import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
+import HTTPError from 'http-errors';
 
 /**
  * dmCreateV1
@@ -277,4 +278,4 @@ function dmMessagesV2(token: string, dmId: number, start: number): (messagesUnde
   };
 }
 
-export { dmCreateV1, dmLeaveV1, dmMessagesV1, dmDetailsV1, dmListV1, dmRemoveV1 };
+export { dmCreateV1, dmLeaveV1, dmMessagesV2, dmDetailsV1, dmListV1, dmRemoveV1 };

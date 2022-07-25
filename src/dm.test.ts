@@ -285,14 +285,14 @@ describe('Testing dmMessagesV1', () => {
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds, 200);
-    const messages = requestDmMessages(authUser.token, dm.dmId, 1, 400);
+    requestDmMessages(authUser.token, dm.dmId, 1, 400);
   });
   test('ChannelId is invalid', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds, 200);
-    const messages = requestDmMessages(authUser.token, dm.dmId + 1, 0, 400);
+    requestDmMessages(authUser.token, dm.dmId + 1, 0, 400);
   });
   test('ChannelId is valid but user is not part of channel', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
@@ -300,6 +300,6 @@ describe('Testing dmMessagesV1', () => {
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds, 200);
     const authUser3 = requestAuthRegister('emai3@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
-    const messages = requestDmMessages(authUser3.token, dm.dmId, 0, 403);
+    requestDmMessages(authUser3.token, dm.dmId, 0, 403);
   });
 });
