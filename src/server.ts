@@ -65,7 +65,7 @@ app.post('/auth/logout/v2', (req, res, next) => {
 
 // ================================================================ //
 // Channels functions
-app.post('/channels/create/v2', (req, res, next) => {
+app.post('/channels/create/v3', (req, res, next) => {
   try {
     const { token, name, isPublic } = req.body;
     return res.json(channelsCreateV1(token, name, isPublic));
@@ -74,7 +74,7 @@ app.post('/channels/create/v2', (req, res, next) => {
   }
 });
 
-app.get('/channels/list/v2', (req, res, next) => {
+app.get('/channels/list/v3', (req, res, next) => {
   try {
     const token = req.query.token as string;
     return res.json(channelsListV1(token));
@@ -83,7 +83,7 @@ app.get('/channels/list/v2', (req, res, next) => {
   }
 });
 
-app.get('/channels/listall/v2', (req, res, next) => {
+app.get('/channels/listall/v3', (req, res, next) => {
   try {
     const token = req.query.token as string;
     return res.json(channelsListallV1(token));
@@ -208,7 +208,7 @@ app.get('/users/all/v1', (req, res, next) => {
 
 // ================================================================ //
 // Message functions
-app.post('/message/send/v1', (req, res, next) => {
+app.post('/message/send/v2', (req, res, next) => {
   try {
     const { token, channelId, message } = req.body;
     return res.json(messageSendV1(token, channelId, message));
@@ -217,7 +217,7 @@ app.post('/message/send/v1', (req, res, next) => {
   }
 });
 
-app.post('/message/senddm/v1', (req, res, next) => {
+app.post('/message/senddm/v2', (req, res, next) => {
   try {
     const { token, dmId, message } = req.body;
     return res.json(messageSenddmV1(token, dmId, message));
@@ -226,7 +226,7 @@ app.post('/message/senddm/v1', (req, res, next) => {
   }
 });
 
-app.put('/message/edit/v1', (req, res, next) => {
+app.put('/message/edit/v2', (req, res, next) => {
   try {
     const { token, messageId, message } = req.body;
     return res.json(messageEditV1(token, messageId, message));
@@ -235,7 +235,7 @@ app.put('/message/edit/v1', (req, res, next) => {
   }
 });
 
-app.delete('/message/remove/v1', (req, res, next) => {
+app.delete('/message/remove/v2', (req, res, next) => {
   try {
     const token = req.query.token as string;
     const messageId = req.query.messageId as string;

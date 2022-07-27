@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear, errorMsg } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear } from './helperTests';
 import { requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -248,8 +248,6 @@ describe('Testing auth/logout/v2', () => {
     const authUser = requestAuthRegister('email@email.com', 'password', 'name', 'name2');
     const authLogoutReturn = requestAuthLogout(authUser.token);
     expect(authLogoutReturn).toStrictEqual({});
-    // CHANGE THIS TEST CASE WHEN CHANNEL CREATE THROWS EXCEPTIONS
-    const channel = requestChannelCreate(authUser.token, 'channel', true);
-    expect(channel).toStrictEqual(errorMsg);
+    requestChannelCreate(authUser.token, 'channel', true, 403);
   });
 });
