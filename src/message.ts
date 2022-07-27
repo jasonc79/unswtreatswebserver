@@ -246,7 +246,51 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
+// function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : messageId | error {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Token is invalid');
+//   }
+//   if (!checkValidChannel(channelId)) {
+//     throw HTTPError(400, 'Channel ID does not refer to a valid channel');
+//   }
+//   if (isPast) {
+//     throw HTTPError(400, 'timeSent is a time in the past');
+//   }
+//   if (!isMember(token, channelId)) {
+//     throw HTTPError(403, 'The authorised user is not a member of the channel');
+//   }
+//   if (message.length < 1 || message.length > 1000) {
+//     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
+//   }
+
+//   const etaMs = timeSent - Math.floor((new Date()).getTime() / 1000);
+//   //const timeout = setTimeout(() => {}, etaMs);
+//   const messageId = setTimeout(messageSend(channelId, message), etaMs);
+  
+//   //const messageId = messageSend(channelId, message);
+//   return { messageId: messageId };
+  
+// }
+
 // helper function
+function messageSend(token :string, channelId: number, message: string) {
+  const data = getData();
+  const cuurentChannel = returnValidChannel(channelId);
+  const newMessage = {
+    messageId: Math.floor(Math.random() * Date.now()),
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+  };
+  for (const channel of data.channels) {
+    if (channel.channelId === cuurentChannel.channelId) {
+      channel.messages.push(newMessage);
+    }
+  }
+  setData(data);
+  return newMessage.messageId;
+}
+
 function editMessage(token: string, id: number, message: string, prop: string) {
   const data = getData();
   if (message.length === 0) {
@@ -271,6 +315,11 @@ function editMessage(token: string, id: number, message: string, prop: string) {
     }
   }
   setData(data);
+}
+
+function isPast(time) {
+  const now = Math.floor((new Date()).getTime() / 1000);
+  return time < now;
 }
 
 export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 };

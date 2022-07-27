@@ -10,6 +10,7 @@ import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1, dmLeaveV1, dmMessagesV1 
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
 import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { standupStartV1, standupActiveV1 } from './standup';
 import { clearV1 } from './other';
 import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1, channelInviteV1 } from './channel';
 // Set up web app, use JSON
@@ -245,6 +246,15 @@ app.delete('/message/remove/v2', (req, res, next) => {
   }
 });
 
+// app.post('/message/sendlater/v1', (req, res, next) => {
+//   try {
+//     const { token, channelId, message, timeSent } = req.body;
+//     return res.json(messageSendlaterV1(token, channelId, message, timeSent));
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v1', (req, res, next) => {
@@ -307,6 +317,27 @@ app.get('/dm/messages/v1', (req, res, next) => {
     next(err);
   }
 });
+// ================================================================ //
+// Standup functions
+
+app.post('/standup/start/v1', (req, res, next) => {
+  try {
+    const { token, channelId, length } = req.body;
+    return res.json(standupStartV1(token, channelId, length));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/standup/active/v1', (req, res, next) => {
+  try {
+    const { token, channelId } = req.body;
+    return res.json(standupActiveV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
 // Other functions
 
