@@ -158,7 +158,7 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
   }
 
   if (!checkValidDm(dmId)) {
-    throw HTTPError(400, 'dmId is invalid'); //
+    throw HTTPError(400, 'dmId is invalid');
   }
 
   if (!isOwnerDm(token, dmId)) {
@@ -171,7 +171,6 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
 
   const data = getData();
   const dmDetails = returnValidDm(dmId);
-  console.log(dmDetails.members);
   data.dms = data.dms.filter((item) => {
     return item !== dmDetails;
   });
@@ -210,17 +209,24 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   }
 
   const data = getData();
-  const dm = returnValidDm(dmId);
   const user = userProfileV1(token, getIdfromToken(token)) as userReturn;
-  dm.members = dm.members.filter((item) => {
+
+  let leaveDm: Dm;
+  for (const dm of data.dms) {
+    if (dm.dmId === dmId) {
+      leaveDm = dm;
+    }
+  }
+
+  leaveDm.members = leaveDm.members.filter((item) => {
     return item.uId !== user.user.uId;
   });
   if (isOwnerDm(token, dmId)) {
-    dm.owners = dm.owners.filter((item) => {
+    leaveDm.owners = leaveDm.owners.filter((item) => {
       return item.uId !== user.user.uId;
     });
-    setData(data);
   }
+  setData(data);
   return {};
 };
 
