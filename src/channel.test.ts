@@ -340,8 +340,8 @@ describe('Testing channelRemoveOwnerV1', () => {
   });
 });
 
-// Tests for channelInviteV1
-describe('Testing channelInviteV1', () => {
+// Tests for channelInviteV3
+describe('Testing channelInviteV3', () => {
   test('Valid inputs', () => {
     const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
     const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
@@ -351,29 +351,26 @@ describe('Testing channelInviteV1', () => {
 
   test('Invalid channelID', () => {
     const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
-    const invalidChannelId = requestChannelInvite(authUser.token, -1, authUserId2.authUserId);
-    expect(invalidChannelId).toEqual({ error: 'error' });
+    requestChannelInvite(authUser.token, -1, authUserId2.authUserId, 400);
   });
 
   test('Invalid userID', () => {
     const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
-    const invalidUserId = requestChannelInvite(authUser.token, channelId.channelId, -1);
-    expect(invalidUserId).toEqual({ error: 'error' });
+    requestChannelInvite(authUser.token, channelId.channelId, -1, 400);
   });
 
   test('User is already a member', () => {
     const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
     const channelId = requestChannelCreate(authUser.token, 'Channel1', true);
     requestChannelJoin(authUserId2.token, channelId.channelId);
-    const alreadyMember = requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId);
-    expect(alreadyMember).toEqual({ error: 'error' });
+    requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId, 400);
   });
 
   test('Authorised user is not a member', () => {
     const authUserId2 = requestAuthRegister('test2@gmail.com', '123abc!@#', 'Test2', 'Smith');
+    const authUserId3 = requestAuthRegister('test3@gmail.com', '123abc!@#', 'Test3', 'Smith');
     const channelId = requestChannelCreate(authUserId2.token, 'Channel1', true);
-    const notMember = requestChannelInvite(authUser.token, channelId.channelId, authUserId2.authUserId);
-    expect(notMember).toEqual({ error: 'error' });
+    requestChannelInvite(authUser.token, channelId.channelId, authUserId3.authUserId, 403);
   });
 });
 
