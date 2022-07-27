@@ -71,6 +71,25 @@ interface ChannelInfo {
   name: string,
 }
 
+// STANDUP TYPES AND INTERFACES
+type timeReturn = { timeFinish: number };
+type activeReturn = { 
+    isActive: boolean, 
+    timeFinish: number 
+};
+
+type standupMsg = {
+  handle: string,
+  message: string
+}
+
+interface Standup {
+  channelId: number,
+  messages: standupMsg[],
+  timeFinish: number,
+  isActive: boolean
+}
+
 // ERROR TYPES AND CONSTANTS
 type error = { error: string };
 
@@ -78,6 +97,7 @@ type Data = {
   users: User[],
   channels: Channel[],
   dms: Dm[],
+  standups: Standup[]
 }
 
 // CONSTANTS //
@@ -87,6 +107,7 @@ let data: Data = {
   users: [],
   channels: [],
   dms: [],
+  standups: []
 };
 
 const fileName = 'data.json';
@@ -116,4 +137,5 @@ function loadData() {
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
+export { timeReturn, activeReturn, Standup }
 export { error, errorMsg };

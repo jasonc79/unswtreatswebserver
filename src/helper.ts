@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message, Standup } from './dataStore';
 
 // INCLUDES FUNCTIONS FOR:
 // - Checking whether a function exits
@@ -304,6 +304,16 @@ export function isGlobalOwner(token: string) : boolean {
   const user = returnValidUser(token);
   if (user.permissionId === 1) {
     return true;
+  }
+  return false;
+}
+
+export function isActive(channelId: number) : boolean {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return true;
+    }
   }
   return false;
 }
