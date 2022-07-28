@@ -9,7 +9,7 @@ import { authRegisterV1, authLoginV1, authLogoutV1 } from './auth';
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV1 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageReactV1, messageUnreactV1 } from './message';
 import { clearV1 } from './other';
 import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1, channelInviteV3 } from './channel';
 // Set up web app, use JSON
@@ -244,6 +244,24 @@ app.delete('/message/remove/v2', (req, res, next) => {
     next(err);
   }
 });
+
+app.post('/message/react/v1', (req, res, next) => {
+  try {
+    const { messageId, reactId } = req.body; 
+    return res.json(messageReactV1(messageId, reactId)); 
+  } catch (err) {
+    next(err); 
+  }
+})
+
+app.post('/message/unreact/v1', (req, res, next) => {
+  try {
+    const { messageId, reactId } = req.body; 
+    return res.json(messageUnreactV1(messageId, reactId)); 
+  } catch (err) {
+    next(err); 
+  }
+})
 
 // ================================================================ //
 // dm functions

@@ -35,7 +35,8 @@ interface Message {
   messageId: number,
   uId: number,
   message: string,
-  timeSent: number
+  timeSent: number, 
+  reactId?: number // Empty or 0 for no react, 1 for like react
 }
 
 // DM TYPES AND INTERFACES
@@ -70,6 +71,8 @@ interface ChannelInfo {
   channelId: number,
   name: string,
 }
+
+type channelReturn = { channels: ChannelInfo[] }; 
 
 // ERROR TYPES AND CONSTANTS
 type error = { error: string };
@@ -114,6 +117,6 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
+export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn, channelReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };

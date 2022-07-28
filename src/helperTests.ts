@@ -15,6 +15,16 @@ export type authUserReturn = {
   token: string,
   authUserId: number
 }
+
+export type createDmReturn = {
+  dmId: number,
+  name: string,
+}
+
+export type createChannelReturn = {
+  channelId: number,
+  name: string
+}
 export const errorMsg = { error: 'error' };
 
 /**
@@ -177,6 +187,14 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token, messageId }, err);
+}
+
+export function requestMessageReact(messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', 'message/react/v1', {messageId, reactId}, err);
+}
+
+export function requestMessageUnreact(messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', 'message/unreact/v1', {messageId, reactId}, err);
 }
 
 // Other functions

@@ -20,6 +20,7 @@ import {
   isOwnerDm,
 } from './helper';
 import HTTPError from 'http-errors';
+import { errorMsg } from './helperTests';
 
 type messageId = { messageId: number };
 
@@ -246,6 +247,16 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
+function messageReactV1 (messageId: number, reactId: number): error | {} {
+   
+  return errorMsg; 
+}
+
+function messageUnreactV1 (messageId: number, reactId: number): error | {} {
+   
+  return errorMsg; 
+}
+
 // helper function
 function editMessage(token: string, id: number, message: string, prop: string) {
   const data = getData();
@@ -273,4 +284,4 @@ function editMessage(token: string, id: number, message: string, prop: string) {
   setData(data);
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 };
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageReactV1, messageUnreactV1 };
