@@ -36,7 +36,13 @@ interface Message {
   uId: number,
   message: string,
   timeSent: number, 
-  reactId?: number // Empty or 0 for no react, 1 for like react
+  reacts?: React[] 
+}
+
+interface React {
+  reactId: number, // Empty or 0 for no react, 1 for like react
+  uIds: uId[], 
+  isThisUserReacted: boolean
 }
 
 // DM TYPES AND INTERFACES
@@ -117,6 +123,6 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn, channelReturn };
+export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn, React, channelReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };

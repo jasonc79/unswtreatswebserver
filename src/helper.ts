@@ -59,15 +59,20 @@ export function checkValidDm(id: number): boolean {
   return false;
 }
 
-// export function checkValidReactId(id: number): boolean {
-//   const data: Data = getData(); 
-//   // Checking channel messages
-//   for (const channel of data.channels) {
-//     for ()
-//   }
+export function checkValidReactId(id: number): boolean {
+  const data: Data = getData(); 
+  // Checking channel messages
+  for (const channel of data.channels) {
+    for (const message of channel.messages) {
+      
+    }
+  }
 
-//   // Checking dm messages
-// }
+  // Checking dm messages
+
+
+  return true; 
+}
 
 /**
  * returns true if the message exists in some channel, and false otherwise
