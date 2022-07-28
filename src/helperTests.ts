@@ -82,7 +82,7 @@ export function requestChannelCreate(token: string, name: string, isPublic: bool
 }
 
 export function requestChannelInvite(token: string, channelId: number, uId: number, err?: number) {
-  return requestHelper('POST', '/channel/invite/v2', { token, channelId, uId });
+  return requestHelper('POST', '/channel/invite/v3', { token, channelId, uId }, err);
 }
 
 export function requestChannelJoin(token: string, channelId: number, err?: number) {
@@ -117,24 +117,24 @@ export function requestChannelDetails(token: string, channelId: number, err?: nu
 }
 
 // Dm functions
-export function requestDmCreate(token: string, uIds: number[], err?: number) {
-  return requestHelper('POST', '/dm/create/v1', { token, uIds });
+export function requestDmCreate(token: string, uIds: number[], err? : number) {
+  return requestHelper('POST', '/dm/create/v2', { token, uIds }, err);
 }
 
 export function requestDmLeave(token: string, dmId: number, err?: number) {
-  return requestHelper('POST', '/dm/leave/v1', { token, dmId });
+  return requestHelper('POST', '/dm/leave/v2', { token, dmId }, err);
 }
 
 export function requestDmDetails(token: string, dmId: number, err?: number) {
-  return requestHelper('GET', '/dm/details/v1', { token, dmId });
+  return requestHelper('GET', '/dm/details/v2', { token, dmId }, err);
 }
 
 export function requestDmList(token: string, err?: number) {
-  return requestHelper('GET', '/dm/list/v1', { token });
+  return requestHelper('GET', '/dm/list/v2', { token }, err);
 }
 
 export function requestDmRemove(token: string, dmId: number, err?: number) {
-  return requestHelper('DELETE', '/dm/remove/v1', { token, dmId });
+  return requestHelper('DELETE', '/dm/remove/v2', { token, dmId }, err);
 }
 
 export function requestDmMessages(token: string, dmId: number, start: number, err?: number) {
