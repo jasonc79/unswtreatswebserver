@@ -1,4 +1,4 @@
-import { authUserReturn, requestAuthRegister, errorMsg, requestClear, requestDmList, requestDmCreate, requestDmMessages, requestMessageSenddm, requestDmDetails } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestClear, requestDmList, requestDmCreate, requestDmMessages, requestMessageSenddm, requestDmDetails } from './helperTests';
 import { requestDmLeave, requestDmRemove } from './helperTests';
 import { removeFile } from './helperTests';
 
