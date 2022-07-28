@@ -97,7 +97,7 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
   return {};
 }
 /**
- * channelInviteV1
+ * channelInviteV3
  * Invites a user with ID uId to join a channel with ID channelId.
  *
  * Arguments:
@@ -115,15 +115,17 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
  * @returns {} if there is no error
  */
 
-function channelInviteV1(token: string, channelId: number, uId: number): (error | object) {
+function channelInviteV3(token: string, channelId: number, uId: number): (error | object) {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Invvalid token');
   }
   // Checking if channelID and uId are valid
   const channel = returnValidChannel(channelId);
   const user = returnValidId(uId);
-  if (channel === undefined || user === undefined) {
-    return errorMsg;
+  if (channel === undefined) {
+    throw HTTPError(400, 'Invalid channelId');
+  } else if (user === undefined) {
+    throw HTTPError(400, 'Invalid userId');
   }
   // Checking if uId and authUserID are members
   const authUserId = getIdfromToken(token);
@@ -136,8 +138,10 @@ function channelInviteV1(token: string, channelId: number, uId: number): (error 
       authUserIdMember = true;
     }
   }
-  if (uIdMember === true || authUserIdMember === false) {
-    return errorMsg;
+  if (uIdMember === true) {
+    throw HTTPError(400, 'User is already a member of the channel');
+  } else if (authUserIdMember === false) {
+    throw HTTPError(403, 'Authorised user is not a member of the channel');
   }
 
   channel.allMembers.push(user);
@@ -332,4 +336,4 @@ function channelRemoveOwnerV2(token: string, channelId: number, uId: number): (o
   return {};
 }
 
-export { channelDetailsV2, channelJoinV1, channelInviteV1, channelMessagesV3, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2 };
+export { channelDetailsV2, channelJoinV1, channelInviteV3, channelMessagesV3, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2 };

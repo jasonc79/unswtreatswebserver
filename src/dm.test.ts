@@ -44,13 +44,12 @@ function generateUserIds() {
 // ========================================================================= //
 // Testing
 
-describe('Testing dm/create/v1', () => {
+describe('Testing dm/create/v2', () => {
   test('Any uId in uIds does not refer to a valid user', () => {
     const uId = authUser.authUserId + 1;
     const uIds = [];
     uIds.push(uId);
-    const dm = requestDmCreate(authUser.token, uIds);
-    expect(dm).toStrictEqual(errorMsg);
+    requestDmCreate(authUser.token, uIds, 400);
   });
 
   test('There are duplicate uIds in uIds', () => {
@@ -58,15 +57,13 @@ describe('Testing dm/create/v1', () => {
     const uIds = [];
     uIds.push(uId.authUserId);
     uIds.push(uId.authUserId);
-    const dm = requestDmCreate(authUser.token, uIds);
-    expect(dm).toStrictEqual(errorMsg);
+    requestDmCreate(authUser.token, uIds, 400);
   });
 
   test('Invalid token', () => {
     const uIds = generateUserIds();
     const token = 'bad';
-    const dm = requestDmCreate(token, uIds);
-    expect(dm).toStrictEqual(errorMsg);
+    requestDmCreate(token, uIds, 403);
   });
 
   test('Valid inputs', () => {
@@ -80,22 +77,21 @@ describe('Testing dm/create/v1', () => {
   });
 });
 
-describe('Testing dm/details/v1', () => {
+describe('Testing dm/details/v2', () => {
   test('dmId does not refer to a valid DM', () => {
     const authUser = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const dm = -1;
-    const dmDetail = requestDmDetails(authUser.token, dm);
-    expect(dmDetail).toStrictEqual(errorMsg);
+    requestDmDetails(authUser.token, dm, 400);
   });
 
   test('dmId is valid and the authorised user is not a member of the DM', () => {
+    const authUser = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const authUser2 = requestAuthRegister('email1@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const uId1 = requestAuthRegister('email2@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    const dmDetail = requestDmDetails(authUser2.token, dm);
-    expect(dmDetail).toStrictEqual(errorMsg);
+    requestDmDetails(authUser2.token, dm.dmId, 403);
   });
 
   test('Valid inputs', () => {
@@ -126,7 +122,7 @@ describe('Testing dm/details/v1', () => {
   });
 });
 
-describe('Testing dm/list/v1', () => {
+describe('Testing dm/list/v2', () => {
   test('0 dms, empty list', () => {
     const dmList = requestDmList(authUser.token);
     expect(dmList).toStrictEqual({ dms: [] });
@@ -167,31 +163,28 @@ describe('Testing dm/list/v1', () => {
   });
 });
 
-describe('Testing dm/remove/v1', () => {
+describe('Testing dm/remove/v2', () => {
   test('dmId does not refer to a valid DM', () => {
     const dm = -1;
-    const dmRemove = requestDmRemove(authUser.token, dm);
-    expect(dmRemove).toStrictEqual(errorMsg);
+    requestDmRemove(authUser.token, dm, 400);
   });
 
-  test('dmId is valid and the autyhorised user is not the original DM creator', () => {
+  test('dmId is valid and the authorised user is not the original DM creator', () => {
+    const authUser1 = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    const dmRemove = requestDmRemove(authUser.token, dm);
-    expect(dmRemove).toStrictEqual(errorMsg);
+    requestDmRemove(authUser1.token, dm.dmId, 403);
   });
 
   test('dmId is valid and the authorised user is no longer in the DM', () => {
-    // Need dm/leave for it to work
     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
-    // const dmLeave = getRequestDmLeaveV1(authUser.token, dm.dmId); // UNCOMMENT AFTER IMPLEMENTING DM/LEAVE
-    const dmRemove = requestDmRemove(authUser.token, dm);
-    expect(dmRemove).toStrictEqual(errorMsg);
+    requestDmLeave(authUser.token, dm.dmId);
+    requestDmRemove(authUser.token, dm.dmId, 403);
   });
 
   test('Valid inputs', () => {
@@ -204,7 +197,7 @@ describe('Testing dm/remove/v1', () => {
   });
 });
 
-describe('Testing dm/leave/v1', () => {
+describe('Testing dm/leave/v2', () => {
   describe('errors', () => {
     test('invalid token', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -212,16 +205,14 @@ describe('Testing dm/leave/v1', () => {
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
       const token = 'bad';
-      const dmLeave = requestDmLeave(token, dm.dmId);
-      expect(dmLeave).toStrictEqual(errorMsg);
+      requestDmLeave(token, dm.dmId, 403);
     });
     test('invalid dmId', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const dmLeave = requestDmLeave(authUser.token, dm.dmId + 1);
-      expect(dmLeave).toStrictEqual(errorMsg);
+      requestDmLeave(authUser.token, dm.dmId + 1, 400);
     });
     test('authUser1 is not a member', () => {
       const authUser1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
@@ -229,8 +220,7 @@ describe('Testing dm/leave/v1', () => {
       const uIds = [];
       uIds.push(uId1.authUserId);
       const dm = requestDmCreate(authUser.token, uIds);
-      const dmLeave = requestDmLeave(authUser1.token, dm.dmId);
-      expect(dmLeave).toStrictEqual(errorMsg);
+      requestDmLeave(authUser1.token, dm.dmId, 403);
     });
   });
   describe('passes', () => {
