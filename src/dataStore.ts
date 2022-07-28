@@ -40,7 +40,7 @@ interface Message {
 }
 
 interface React {
-  reactId: number, // Empty or 0 for no react, 1 for like react
+  reactId: number, 
   uIds: uId[], 
   isThisUserReacted: boolean
 }

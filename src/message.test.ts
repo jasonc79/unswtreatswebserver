@@ -11,6 +11,8 @@ const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
+const reactId = 1; 
+
 function generateTimeStamp() {
   return Math.floor(Date.now() / 1000);
 }
@@ -706,7 +708,6 @@ describe('Testing messageRemoveV1', () => {
       test('messageId is not a valid message', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
         const messageId = message.messageId + 1; 
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(messageId, reactId, 400);
       });
 
@@ -717,14 +718,12 @@ describe('Testing messageRemoveV1', () => {
 
       test('Message already contains a react', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId);
         requestMessageReact(message.messageId, reactId, 400);
       });
 
       test('Valid inputs', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         const react = requestMessageReact(message.messageId, reactId);
         expect(react).toStrictEqual({}); 
       });
@@ -741,7 +740,6 @@ describe('Testing messageRemoveV1', () => {
       test('messageId is not a valid message', () => {
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
         const messageId = message.messageId + 1; 
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(messageId, reactId, 400);     
       });
 
@@ -752,14 +750,12 @@ describe('Testing messageRemoveV1', () => {
 
       test('Message already contains a react', () => {
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId);     
         requestMessageReact(message.messageId, reactId, 400);     
       });
 
       test('Valid inputs', () => {
         const message = requestMessageSend(authUser.token, dm.dmId, 'message');
-        const reactId = message.reacts[0].reactId; 
         const react = requestMessageReact(message.messageId, reactId);
         expect(react).toStrictEqual({}); 
       });
@@ -774,7 +770,6 @@ describe('Testing messageRemoveV1', () => {
 
       test('messageId is not a valid message', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId); 
         const messageId = message.messageId + 1; 
         requestMessageUnreact(messageId, reactId, 400);
@@ -782,20 +777,17 @@ describe('Testing messageRemoveV1', () => {
 
       test('reactId is not valid', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId); 
         requestMessageUnreact(message.messageId, -1, 400);
       });
 
       test('Message does not contain a react', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageUnreact(message.messageId, reactId, 400);
       });
 
       test('Valid inputs', () => {
         const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId);
         const unreact = requestMessageUnreact(message.messageId, reactId); 
         expect(unreact).toStrictEqual({}); 
@@ -812,7 +804,6 @@ describe('Testing messageRemoveV1', () => {
 
       test('messageId is not a valid message', () => {
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId);     
         const messageId = message.messageId + 1; 
         requestMessageUnreact(messageId, reactId, 400);     
@@ -820,20 +811,17 @@ describe('Testing messageRemoveV1', () => {
 
       test('reactId is not valid', () => {
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId, 400);     
         requestMessageUnreact(message.messageId, -1, 400);     
       });
 
       test('Message does not contain a react', () => {
         const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-        const reactId = message.reacts[0].reactId; 
         requestMessageUnreact(message.messageId, reactId, 400);     
       });
 
       test('Valid inputs', () => {
         const message = requestMessageSend(authUser.token, dm.dmId, 'message');
-        const reactId = message.reacts[0].reactId; 
         requestMessageReact(message.messageId, reactId);
         const unreact = requestMessageUnreact(message.messageId, reactId); 
         expect(unreact).toStrictEqual({}); 
