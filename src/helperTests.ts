@@ -143,23 +143,23 @@ export function requestDmMessages(token: string, dmId: number, start: number, er
 
 // User functions
 export function requestUserProfile(token: string, uId: number, err?: number) {
-  return requestHelper('GET', '/user/profile/v2', { token, uId });
+  return requestHelper('GET', '/user/profile/v3', { token, uId }, err);
 }
 
 export function requestAllUsers(token: string, err?: number) {
-  return requestHelper('GET', '/users/all/v1', { token });
+  return requestHelper('GET', '/users/all/v2', { token }, err);
 }
 
 export function requestUserSetName(token: string, nameFirst: string, nameLast: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/setname/v1', { token, nameFirst, nameLast });
+  return requestHelper('PUT', '/user/profile/setname/v2', { token, nameFirst, nameLast }, err);
 }
 
 export function requestUserEmail(token: string, email: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/setemail/v1', { token, email });
+  return requestHelper('PUT', '/user/profile/setemail/v2', { token, email }, err);
 }
 
 export function requestUserHandle(token: string, handleStr: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/sethandle/v1', { token, handleStr });
+  return requestHelper('PUT', '/user/profile/sethandle/v2', { token, handleStr }, err);
 }
 
 // Message functions
