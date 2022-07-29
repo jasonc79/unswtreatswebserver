@@ -86,7 +86,7 @@ export function requestChannelInvite(token: string, channelId: number, uId: numb
 }
 
 export function requestChannelJoin(token: string, channelId: number, err?: number) {
-  return requestHelper('POST', '/channel/join/v2', { token, channelId });
+  return requestHelper('POST', '/channel/join/v3', { token, channelId }, err);
 }
 export function requestChannelMessages(token: string, channelId: number, start: number, err?: number) {
   return requestHelper('GET', '/channel/messages/v2', { token, channelId, start });
@@ -113,7 +113,7 @@ export function requestChannelLeave(token: string, channelId: number, err?: numb
 }
 
 export function requestChannelDetails(token: string, channelId: number, err?: number) {
-  return requestHelper('GET', '/channel/details/v2', { token, channelId });
+  return requestHelper('GET', '/channel/details/v3', { token, channelId }, err);
 }
 
 // Dm functions

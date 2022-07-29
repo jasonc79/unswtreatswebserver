@@ -85,16 +85,17 @@ describe('Testing channelDetailsV2', () => {
       })
     );
   });
+  test('Testing invalid token (403)', () => {
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelDetails(authUser.token + 1, channel.channelId, 403);
+  });
   test('ChannelId is invalid', () => {
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const details = requestChannelDetails(authUser.token, channel.channelId + 1);
-    expect(details).toStrictEqual(errorMsg);
+    requestChannelDetails(authUser.token, 0, 400);
   });
   test('ChannelId is valid but user is not part of channel', () => {
-    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'correct name', true);
-    const details = requestChannelDetails(authUser2.token, channel.channelId);
-    expect(details).toStrictEqual(errorMsg);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelDetails(authUser2.token, channel.channelId, 403);
   });
 });
 
@@ -375,27 +376,28 @@ describe('Testing channelInviteV3', () => {
 });
 
 describe('Testing channelJoinV1', () => {
+  test('Testing invalid token (403)', () => {
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelJoin(authUser.token + 1, channel.channelId, 403);
+  });
   test('Invalid ChannelId', () => {
-    const channelJoin = requestChannelJoin(authUser.token, 1);
-    expect(channelJoin).toStrictEqual(errorMsg);
+    requestChannelJoin(authUser.token, 1, 400);
   });
   test('the authorised user is already a member of the channel', () => {
-    const channel = requestChannelCreate(authUser.token, 'name', true);
-    const channelJoin = requestChannelJoin(authUser.token, channel.channelId);
-    expect(channelJoin).toStrictEqual(errorMsg);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelJoin(authUser.token, channel.channelId, 400);
   });
   test('Adding non-global user to a private channel', () => {
-    const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser.token, 'name', false);
-    const channelJoin = requestChannelJoin(authUser2.token, channel.channelId);
+    const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'name', false, 200);
     // Auth user is not channel member or global owner
-    expect(channelJoin).toStrictEqual(errorMsg);
+    requestChannelJoin(authUser2.token, channel.channelId, 403);
   });
   test('positive case', () => {
-    const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
-    const channel = requestChannelCreate(authUser2.token, 'name', true);
-    const channelJoin = requestChannelJoin(authUser.token, channel.channelId);
-    const channelDetails = requestChannelDetails(authUser.token, channel.channelId);
+    const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser2.token, 'name', true, 200);
+    const channelJoin = requestChannelJoin(authUser.token, channel.channelId, 200);
+    const channelDetails = requestChannelDetails(authUser.token, channel.channelId, 200);
     expect(channelJoin).toStrictEqual({});
     expect(channelDetails).toStrictEqual(
       {
