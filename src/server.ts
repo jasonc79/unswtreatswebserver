@@ -31,9 +31,6 @@ app.get('/echo', (req, res, next) => {
   }
 });
 
-// handles errors nicely
-app.use(errorHandler());
-
 // ================================================================ //
 // Auth functions
 app.post('/auth/register/v3', (req, res, next) => {
@@ -317,6 +314,10 @@ app.delete('/clear/v1', (req, res, next) => {
     next(err);
   }
 });
+
+
+// handles errors nicely
+app.use(errorHandler());
 
 // for logging errors
 app.use(morgan('dev'));

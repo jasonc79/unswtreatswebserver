@@ -251,3 +251,16 @@ describe('Testing auth/logout/v2', () => {
     requestChannelCreate(authUser.token, 'channel', true, 403);
   });
 });
+
+describe('Testing auth/passwordreset/request/v1', () => {
+  test('Email belongs to a registered user', () => {
+
+  });
+  //const authUser = requestAuthRegister(email0, password0, nameFirst0, nameLast0);
+
+});
+
+describe('Testing auth/passwordreset/reset/v1', () => {
+  
+});
+

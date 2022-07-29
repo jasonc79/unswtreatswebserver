@@ -76,6 +76,15 @@ export function requestAuthLogin(email: string, password: string, err?: number) 
 export function requestAuthLogout(token: string, err?: number) {
   return requestHelper('POST', '/auth/logout/v2', { token: token }, err);
 }
+
+export function requestAuthPasswordRequest(token: string, email: string, err?: number) {
+  return requestHelper('POST', '/auth/passwordreset/request/v1', { token: token }, err);
+}
+
+export function requestAuthPasswordReset(token: string, resetCode: string, newPassword: string, err?: number) {
+  return requestHelper('POST', '/auth/passwordreset/reset/v1', { token: token }, err);
+}
+
 // Channels functions
 export function requestChannelCreate(token: string, name: string, isPublic: boolean, err?: number) {
   return requestHelper('POST', '/channels/create/v3', { token, name, isPublic }, err);
