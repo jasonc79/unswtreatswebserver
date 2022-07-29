@@ -31,9 +31,6 @@ app.get('/echo', (req, res, next) => {
   }
 });
 
-// handles errors nicely
-app.use(errorHandler());
-
 // ================================================================ //
 // Auth functions
 app.post('/auth/register/v3', (req, res, next) => {
@@ -106,7 +103,7 @@ app.get('/channel/messages/v2', (req, res, next) => {
   }
 });
 
-app.get('/channel/details/v2', (req, res, next) => {
+app.get('/channel/details/v3', (req, res, next) => {
   try {
     const token = req.query.token as string;
     const channelId = parseInt(req.query.channelId as string);
@@ -152,7 +149,7 @@ app.post('/channel/removeowner/v1', (req, res, next) => {
   }
 });
 
-app.post('/channel/join/v2', (req, res, next) => {
+app.post('/channel/join/v3', (req, res, next) => {
   try {
     const { token, channelId } = req.body;
     return res.json(channelJoinV1(token, channelId));
@@ -317,6 +314,10 @@ app.delete('/clear/v1', (req, res, next) => {
     next(err);
   }
 });
+
+// =================================================================//
+// handles errors nicely
+app.use(errorHandler());
 
 // for logging errors
 app.use(morgan('dev'));

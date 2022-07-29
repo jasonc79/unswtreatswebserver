@@ -80,16 +80,20 @@ type Data = {
   dms: Dm[],
 }
 
+// EMPTY RETURN
+type empty = object;
+
 // CONSTANTS //
 const errorMsg = { error: 'error' };
+const fileName = 'data.json';
+const OWNER = 1;
+const MEMBER = 2;
 
 let data: Data = {
   users: [],
   channels: [],
   dms: [],
 };
-
-const fileName = 'data.json';
 
 // Use get() to access the data
 function getData(): Data {
@@ -116,4 +120,4 @@ function loadData() {
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
-export { error, errorMsg };
+export { error, errorMsg, empty, OWNER, MEMBER };
