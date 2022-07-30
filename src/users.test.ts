@@ -1,4 +1,4 @@
-import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestClear } from './helperTests';
 import { requestUserSetName, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -121,7 +121,6 @@ describe('Testing userSetHandleV1', () => {
   test('Same handle as updated handle', () => {
     requestUserHandle(authUser.token, 'firstnamelastname', 400);
   });
-
 });
 
 describe('Testing usersAllV1', () => {
