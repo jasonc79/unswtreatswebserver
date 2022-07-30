@@ -173,7 +173,7 @@ describe('Testing userStats', () => {
     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4);
-    const channel = requestChannelCreate(authUser2.token, 'name', true);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
     requestChannelJoin(authUser2.token, channel.channelId);
     requestChannelJoin(authUser3.token, channel.channelId);
     requestChannelJoin(authUser4.token, channel.channelId);
@@ -184,7 +184,7 @@ describe('Testing userStats', () => {
     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4);
-    const channel = requestChannelCreate(authUser2.token, 'name', true);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
     requestChannelJoin(authUser2.token, channel.channelId);
     const stats = requestUsersStats(authUser.token);
     expect(stats).toStrictEqual('1/2');

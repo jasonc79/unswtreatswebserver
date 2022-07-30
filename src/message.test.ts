@@ -799,6 +799,7 @@ describe('Testing messageunpin', () => {
       requestMessageUnpin(authUser.token, message.messageId, 200);
       requestMessageUnpin(authUser.token, message.messageId, 400);
     });
+    
   });
 
   describe('passes', () => {
