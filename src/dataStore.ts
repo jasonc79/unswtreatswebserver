@@ -17,6 +17,9 @@ interface User {
   token: token[],
   password: string,
   permissionId: number,
+  channelsJoined: number,
+  dmsJoined: number,
+  msgsSent: number,
 }
 
 interface UserInfo {
@@ -35,7 +38,8 @@ interface Message {
   messageId: number,
   uId: number,
   message: string,
-  timeSent: number
+  timeSent: number,
+  pinned: boolean,
 }
 
 // DM TYPES AND INTERFACES

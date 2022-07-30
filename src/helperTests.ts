@@ -178,6 +178,14 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token, messageId }, err);
 }
+
+export function requestMessagePin(token: string, messageId: number, err?: number) {
+  return requestHelper('PUT', '/message/pin/v1', { token, messageId }, err);
+}
+
+export function requestMessageUnpin(token: string, messageId: number, err?: number) {
+  return requestHelper('PUT', '/message/unpin/v1', { token, messageId }, err);
+}
 // Other functions
 export function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});

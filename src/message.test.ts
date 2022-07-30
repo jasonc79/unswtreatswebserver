@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessagePin, requestMessageUnpin } from './helperTests';
 import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
