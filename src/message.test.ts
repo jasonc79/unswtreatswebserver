@@ -74,7 +74,8 @@ describe('Testing messageSendV1', () => {
             messageId: message.messageId,
             uId: authUser.authUserId,
             message: 'message',
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            pinned: false
           }],
           start: 0,
           end: -1
@@ -113,7 +114,8 @@ describe('Testing messageSendV1', () => {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message1',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             },
           ],
           start: 0,
@@ -127,7 +129,8 @@ describe('Testing messageSendV1', () => {
               messageId: message2.messageId,
               uId: authUser.authUserId,
               message: 'message2',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             },
           ],
           start: 0,
@@ -166,13 +169,15 @@ describe('Testing messageSendV1', () => {
               messageId: message2.messageId,
               uId: authUser.authUserId,
               message: 'message2',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             },
             {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message1',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }
           ],
           start: 0,
@@ -223,7 +228,7 @@ describe('Testing messageSenddmV1', () => {
   });
 
   describe('passes', () => {
-    test('1 message - 1 channel', () => {
+    test('1 message - 1 dm', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uIds = [];
       uIds.push(uId1.authUserId);
@@ -242,7 +247,8 @@ describe('Testing messageSenddmV1', () => {
             messageId: message.messageId,
             uId: authUser.authUserId,
             message: 'message',
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            pinned: false
           }],
           start: 0,
           end: -1
@@ -282,13 +288,15 @@ describe('Testing messageSenddmV1', () => {
               messageId: message2.messageId,
               uId: authUser.authUserId,
               message: 'message2',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             },
             {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message1',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }
           ],
           start: 0,
@@ -363,7 +371,8 @@ describe('Testing messageEditV1', () => {
               messageId: message.messageId,
               uId: authUser.authUserId,
               message: 'new message',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -386,7 +395,8 @@ describe('Testing messageEditV1', () => {
               messageId: message.messageId,
               uId: authUser2.authUserId,
               message: 'new message',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -476,7 +486,8 @@ describe('Testing messageEditV1', () => {
               messageId: message.messageId,
               uId: authUser.authUserId,
               message: 'new message',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -500,7 +511,8 @@ describe('Testing messageEditV1', () => {
               messageId: message.messageId,
               uId: uId1.authUserId,
               message: 'new message',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -569,7 +581,8 @@ describe('Testing messageRemoveV1', () => {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message2',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -667,7 +680,8 @@ describe('Testing messageRemoveV1', () => {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message2',
-              timeSent: expect.any(Number)
+              timeSent: expect.any(Number),
+              pinned: false
             }],
             start: 0,
             end: -1
@@ -692,6 +706,158 @@ describe('Testing messageRemoveV1', () => {
           })
         );
       });
+    });
+  });
+});
+
+describe('Testing messagepin', () => {
+  describe('error', () => {
+    test('invalid token', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin('bad', message.messageId, 403);
+    });
+    test('message is already pinned', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessagePin(authUser.token, message.messageId, 400);
+    });
+  });
+
+  describe('passes', () => {
+    test('1 message - 1 channel', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message');
+      const expectedTime = generateTimeStamp();
+      requestMessagePin(authUser.token, message.messageId, 200);
+      const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+      expect(message).toStrictEqual(
+        expect.objectContaining({
+          messageId: expect.any(Number),
+        })
+      );
+      expect(messages).toStrictEqual(
+        expect.objectContaining({
+          messages: [{
+            messageId: message.messageId,
+            uId: authUser.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            pinned: true
+          }],
+          start: 0,
+          end: -1
+        })
+      );
+      checkTimestamp(messages.messages[0].timeSent, expectedTime);
+    });
+    test('1 message - 1 dm', () => {
+      const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+      const uIds = [];
+      uIds.push(uId1.authUserId);
+      const dm = requestDmCreate(authUser.token, uIds);
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      const expectedTime = generateTimeStamp();
+      requestMessagePin(authUser.token, message.messageId, 200);
+      const messages = requestDmMessages(authUser.token, dm.dmId, 0);
+      expect(message).toStrictEqual(
+        expect.objectContaining({
+          messageId: expect.any(Number),
+        })
+      );
+      expect(messages).toStrictEqual(
+        expect.objectContaining({
+          messages: [{
+            messageId: message.messageId,
+            uId: authUser.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            pinned: true
+          }],
+          start: 0,
+          end: -1
+        })
+      );
+      checkTimestamp(messages.messages[0].timeSent, expectedTime);
+    });
+  });
+});
+
+describe('Testing messageunpin', () => {
+  describe('error', () => {
+    test('invalid token', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin('bad', message.messageId, 403);
+    });
+    test('message is already unpinned', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser.token, message.messageId, 400);
+    });
+  });
+
+  describe('passes', () => {
+    test('1 message - 1 channel', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message');
+      const expectedTime = generateTimeStamp();
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser.token, message.messageId, 200);
+      const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+      expect(message).toStrictEqual(
+        expect.objectContaining({
+          messageId: expect.any(Number),
+        })
+      );
+      expect(messages).toStrictEqual(
+        expect.objectContaining({
+          messages: [{
+            messageId: message.messageId,
+            uId: authUser.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            pinned: true
+          }],
+          start: 0,
+          end: -1
+        })
+      );
+      checkTimestamp(messages.messages[0].timeSent, expectedTime);
+    });
+    test('1 message - 1 dm', () => {
+      const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+      const uIds = [];
+      uIds.push(uId1.authUserId);
+      const dm = requestDmCreate(authUser.token, uIds);
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      const expectedTime = generateTimeStamp();
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser.token, message.messageId, 200);
+      const messages = requestDmMessages(authUser.token, dm.dmId, 0);
+      expect(message).toStrictEqual(
+        expect.objectContaining({
+          messageId: expect.any(Number),
+        })
+      );
+      expect(messages).toStrictEqual(
+        expect.objectContaining({
+          messages: [{
+            messageId: message.messageId,
+            uId: authUser.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            pinned: true
+          }],
+          start: 0,
+          end: -1
+        })
+      );
+      checkTimestamp(messages.messages[0].timeSent, expectedTime);
     });
   });
 });
