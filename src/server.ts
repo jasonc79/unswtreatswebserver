@@ -248,7 +248,7 @@ app.delete('/message/remove/v2', (req, res, next) => {
 app.put('/message/pin/v1', (req, res, next) => {
   try {
     const { token, messageId } = req.body;
-    return res.json(messagePinV1(token, messageId, message));
+    return res.json(messagePinV1(token, messageId));
   } catch (err) {
     next(err);
   }
@@ -257,7 +257,7 @@ app.put('/message/pin/v1', (req, res, next) => {
 app.put('/message/unpin/v1', (req, res, next) => {
   try {
     const { token, messageId } = req.body;
-    return res.json(messageUnpinV1(token, messageId, message));
+    return res.json(messageUnpinV1(token, messageId));
   } catch (err) {
     next(err);
   }

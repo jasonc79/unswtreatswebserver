@@ -75,7 +75,7 @@ describe('Testing messageSendV1', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: false
+            isPinned: false
           }],
           start: 0,
           end: -1
@@ -115,7 +115,7 @@ describe('Testing messageSendV1', () => {
               uId: authUser.authUserId,
               message: 'message1',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             },
           ],
           start: 0,
@@ -130,7 +130,7 @@ describe('Testing messageSendV1', () => {
               uId: authUser.authUserId,
               message: 'message2',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             },
           ],
           start: 0,
@@ -170,14 +170,14 @@ describe('Testing messageSendV1', () => {
               uId: authUser.authUserId,
               message: 'message2',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             },
             {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message1',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }
           ],
           start: 0,
@@ -248,7 +248,7 @@ describe('Testing messageSenddmV1', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: false
+            isPinned: false
           }],
           start: 0,
           end: -1
@@ -289,14 +289,14 @@ describe('Testing messageSenddmV1', () => {
               uId: authUser.authUserId,
               message: 'message2',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             },
             {
               messageId: message1.messageId,
               uId: authUser.authUserId,
               message: 'message1',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }
           ],
           start: 0,
@@ -372,7 +372,7 @@ describe('Testing messageEditV1', () => {
               uId: authUser.authUserId,
               message: 'new message',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -396,7 +396,7 @@ describe('Testing messageEditV1', () => {
               uId: authUser2.authUserId,
               message: 'new message',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -487,7 +487,7 @@ describe('Testing messageEditV1', () => {
               uId: authUser.authUserId,
               message: 'new message',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -512,7 +512,7 @@ describe('Testing messageEditV1', () => {
               uId: uId1.authUserId,
               message: 'new message',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -582,7 +582,7 @@ describe('Testing messageRemoveV1', () => {
               uId: authUser.authUserId,
               message: 'message2',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -681,7 +681,7 @@ describe('Testing messageRemoveV1', () => {
               uId: authUser.authUserId,
               message: 'message2',
               timeSent: expect.any(Number),
-              pinned: false
+              isPinned: false
             }],
             start: 0,
             end: -1
@@ -744,7 +744,7 @@ describe('Testing messagepin', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: true
+            isPinned: true
           }],
           start: 0,
           end: -1
@@ -773,7 +773,7 @@ describe('Testing messagepin', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: true
+            isPinned: true
           }],
           start: 0,
           end: -1
@@ -821,7 +821,7 @@ describe('Testing messageunpin', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: true
+            isPinned: false
           }],
           start: 0,
           end: -1
@@ -851,7 +851,7 @@ describe('Testing messageunpin', () => {
             uId: authUser.authUserId,
             message: 'message',
             timeSent: expect.any(Number),
-            pinned: true
+            isPinned: false
           }],
           start: 0,
           end: -1

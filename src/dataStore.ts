@@ -39,7 +39,7 @@ interface Message {
   uId: number,
   message: string,
   timeSent: number,
-  pinned: boolean,
+  isPinned: boolean,
 }
 
 // DM TYPES AND INTERFACES
