@@ -342,89 +342,115 @@ export function updateChannel(channelId: number, channel: Channel) {
 export function addMetric(metricType: string, metricValue: number, uId?: number) {
   const data = getData();
   const currTime = Math.floor((new Date()).getTime() / 1000);
+
+  /// Check for metricType
   if (metricType === 'channelsJoined') {
+    /// If metricType is channelsJoined
     const currValue = data.users[uId].channelsJoined.length - 1;
     if (currValue === -1) {
+      /// Check if channelsJoined is empty
       const temp: channelsJoined = {
-        numChannelsJoined: 0 += metricValue,
-        timeStamp: currTime
+        numChannelsJoined: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalChannelsJoined
       const temp: channelsJoined = {
-        numChannelsJoined: data.users[uId].channelsJoined[currValue].numChannelsJoined += metricValue,
-        timeStamp: currTime
+        numChannelsJoined: data.users[uId].totalChannelsJoined += metricValue,
+        timeStamp: currTime,
       }
     }
+    data.users[uId].totalChannelsJoined += metricValue;
     data.users[uId].channelsJoined.push(temp);
   } else if (metricType === 'dmsJoined') {
+    /// If metricType is dmsJoined
     const currValue = data.users[uId].dmsJoined.length - 1;
     if (currValue === -1) {
+      /// Check if totalDmsJoined is empty
       const temp: dmsJoined = {
-        numDmsJoined: 0 += metricValue,
-        timeStamp: currTime
+        numDmsJoined: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalDmsJoined
       const temp: dmsJoined = {
         numDmsJoined: data.users[uId].dmsJoined[currValue].numDmsJoined += metricValue,
-        timeStamp: currTime
+        timeStamp: currTime,
       }
     }
+    data.users[uId].totalDmsJoined += metricValue;
     data.users[uId].dmsJoined.push(temp);
   } else if (metricType === 'messagesSent') {
+    /// If metricType is messagesSent
     const currValue = data.users[uId].messagesSent.length - 1;
     if (currValue === -1) {
+      /// Check if totalMessagesSent is empty
       const temp: messagesSent = {
-        numMessagesSent: 0 += metricValue,
-        timeStamp: currTime
+        numMessagesSent: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalMessagesSent
       const temp: messagesSent = {
         numMessagesSent: data.users[uId].messagesSent[currValue].numMessagesSent += metricValue,
-        timeStamp: currTime
+        timeStamp: currTime,
       }
     }
+    data.users[uId].totalMessagesSent += metricValue;
     data.users[uId].messagesSent.push(temp);
   } else if (metricType === 'channelsExist') {
+    /// If metricType is channelsExist
     const currValue = data.channelsExist.length - 1;
     if (currValue === -1) {
+      /// Check if totalChannelsExist is empty
       const temp: channelsExist = {
-        numChannelsExist: 0 += metricValue,
-        timeStamp: currTime
+        numChannelsExist: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalChannelsExist
       const temp: channelsExist = {
         numChannelsExist: data.channelsExist[currValue].numChannelsExist += metricValue,
-        timeStamp: currTime
+        timeStamp: currTime,
       }
     }
+    data.totalChannelsExist += metricValue;
     data.channelsExist.push(temp);
   } else if (metricType === 'dmsExist') {
+    /// If metricType is dmsExist
     const currValue = data.dmsExist.length - 1;
     if (currValue === -1) {
+      /// Check if totalDmsExist is empty
       const temp: dmsExist = {
-        numDmsExist: 0 += metricValue,
-        timeStamp: currTime
+        numDmsExist: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalDmsExist
       const temp: dmsExist = {
         numDmsExist: data.dmsExist[currValue].numDmsExist += metricValue,
-        timeStamp: currTime
+        timeStamp: currTime,
       }
     }
+    data.totalDmsExist += metricValue;
     data.dmsExist.push(temp);
   } else if (metricType === 'messagesExist') {
+    /// If metricType is messagesExist
     const currValue = data.messagesExist.length - 1;
     if (currValue === -1) {
+      /// Check if totalMessagesExist is empty
       const temp: messagesExist = {
-        numMessagesExist: 0 += metricValue,
-        timeStamp: currTime
+        numMessagesExist: 0 + metricValue,
+        timeStamp: currTime,
       }
     } else {
+      /// Else add metricValue to totalMessagesExist
       const temp: messagesExist = {
         numMessagesExist: data.messagesExist[currValue].numMessagesExist += metricValue,
-        timeStamp: currTime
+        timeStamp: currTime,
       }
     }
+    data.totalMessagesExist += metricValue;
     data.messagesExist.push(temp);
   }
   setData(data);

@@ -50,6 +50,9 @@ interface User {
   channelsJoined: channelsJoined[],
   dmsJoined: dmsJoined[],
   messagesSent: messagesSent[],
+  totalChannelsJoined: number,
+  totalDmsJoined: number,
+  totalMessagesSent: number,
 }
 
 interface UserInfo {
@@ -115,6 +118,9 @@ type Data = {
   channelsExist: channelsExist[],
   dmsExist: dmsExist[],
   messagesExist: messagesExist[],
+  totalMessagesExist: number,
+  totalDmsExist: number,
+  totalChannelsExist: number,
 }
 
 // CONSTANTS //
@@ -127,6 +133,7 @@ let data: Data = {
   channelsExist: [],
   dmsExist: [],
   messagesExist: [],
+  totalMessagesExist: 0,
 };
 
 const fileName = 'data.json';
