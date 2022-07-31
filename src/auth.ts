@@ -65,7 +65,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   setData(data);
   
   return {
-    token: token,
+    token: getHashOf(token + ELEMENT),
     authUserId: user.uId
   };
 };
@@ -100,7 +100,7 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
   updateUser(uId, user);
 
   return {
-    token: token,
+    token: getHashOF(token + ELEMENT),
     authUserId: user.uId
   };
 };
