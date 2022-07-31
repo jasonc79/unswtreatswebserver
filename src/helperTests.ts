@@ -160,7 +160,7 @@ export function requestUserProfile(token: string, uId: number, err?: number) {
 }
 
 export function requestAllUsers(token: string, err?: number) {
-  return requestHelper('GET', '/users/all/v1', { token: token }, {}, err);
+  return requestHelper('GET', '/users/all/v2', { token: token }, {}, err);
 }
 
 export function requestUserSetName(token: string, nameFirst: string, nameLast: string, err?: number) {

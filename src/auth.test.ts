@@ -278,9 +278,9 @@ describe('Testing auth/passwordreset/request/v1', () => {
 
 });
 
-// describe('Testing auth/passwordreset/reset/v1', () => {
-//   test('Invalid reset code or password', () => {
-//     requestAuthPasswordReset('invalid code', 'newPassword', 400);
-//   });
-// });
+describe('Testing auth/passwordreset/reset/v1', () => {
+  test('Invalid reset code or password', () => {
+    requestAuthPasswordReset('invalid code', 'newPassword', 400);
+  });
+});
 
