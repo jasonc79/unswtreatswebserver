@@ -1,6 +1,7 @@
 import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
-import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser } from './helper';
+import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser, getIdfromToken } from './helper';
 import { checkValidEmail } from './auth';
+import HTTPError from 'http-errors';
 
 /*
 userProfileV1 checks if authUserId and uId are valid and then returns an object containing
@@ -137,13 +138,13 @@ function usersAllV1(token: string) : error | allUserReturn {
   return { users: userDetails };
 }
 
-function usersStats(token: string): (workspaceStats) {
+function usersStats(token: string) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
   const data = getData();
   let top = 0;
-  let bottom = data.users.length;
+  const bottom = data.users.length;
   for (const object of data.users) {
     if (object.totalChannelsJoined > 0) {
       top++;
@@ -151,17 +152,17 @@ function usersStats(token: string): (workspaceStats) {
       top++;
     }
   }
-  const utilizationRate = top/bottom;
+  const utilizationRate = top / bottom;
   const temp = {
     channelsExist: data.channelsExist,
     dmsExist: data.dmExist,
     messagesExist: data.messagesExist,
     utilizationRate: utilizationRate
-  }
+  };
   console.log(temp);
 }
 
-function userStats(token: string): (userStats) {
+function userStats(token: string) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -169,14 +170,14 @@ function userStats(token: string): (userStats) {
   const uId = getIdfromToken(token);
   const top = data.users[uId].totalChannelsJoined + data.users[uId].totalDmsJoined + data.users[uId].totalMessagesSent;
   const bottom = data.totalMessagesExist + data.totalDmsExist + data.totalChannelsExist;
-  const involvementRate = top/bottom;
+  const involvementRate = top / bottom;
   const temp = {
-    channelsJoined: [{numChannelsJoined, timestamp}],
-    dmsJoined: [{numDmsJoined, timestamp}],
-    messagesSent: [{numMessagesSent, timestamp}],
+    channelsJoined: data.users[uId].totalChannelsJoined,
+    dmsJoined: data.users[uId].totalDmsJoined,
+    messagesSent: data.users[uId].totalMessagesSent,
     involvementRate: involvementRate
-  }
+  };
   console.log(temp);
 }
 
-export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1 };
+export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1, usersStats, userStats };

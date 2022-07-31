@@ -39,7 +39,6 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   const data = getData();
   const handle = createHandle(nameFirst, nameLast);
   const token = generateToken();
-
   // Generate uId using the size of array users and default permission 2
   const user = {
     uId: data.users.length,
@@ -50,9 +49,12 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     password: password,
     token: [token],
     permissionId: 2,
-    channelsJoined: 0,
-    dmsJoined: 0,
-    msgsSent: 0.0
+    channelsJoined: [],
+    dmsJoined: [],
+    messagesSent: [],
+    totalChannelsJoined: 0,
+    totalDmsJoined: 0,
+    totalMessagesSent: 0,
   };
   // Global owner
   if (user.uId === 0) {

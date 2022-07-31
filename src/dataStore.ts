@@ -134,6 +134,8 @@ let data: Data = {
   dmsExist: [],
   messagesExist: [],
   totalMessagesExist: 0,
+  totalDmsExist: 0,
+  totalChannelsExist: 0,
 };
 
 const fileName = 'data.json';
