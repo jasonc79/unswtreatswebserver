@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageSendlater } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageSendlater, requestMessageSendlaterdm } from './helperTests';
 import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
@@ -10,7 +10,7 @@ const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
 function generateTimeStamp() {
-  return Math.floor(Date.now() / 1000);
+  return Math.floor((new Date()).getTime() / 1000);
 }
 
 function checkTimestamp(timestamp: number, expectedTimestamp: number) {
@@ -19,6 +19,50 @@ function checkTimestamp(timestamp: number, expectedTimestamp: number) {
    */
   expect(timestamp).toBeGreaterThanOrEqual(expectedTimestamp - 3);
   expect(timestamp).toBeLessThan(expectedTimestamp + 3);
+}
+
+function checkChannelMsg(authUser, channel, message, expectedTime) {
+  const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+  expect(message).toStrictEqual(
+    expect.objectContaining({
+      messageId: expect.any(Number),
+    })
+  );
+  expect(messages).toStrictEqual(
+    expect.objectContaining({
+      messages: [{
+        messageId: message.messageId,
+        uId: authUser.authUserId,
+        message: 'message',
+        timeSent: expect.any(Number)
+      }],
+      start: 0,
+      end: -1
+    })
+  );
+  checkTimestamp(messages.messages[0].timeSent, expectedTime);
+}
+
+function checkDmMsg(authUser, dm, message, expectedTime) {
+  const messages = requestDmMessages(authUser.token, dm.dmId, 0);
+  expect(message).toStrictEqual(
+    expect.objectContaining({
+      messageId: expect.any(Number),
+    })
+  );
+  expect(messages).toStrictEqual(
+    expect.objectContaining({
+      messages: [{
+        messageId: message.messageId,
+        uId: authUser.authUserId,
+        message: 'message',
+        timeSent: expect.any(Number)
+      }],
+      start: 0,
+      end: -1
+    })
+  );
+  checkTimestamp(messages.messages[0].timeSent, expectedTime);
 }
 
 beforeEach(() => {
@@ -700,150 +744,88 @@ describe('Testing messageSendlaterV1', () => {
   describe('error', () => {
     test('invalid token', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      requestMessageSendlater('bad', channel.channelId, 'message', 403);
+      requestMessageSendlater('bad', channel.channelId, 'message', generateTimeStamp() + 1, 403);
     });
     test('channelId is invalid', () => {
-      requestMessageSend(authUser.token, 1, 'message', 400);
+      requestMessageSendlater(authUser.token, 1, 'message', generateTimeStamp() + 1, 400);
     });
     test('length of message is less than 1', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      requestMessageSend(authUser.token, channel.channelId, '', 400);
+      requestMessageSendlater(authUser.token, channel.channelId, '', generateTimeStamp() + 1, 400);
     });
     test('length of message is more than 1000', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       const message = 'a'.repeat(1001);
-      requestMessageSend(authUser.token, channel.channelId, message, 400);
+      requestMessageSendlater(authUser.token, channel.channelId, message, generateTimeStamp() + 1, 400);
     });
     test('user is not a member of channel', () => {
       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      requestMessageSend(authUser2.token, channel.channelId, 'message', 403);
+      requestMessageSendlater(authUser2.token, channel.channelId, 'message', generateTimeStamp() + 5, 403);
+    });
+    test('imput time is in the past', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSendlater(authUser.token, channel.channelId, 'message', generateTimeStamp() - 5, 400);
     });
   });
-  // describe('passes', () => {
-  //   test('1 message - 1 channel', () => {
-  //     const channel = requestChannelCreate(authUser.token, 'name', false);
-  //     const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-  //     const expectedTime = generateTimeStamp();
-  //     const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
-  //     expect(message).toStrictEqual(
-  //       expect.objectContaining({
-  //         messageId: expect.any(Number),
-  //       })
-  //     );
-  //     expect(messages).toStrictEqual(
-  //       expect.objectContaining({
-  //         messages: [{
-  //           messageId: message.messageId,
-  //           uId: authUser.authUserId,
-  //           message: 'message',
-  //           timeSent: expect.any(Number)
-  //         }],
-  //         start: 0,
-  //         end: -1
-  //       })
-  //     );
-  //     checkTimestamp(messages.messages[0].timeSent, expectedTime);
-  //   });
-  //   test('2 messages - 2 channels', () => {
-  //     const channel1 = requestChannelCreate(authUser.token, 'name1', false);
-  //     const channel2 = requestChannelCreate(authUser.token, 'name2', false);
-  //     const message1 = requestMessageSend(authUser.token, channel1.channelId, 'message1');
-  //     const expectedTime1 = generateTimeStamp();
-  //     const message2 = requestMessageSend(authUser.token, channel2.channelId, 'message2');
-  //     const expectedTime2 = generateTimeStamp();
-  //     const messages1 = requestChannelMessages(authUser.token, channel1.channelId, 0);
-  //     const messages2 = requestChannelMessages(authUser.token, channel2.channelId, 0);
-  //     expect(message1).toStrictEqual(
-  //       expect.objectContaining({
-  //         messageId: expect.any(Number),
-  //       })
-  //     );
-  //     expect(message2).toStrictEqual(
-  //       expect.objectContaining({
-  //         messageId: expect.any(Number),
-  //       })
-  //     );
-  //     expect(message2).toStrictEqual(
-  //       expect.not.objectContaining({
-  //         messageId: message1.messageId,
-  //       })
-  //     );
-  //     expect(messages1).toStrictEqual(
-  //       expect.objectContaining({
-  //         messages: [
-  //           {
-  //             messageId: message1.messageId,
-  //             uId: authUser.authUserId,
-  //             message: 'message1',
-  //             timeSent: expect.any(Number)
-  //           },
-  //         ],
-  //         start: 0,
-  //         end: -1
-  //       })
-  //     );
-  //     expect(messages2).toStrictEqual(
-  //       expect.objectContaining({
-  //         messages: [
-  //           {
-  //             messageId: message2.messageId,
-  //             uId: authUser.authUserId,
-  //             message: 'message2',
-  //             timeSent: expect.any(Number)
-  //           },
-  //         ],
-  //         start: 0,
-  //         end: -1
-  //       })
-  //     );
-  //     checkTimestamp(messages1.messages[0].timeSent, expectedTime1);
-  //     checkTimestamp(messages2.messages[0].timeSent, expectedTime2);
-  //   });
-  //   test('2 messages - 1 channel', () => {
-  //     const channel = requestChannelCreate(authUser.token, 'name', false);
-  //     const message1 = requestMessageSend(authUser.token, channel.channelId, 'message1');
-  //     const expectedTime1 = generateTimeStamp();
-  //     const message2 = requestMessageSend(authUser.token, channel.channelId, 'message2');
-  //     const expectedTime2 = generateTimeStamp();
-  //     const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
-  //     expect(message1).toStrictEqual(
-  //       expect.objectContaining({
-  //         messageId: expect.any(Number),
-  //       })
-  //     );
-  //     expect(message2).toStrictEqual(
-  //       expect.objectContaining({
-  //         messageId: expect.any(Number),
-  //       })
-  //     );
-  //     expect(message2).toStrictEqual(
-  //       expect.not.objectContaining({
-  //         messageId: message1.messageId,
-  //       })
-  //     );
-  //     expect(messages).toStrictEqual(
-  //       expect.objectContaining({
-  //         messages: [
-  //           {
-  //             messageId: message2.messageId,
-  //             uId: authUser.authUserId,
-  //             message: 'message2',
-  //             timeSent: expect.any(Number)
-  //           },
-  //           {
-  //             messageId: message1.messageId,
-  //             uId: authUser.authUserId,
-  //             message: 'message1',
-  //             timeSent: expect.any(Number)
-  //           }
-  //         ],
-  //         start: 0,
-  //         end: -1
-  //       })
-  //     );
-  //     checkTimestamp(messages.messages[0].timeSent, expectedTime1);
-  //     checkTimestamp(messages.messages[1].timeSent, expectedTime2);
-  //   });
-  // });
+  test('message sends', () => {
+    const channel = requestChannelCreate(authUser.token, 'name', false);
+    const message = requestMessageSendlater(authUser.token, channel.channelId, 'message', generateTimeStamp() + 1);
+    const expectedTime = generateTimeStamp() + 1;
+    setTimeout(() => checkChannelMsg(authUser, channel, message, expectedTime), 1000);
+  });
 });
+
+// describe('Testing messageSendlaterdmV1', () => {
+//   describe('error', () => {
+//     test('invalid token', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm('bad', dm.dmId, 'message', generateTimeStamp() + 1, 403);
+//     });
+//     test('channelId is invalid', () => {
+//       requestMessageSendlaterdm(authUser.token, 1, 'message', generateTimeStamp() + 1, 400);
+//     });
+//     test('length of message is less than 1', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, '', generateTimeStamp() + 1, 400);
+//     });
+//     test('length of message is more than 1000', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       const message = 'a'.repeat(1001);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, message, generateTimeStamp() + 1, 400);
+//     });
+//     test('user is not a member of dm', () => {
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser2.token, dm.dmId, 'message', generateTimeStamp() + 5, 403);
+//     });
+//     test('imput time is in the past', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, 'message', generateTimeStamp() - 5, 400);
+//     });
+//   });
+//   test('message sends', () => {
+//     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//     const uIds = [];
+//     uIds.push(uId1.authUserId);
+//     const dm = requestDmCreate(authUser.token, uIds);
+//     const message = requestMessageSendlaterdm(authUser.token, dm.dmId, 'message', generateTimeStamp() + 1);
+//     const expectedTime = generateTimeStamp() + 1;
+//     setTimeout(() => checkDmMsg(authUser, dm, message, expectedTime), 1000);
+//   });
+// });
