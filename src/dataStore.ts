@@ -75,7 +75,7 @@ interface ChannelInfo {
 interface Codes {
   code: string,
   uId: number
-};
+}
 
 // ERROR TYPES AND CONSTANTS
 type error = { error: string };

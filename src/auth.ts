@@ -1,12 +1,11 @@
-import { getData, setData, error, authUserId, token, User, Codes} from './dataStore';
+import { getData, setData, error, authUserId, token, Codes } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser, returnValidId, getHashOf } from './helper';
 import validator from 'validator';
 import HTTPError from 'http-errors';
-import nodemailer from "nodemailer";
-import Mail from "nodemailer/lib/mailer";
+import nodemailer from 'nodemailer';
 
-const SECRET = "Teatime";
-const ELEMENT = "Water";
+export const SECRET = 'Teatime';
+export const ELEMENT = 'Water';
 
 /**
  * authRegisterV1
@@ -63,7 +62,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   // Update data
   data.users.push(user);
   setData(data);
-  
+
   return {
     token: getHashOf(token + ELEMENT),
     authUserId: user.uId
@@ -100,7 +99,7 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
   updateUser(uId, user);
 
   return {
-    token: getHashOF(token + ELEMENT),
+    token: getHashOf(token + ELEMENT),
     authUserId: user.uId
   };
 };
@@ -124,46 +123,46 @@ const authLogoutV1 = (token: token) : object | error => {
   }
 
   const user = returnValidUser(token);
-  user.token = user.token.filter((temp: token) => temp !== token);
+  user.token = user.token.filter((temp: token) => getHashOf(temp + ELEMENT) !== token);
   updateUser(user.uId, user);
   return {};
 };
 
-type empty = {};
+type empty = object;
 const authPasswordRequest = (email: string) : empty => {
-  let data = getData();
+  const data = getData();
   const user = checkEmailExists(email);
   if (user !== false) {
     const code = generateResetCode();
     if (sendPasswordResetEmail(email, code)) {
-      let newResetCode = {
+      const newResetCode = {
         code: code,
         uId: user.uId
-      }
-      data.resetCodes.push(newResetCode);      
+      };
+      data.resetCodes.push(newResetCode);
     }
     setData(data);
-     // Log user out of multiple sessions 
+    // Log user out of multiple sessions
     user.token = [];
     updateUser(user.uId, user);
   }
- 
-  return {};
-}
 
-const authPasswordReset= (resetCode: string, newPassword: string): empty => {
+  return {};
+};
+
+const authPasswordReset = (resetCode: string, newPassword: string): empty => {
   if (newPassword.length < 6) {
     throw HTTPError(400, 'Length of new password is not less than 6 characters');
   }
- 
-  let data = getData();
+
+  const data = getData();
   let userCode = {
     uId: -1,
     code: ''
   };
   // Find the uId using the code. Returns uId = -1 on error
   for (const code of data.resetCodes) {
-    if (code.code == resetCode) {
+    if (code.code === resetCode) {
       userCode = code;
     }
   }
@@ -178,7 +177,7 @@ const authPasswordReset= (resetCode: string, newPassword: string): empty => {
   setData(data);
   updateUser(user.uId, user);
   return {};
-}
+};
 
 // HELPER FUNCTIONS
 
@@ -262,33 +261,32 @@ const removeNonAlphaNumeric = (string: string) : string => {
   return string.toLowerCase();
 };
 
-
 // Returns true if email is sent successfully. False otherwise
 const sendPasswordResetEmail = (email: string, resetCode: string): boolean => {
-    const sendEmail = 'unswtreats@alwaysdata.net';
-    let isError = false;
-    let transporter = nodemailer.createTransport({
-      host: "smtp-unswtreats.alwaysdata.net",
-      port: 587,
-      auth: {
-        user: sendEmail,
-        pass: '1531qwertyuiop['
-      }
-    });
-    let mail = {
-      from: `1531 Treats 👻 <${sendEmail}>`,
-      to: email,
-      subject: "Password reset code", // Subject line
-      text: `Hello Treats user! \n\nYour code is: ${resetCode} \n\nNot you? Sus...`
-    };
-    
-    transporter.sendMail(mail, function(error, info){
-      if (error) {
-        isError = true;
-      }
-    });
+  const sendEmail = 'unswtreats@alwaysdata.net';
+  let isError = false;
+  const transporter = nodemailer.createTransport({
+    host: 'smtp-unswtreats.alwaysdata.net',
+    port: 587,
+    auth: {
+      user: sendEmail,
+      pass: '1531qwertyuiop['
+    }
+  });
+  const mail = {
+    from: `1531 Treats 👻 <${sendEmail}>`,
+    to: email,
+    subject: 'Password reset code', // Subject line
+    text: `Hello Treats user! \n\nYour code is: ${resetCode} \n\nNot you? Sus...`
+  };
+
+  transporter.sendMail(mail, function(error, info) {
+    if (error) {
+      isError = true;
+    }
+  });
   return !isError;
-}
+};
 
 // Generate a token
 const generateToken = () : token => {
@@ -306,7 +304,6 @@ const generateToken = () : token => {
 };
 
 const generateResetCode = () : string => {
-  let data = getData();
   let isValidCode = false;
   let code = (Math.floor(1000 + Math.random() * 9000)).toString();
   // Ensure code is unique
@@ -319,14 +316,14 @@ const generateResetCode = () : string => {
     }
   }
   return code;
-}
+};
 
 function checkResetCodeExists(newCode: string) : boolean {
   const data = getData();
   for (const code of data.resetCodes) {
-      if (newCode === code.code) {
-        return true;
-      }
+    if (newCode === code.code) {
+      return true;
+    }
   }
   return false;
 }

@@ -269,13 +269,15 @@ const generateDmName = (DmMembers: UserInfo[]): string => {
 
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
-function dmMessagesV1(token: string, dmId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  if (!checkValidDm(dmId) || !checkValidToken(token)) {
-    return errorMsg;
+function dmMessagesV2(token: string, dmId: number, start: number): (messagesUnder50 | messagesOver50) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
   }
-
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'dmlId does not refer to a valid DM');
+  }
   if (!isMemberDm(token, dmId)) {
-    return errorMsg;
+    throw HTTPError(403, 'dmId is valid and the authorised user is not a member of the DM');
   }
 
   const currDm = returnValidDm(dmId);
@@ -284,7 +286,7 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
   const final = start + 50;
 
   if (dmMsg.length < start) {
-    return errorMsg;
+    throw HTTPError(400, 'start is greater than the total number of messages in the channel');
   }
 
   for (let i = start; i < final; i++) {
@@ -303,5 +305,4 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
     end: final,
   };
 }
-
-export { dmCreateV2, dmLeaveV2, dmMessagesV1, dmDetailsV2, dmListV2, dmRemoveV2 };
+export { dmCreateV2, dmLeaveV2, dmMessagesV2, dmDetailsV2, dmListV2, dmRemoveV2 };

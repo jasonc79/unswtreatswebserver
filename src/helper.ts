@@ -1,4 +1,5 @@
 import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { ELEMENT } from './auth';
 import crypto from 'crypto';
 
 // INCLUDES FUNCTIONS FOR:
@@ -47,7 +48,7 @@ export function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return true;
       }
     }
@@ -152,7 +153,7 @@ export function returnValidUser(token: string) : User {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return user;
       }
     }
@@ -203,7 +204,7 @@ export function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return user.uId;
       }
     }
