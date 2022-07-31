@@ -309,41 +309,6 @@ function messagePinV1(token: string, messageId: number): (object) {
   setData(data);
   return {};
 }
-// if (checkValidChannelMessage(messageId)) {
-//   const message = returnValidMessagefromChannel(messageId);
-//   const channel = getChannelfromMessage(messageId)
-//   if (!isOwner(token, channel.channelId) && !isGlobalOwner(token)) {
-//     throw HTTPError(403, 'messageId refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM');
-//   }
-//   for (const chnl of data.channels) {
-//     for (const msg of chnl.messages) {
-//       if (msg.messageId === message.messageId) {
-//         if (msg.pinned === true) {
-//           throw HTTPError(403, 'the message is already pinned');
-//         }
-//         msg.pinned = true;
-//       }
-//     }
-//   }
-//   setData(data);
-// } else {
-//   const message = returnValidMessagefromDm(messageId);
-//   const dm = getDmfromMessage(messageId)
-//   if (!isOwnerDm(token, dm.channelId) && !isGlobalOwner(token)) {
-//     throw HTTPError(403, 'messageId refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM');
-//   }
-//   for (const chnl of data.dm) {
-//     for (const msg of chnl.messages) {
-//       if (msg.messageId === message.messageId) {
-//         if (msg.pinned === true) {
-//           throw HTTPError(403, 'the message is already pinned');
-//         }
-//         msg.pinned = true;
-//       }
-//     }
-//   }
-// }
-// }
 
 function messageUnpinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {

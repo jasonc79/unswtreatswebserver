@@ -143,7 +143,6 @@ function channelInviteV3(token: string, channelId: number, uId: number): (error 
   } else if (authUserIdMember === false) {
     throw HTTPError(403, 'Authorised user is not a member of the channel');
   }
-
   channel.allMembers.push(user);
   updateChannel(channelId, channel);
   return {};
