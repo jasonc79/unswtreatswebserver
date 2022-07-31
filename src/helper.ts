@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message, Standup } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
 
 // INCLUDES FUNCTIONS FOR:
 // - Checking whether a function exits

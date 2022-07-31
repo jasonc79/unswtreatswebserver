@@ -9,7 +9,7 @@ import { authRegisterV1, authLoginV1, authLogoutV1 } from './auth';
 import { dmCreateV1, dmDetailsV1, dmListV1, dmRemoveV1, dmLeaveV1, dmMessagesV1 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1 } from './message';
 import { standupStartV1, standupActiveV1 } from './standup';
 import { clearV1 } from './other';
 import { channelMessagesV2, channelDetailsV2, channelLeaveV1, channelAddOwnerV1, channelRemoveOwnerV1, channelJoinV1, channelInviteV1 } from './channel';
@@ -31,9 +31,6 @@ app.get('/echo', (req, res, next) => {
     next(err);
   }
 });
-
-// handles errors nicely
-app.use(errorHandler());
 
 // ================================================================ //
 // Auth functions
@@ -246,14 +243,23 @@ app.delete('/message/remove/v2', (req, res, next) => {
   }
 });
 
-// app.post('/message/sendlater/v1', (req, res, next) => {
-//   try {
-//     const { token, channelId, message, timeSent } = req.body;
-//     return res.json(messageSendlaterV1(token, channelId, message, timeSent));
-//   } catch (err) {
-//     next(err);
-//   }
-// });
+app.post('/message/sendlater/v1', (req, res, next) => {
+  try {
+    const { token, channelId, message, timeSent } = req.body;
+    return res.json(messageSendlaterV1(token, channelId, message, timeSent));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/sendlaterdm/v1', (req, res, next) => {
+  try {
+    const { token, dmId, message, timeSent } = req.body;
+    return res.json(messageSendlaterV1(token, dmId, message, timeSent));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ================================================================ //
 // dm functions
@@ -331,7 +337,8 @@ app.post('/standup/start/v1', (req, res, next) => {
 
 app.get('/standup/active/v1', (req, res, next) => {
   try {
-    const { token, channelId } = req.body;
+    const token = req.query.token as string;
+    const channelId = parseInt(req.query.channelId as string);
     return res.json(standupActiveV1(token, channelId));
   } catch (err) {
     next(err);
@@ -348,6 +355,9 @@ app.delete('/clear/v1', (req, res, next) => {
     next(err);
   }
 });
+
+// handles errors nicely
+app.use(errorHandler());
 
 // for logging errors
 app.use(morgan('dev'));

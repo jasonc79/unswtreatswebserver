@@ -73,9 +73,9 @@ interface ChannelInfo {
 
 // STANDUP TYPES AND INTERFACES
 type timeReturn = { timeFinish: number };
-type activeReturn = { 
-    isActive: boolean, 
-    timeFinish: number 
+type activeReturn = {
+    isActive: boolean,
+    timeFinish: number
 };
 
 type standupMsg = {
@@ -137,5 +137,5 @@ function loadData() {
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
-export { timeReturn, activeReturn, Standup }
+export { timeReturn, activeReturn, Standup };
 export { error, errorMsg };
