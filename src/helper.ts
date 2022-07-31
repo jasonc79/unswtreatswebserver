@@ -1,11 +1,17 @@
 import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import crypto from 'crypto';
 
 // INCLUDES FUNCTIONS FOR:
+// - Get hash of a token
 // - Checking whether a function exits
 // - Returning an object
 // - Getting/returning using ids
 // - Checking whether a property is satisfied
 // - Updating objects in the datastore
+
+export function getHashOf(plaintext: string) {
+  return crypto.createHash('sha256').update(plaintext).digest('hex');
+}
 
 //= ==========================================================================//
 // CHECKING FUNCTIONS - RETURNS BOOLEAN                                      //

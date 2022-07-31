@@ -1,4 +1,5 @@
-import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestChannelCreate, requestClear } from './helperTests';
+import { requestAuthRegister, requestAuthLogin, requestAuthLogout, requestAuthPasswordReset, requestAuthPasswordRequest } from './helperTests';
+import {requestChannelCreate, requestClear } from './helperTests';
 import { requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -253,14 +254,33 @@ describe('Testing auth/logout/v2', () => {
 });
 
 describe('Testing auth/passwordreset/request/v1', () => {
-  test('Email belongs to a registered user', () => {
-
+  const realEmail = '1531treats@gmail.com';
+  test('Email is invalid', () => {
+   const authUser = requestAuthRegister(email0, password0, nameFirst0, nameLast0);
+  // No error is raised when email is invalid
+  expect(requestAuthPasswordRequest('invalid email', 200)).toStrictEqual({});
   });
-  //const authUser = requestAuthRegister(email0, password0, nameFirst0, nameLast0);
+  test('Successful reset - user is logged out of a single session', () => {
+  requestAuthRegister(realEmail, password0, nameFirst0, nameLast0);
+  const authUser = requestAuthLogin(realEmail, password0);
+  expect(requestAuthPasswordRequest(realEmail, 200)).toStrictEqual({});
+  requestChannelCreate(authUser.token, 'channel', true, 403);
+  });
+  test('Successful reset - user is logged out of multiple sessions', () => {
+  requestAuthRegister(realEmail, password0, nameFirst0, nameLast0);
+  const authUser = requestAuthLogin(realEmail, password0);
+  const authUser2 = requestAuthLogin(realEmail, password0);
+  // No error is raised when email is invalid
+  expect(requestAuthPasswordRequest(realEmail, 200)).toStrictEqual({});
+  requestChannelCreate(authUser.token, 'channel', true, 403);
+  requestChannelCreate(authUser2.token, 'channel2', true, 403);
+  });
 
 });
 
-describe('Testing auth/passwordreset/reset/v1', () => {
-  
-});
+// describe('Testing auth/passwordreset/reset/v1', () => {
+//   test('Invalid reset code or password', () => {
+//     requestAuthPasswordReset('invalid code', 'newPassword', 400);
+//   });
+// });
 
