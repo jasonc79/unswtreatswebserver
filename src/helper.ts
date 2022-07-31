@@ -333,10 +333,7 @@ export function updateChannel(channelId: number, channel: Channel) {
   setData(data);
 }
 
-
 /// if not remove 1 by one make uId an array(uId[])
-
-
 
 /// helper function to change metric values
 export function addMetric(metricType: string, metricValue: number, uId?: number) {
@@ -352,16 +349,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: channelsJoined = {
         numChannelsJoined: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalChannelsJoined += metricValue;
+      data.users[uId].channelsJoined.push(temp);
     } else {
       /// Else add metricValue to totalChannelsJoined
       const temp: channelsJoined = {
         numChannelsJoined: data.users[uId].totalChannelsJoined += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalChannelsJoined += metricValue;
+      data.users[uId].channelsJoined.push(temp);
     }
-    data.users[uId].totalChannelsJoined += metricValue;
-    data.users[uId].channelsJoined.push(temp);
   } else if (metricType === 'dmsJoined') {
     /// If metricType is dmsJoined
     const currValue = data.users[uId].dmsJoined.length - 1;
@@ -370,16 +369,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: dmsJoined = {
         numDmsJoined: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalDmsJoined += metricValue;
+      data.users[uId].dmsJoined.push(temp);
     } else {
       /// Else add metricValue to totalDmsJoined
       const temp: dmsJoined = {
         numDmsJoined: data.users[uId].dmsJoined[currValue].numDmsJoined += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalDmsJoined += metricValue;
+      data.users[uId].dmsJoined.push(temp);
     }
-    data.users[uId].totalDmsJoined += metricValue;
-    data.users[uId].dmsJoined.push(temp);
   } else if (metricType === 'messagesSent') {
     /// If metricType is messagesSent
     const currValue = data.users[uId].messagesSent.length - 1;
@@ -388,16 +389,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: messagesSent = {
         numMessagesSent: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalMessagesSent += metricValue;
+      data.users[uId].messagesSent.push(temp);
     } else {
       /// Else add metricValue to totalMessagesSent
       const temp: messagesSent = {
         numMessagesSent: data.users[uId].messagesSent[currValue].numMessagesSent += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.users[uId].totalMessagesSent += metricValue;
+      data.users[uId].messagesSent.push(temp);
     }
-    data.users[uId].totalMessagesSent += metricValue;
-    data.users[uId].messagesSent.push(temp);
   } else if (metricType === 'channelsExist') {
     /// If metricType is channelsExist
     const currValue = data.channelsExist.length - 1;
@@ -406,16 +409,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: channelsExist = {
         numChannelsExist: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalChannelsExist += metricValue;
+      data.channelsExist.push(temp);
     } else {
       /// Else add metricValue to totalChannelsExist
       const temp: channelsExist = {
         numChannelsExist: data.channelsExist[currValue].numChannelsExist += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalChannelsExist += metricValue;
+      data.channelsExist.push(temp);
     }
-    data.totalChannelsExist += metricValue;
-    data.channelsExist.push(temp);
   } else if (metricType === 'dmsExist') {
     /// If metricType is dmsExist
     const currValue = data.dmsExist.length - 1;
@@ -424,16 +429,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: dmsExist = {
         numDmsExist: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalDmsExist += metricValue;
+      data.dmsExist.push(temp);
     } else {
       /// Else add metricValue to totalDmsExist
       const temp: dmsExist = {
         numDmsExist: data.dmsExist[currValue].numDmsExist += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalDmsExist += metricValue;
+      data.dmsExist.push(temp);
     }
-    data.totalDmsExist += metricValue;
-    data.dmsExist.push(temp);
   } else if (metricType === 'messagesExist') {
     /// If metricType is messagesExist
     const currValue = data.messagesExist.length - 1;
@@ -442,16 +449,18 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
       const temp: messagesExist = {
         numMessagesExist: 0 + metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalMessagesExist += metricValue;
+      data.messagesExist.push(temp);
     } else {
       /// Else add metricValue to totalMessagesExist
       const temp: messagesExist = {
         numMessagesExist: data.messagesExist[currValue].numMessagesExist += metricValue,
         timeStamp: currTime,
-      }
+      };
+      data.totalMessagesExist += metricValue;
+      data.messagesExist.push(temp);
     }
-    data.totalMessagesExist += metricValue;
-    data.messagesExist.push(temp);
   }
   setData(data);
 }
