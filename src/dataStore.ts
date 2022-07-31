@@ -8,6 +8,36 @@ type authUserId = {
   authUserId: number
 };
 
+interface channelsJoined {
+  numChannelsJoined: number,
+  timeStamp: number,
+}
+
+interface dmsJoined {
+  numDmsJoined: number,
+  timeStamp: number,
+}
+
+interface messagesSent {
+  numMessagesSent: number,
+  timeStamp: number,
+}
+
+interface channelsExist {
+  numChannelsExist: number,
+  timeStamp: number,
+}
+
+interface dmsExist {
+  numDmsExist: number,
+  timeStamp: number,
+}
+
+interface messagesExist {
+  numMessagesExist: number,
+  timeStamp: number,
+}
+
 interface User {
   uId: number,
   email: string,
@@ -17,9 +47,9 @@ interface User {
   token: token[],
   password: string,
   permissionId: number,
-  channelsJoined: number,
-  dmsJoined: number,
-  msgsSent: number,
+  channelsJoined: channelsJoined[],
+  dmsJoined: dmsJoined[],
+  messagesSent: messagesSent[],
 }
 
 interface UserInfo {
@@ -82,6 +112,9 @@ type Data = {
   users: User[],
   channels: Channel[],
   dms: Dm[],
+  channelsExist: channelsExist[],
+  dmsExist: dmsExist[],
+  messagesExist: messagesExist[],
 }
 
 // CONSTANTS //
@@ -91,6 +124,9 @@ let data: Data = {
   users: [],
   channels: [],
   dms: [],
+  channelsExist: [],
+  dmsExist: [],
+  messagesExist: [],
 };
 
 const fileName = 'data.json';

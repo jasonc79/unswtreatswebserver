@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 
 // INCLUDES FUNCTIONS FOR:
 // - Checking whether a function exits
@@ -329,6 +329,103 @@ export function updateChannel(channelId: number, channel: Channel) {
     if (data.channels[i].channelId === channelId) {
       data.channels[i] = channel;
     }
+  }
+  setData(data);
+}
+
+
+/// if not remove 1 by one make uId an array(uId[])
+
+
+
+/// helper function to change metric values
+export function addMetric(metricType: string, metricValue: number, uId?: number) {
+  const data = getData();
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  if (metricType === 'channelsJoined') {
+    const currValue = data.users[uId].channelsJoined.length - 1;
+    if (currValue === -1) {
+      const temp: channelsJoined = {
+        numChannelsJoined: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: channelsJoined = {
+        numChannelsJoined: data.users[uId].channelsJoined[currValue].numChannelsJoined += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.users[uId].channelsJoined.push(temp);
+  } else if (metricType === 'dmsJoined') {
+    const currValue = data.users[uId].dmsJoined.length - 1;
+    if (currValue === -1) {
+      const temp: dmsJoined = {
+        numDmsJoined: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: dmsJoined = {
+        numDmsJoined: data.users[uId].dmsJoined[currValue].numDmsJoined += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.users[uId].dmsJoined.push(temp);
+  } else if (metricType === 'messagesSent') {
+    const currValue = data.users[uId].messagesSent.length - 1;
+    if (currValue === -1) {
+      const temp: messagesSent = {
+        numMessagesSent: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: messagesSent = {
+        numMessagesSent: data.users[uId].messagesSent[currValue].numMessagesSent += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.users[uId].messagesSent.push(temp);
+  } else if (metricType === 'channelsExist') {
+    const currValue = data.channelsExist.length - 1;
+    if (currValue === -1) {
+      const temp: channelsExist = {
+        numChannelsExist: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: channelsExist = {
+        numChannelsExist: data.channelsExist[currValue].numChannelsExist += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.channelsExist.push(temp);
+  } else if (metricType === 'dmsExist') {
+    const currValue = data.dmsExist.length - 1;
+    if (currValue === -1) {
+      const temp: dmsExist = {
+        numDmsExist: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: dmsExist = {
+        numDmsExist: data.dmsExist[currValue].numDmsExist += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.dmsExist.push(temp);
+  } else if (metricType === 'messagesExist') {
+    const currValue = data.messagesExist.length - 1;
+    if (currValue === -1) {
+      const temp: messagesExist = {
+        numMessagesExist: 0 += metricValue,
+        timeStamp: currTime
+      }
+    } else {
+      const temp: messagesExist = {
+        numMessagesExist: data.messagesExist[currValue].numMessagesExist += metricValue,
+        timeStamp: currTime
+      }
+    }
+    data.messagesExist.push(temp);
   }
   setData(data);
 }
