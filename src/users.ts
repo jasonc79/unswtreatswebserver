@@ -137,4 +137,46 @@ function usersAllV1(token: string) : error | allUserReturn {
   return { users: userDetails };
 }
 
+function usersStats(token: string): (workspaceStats) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+  const data = getData();
+  let top = 0;
+  let bottom = data.users.length;
+  for (const object of data.users) {
+    if (object.totalChannelsJoined > 0) {
+      top++;
+    } else if (object.totalDmsJoined > 0) {
+      top++;
+    }
+  }
+  const utilizationRate = top/bottom;
+  const temp = {
+    channelsExist: data.channelsExist,
+    dmsExist: data.dmExist,
+    messagesExist: data.messagesExist,
+    utilizationRate: utilizationRate
+  }
+  console.log(temp);
+}
+
+function userStats(token: string): (userStats) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  }
+  const data = getData();
+  const uId = getIdfromToken(token);
+  const top = data.users[uId].totalChannelsJoined + data.users[uId].totalDmsJoined + data.users[uId].totalMessagesSent;
+  const bottom = data.totalMessagesExist + data.totalDmsExist + data.totalChannelsExist;
+  const involvementRate = top/bottom;
+  const temp = {
+    channelsJoined: [{numChannelsJoined, timestamp}],
+    dmsJoined: [{numDmsJoined, timestamp}],
+    messagesSent: [{numMessagesSent, timestamp}],
+    involvementRate: involvementRate
+  }
+  console.log(temp);
+}
+
 export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1 };
