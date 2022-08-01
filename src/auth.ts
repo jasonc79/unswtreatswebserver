@@ -1,4 +1,4 @@
-import { getData, setData, error, authUserId, token } from './dataStore';
+import { getData, setData, error, authUserId, token, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser } from './helper';
 import validator from 'validator';
 import HTTPError from 'http-errors';
@@ -39,6 +39,19 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   const data = getData();
   const handle = createHandle(nameFirst, nameLast);
   const token = generateToken();
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  const temp1: channelsJoined = {
+    numChannelsJoined: 0,
+    timeStamp: currTime,
+  };
+  const temp2: dmsJoined = {
+    numDmsJoined: 0,
+    timeStamp: currTime,
+  };
+  const temp3: messagesSent = {
+    numMessagesSent: 0,
+    timeStamp: currTime,
+  };
   // Generate uId using the size of array users and default permission 2
   const user = {
     uId: data.users.length,
@@ -49,9 +62,9 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     password: password,
     token: [token],
     permissionId: 2,
-    channelsJoined: [],
-    dmsJoined: [],
-    messagesSent: [],
+    channelsJoined: [temp1],
+    dmsJoined: [temp2],
+    messagesSent: [temp3],
     totalChannelsJoined: 0,
     totalDmsJoined: 0,
     totalMessagesSent: 0,
@@ -59,6 +72,21 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   // Global owner
   if (user.uId === 0) {
     user.permissionId = 1;
+    const temp4: messagesExist = {
+      numMessagesExist: 0,
+      timeStamp: currTime,
+    };
+    const temp5: dmsExist = {
+      numDmsExist: 0,
+      timeStamp: currTime,
+    };
+    const temp6: channelsExist = {
+      numChannelsExist: 0,
+      timeStamp: currTime,
+    };
+    data.messagesExist.push(temp4);
+    data.dmsExist.push(temp5);
+    data.channelsExist.push(temp6);
   }
   // Update data
   data.users.push(user);

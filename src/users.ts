@@ -155,7 +155,7 @@ function usersStats(token: string) {
   const utilizationRate = top / bottom;
   const temp = {
     channelsExist: data.channelsExist,
-    dmsExist: data.dmExist,
+    dmsExist: data.dmsExist,
     messagesExist: data.messagesExist,
     utilizationRate: utilizationRate
   };

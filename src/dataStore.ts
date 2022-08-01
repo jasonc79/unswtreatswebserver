@@ -166,3 +166,4 @@ export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { error, errorMsg };
+export { channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist };
