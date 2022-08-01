@@ -276,7 +276,7 @@ function editMessage(token: string, id: number, message: string, prop: string) {
   setData(data);
 }
 
-function messagePinV1(token: string, messageId: number): (object | error) {
+function messagePinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -310,7 +310,7 @@ function messagePinV1(token: string, messageId: number): (object | error) {
   return {};
 }
 
-function messageUnpinV1(token: string, messageId: number): (object | error) {
+function messageUnpinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }

@@ -147,7 +147,7 @@ interface workspaceStats {
 
 type returnWorkspaceStats = { workspaceStats: workspaceStats};
 
-function usersStatsV1(token: string) : (returnWorkspaceStats | error) {
+function usersStatsV1(token: string) : (returnWorkspaceStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -179,7 +179,7 @@ interface userStats {
 
 type returnUserStats = { userStats: userStats};
 
-function userStatsV1(token: string) : (returnUserStats | error) {
+function userStatsV1(token: string) : (returnUserStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }

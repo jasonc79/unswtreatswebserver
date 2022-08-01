@@ -121,7 +121,7 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
  * @returns {} if there is no error
  */
 
-function channelInviteV3(token: string, channelId: number, uId: number): (error | object) {
+function channelInviteV3(token: string, channelId: number, uId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -177,7 +177,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (error 
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
-function channelMessagesV3(token: string, channelId: number, start: number): (messagesUnder50 | messagesOver50 | error) {
+function channelMessagesV3(token: string, channelId: number, start: number): (messagesUnder50 | messagesOver50 ) {
   // const uId = returnValidUser(token);
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -230,7 +230,7 @@ function channelMessagesV3(token: string, channelId: number, start: number): (me
  * @returns { object } on no error
  */
 
-function channelLeaveV2(token: string, channelId: number): (object | error) {
+function channelLeaveV2(token: string, channelId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   } else if (!checkValidChannel(channelId)) {
@@ -267,7 +267,7 @@ function channelLeaveV2(token: string, channelId: number): (object | error) {
  * @returns { object } when no error
  */
 
-function channelAddOwnerV2(token: string, channelId: number, uId: number): (object | error) {
+function channelAddOwnerV2(token: string, channelId: number, uId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
