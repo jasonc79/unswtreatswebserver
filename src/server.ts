@@ -358,7 +358,8 @@ app.get('/dm/messages/v2', (req, res, next) => {
 
 app.post('/standup/start/v1', (req, res, next) => {
   try {
-    const { token, channelId, length } = req.body;
+    const token = req.headers.token as string;
+    const { channelId, length } = req.body;
     return res.json(standupStartV1(token, channelId, length));
   } catch (err) {
     next(err);
@@ -367,7 +368,8 @@ app.post('/standup/start/v1', (req, res, next) => {
 
 app.get('/standup/active/v1', (req, res, next) => {
   try {
-    const token = req.query.token as string;
+    const token = req.headers.token as string;
+    //const token = req.query.token as string;
     const channelId = parseInt(req.query.channelId as string);
     return res.json(standupActiveV1(token, channelId));
   } catch (err) {
