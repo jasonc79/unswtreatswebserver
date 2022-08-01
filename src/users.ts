@@ -138,7 +138,7 @@ function usersAllV1(token: string) : error | allUserReturn {
   return { users: userDetails };
 }
 
-function usersStats(token: string) {
+function usersStatsV1(token: string) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -162,7 +162,7 @@ function usersStats(token: string) {
   console.log(temp);
 }
 
-function userStats(token: string) {
+function userStatsV1(token: string) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -170,14 +170,17 @@ function userStats(token: string) {
   const uId = getIdfromToken(token);
   const top = data.users[uId].totalChannelsJoined + data.users[uId].totalDmsJoined + data.users[uId].totalMessagesSent;
   const bottom = data.totalMessagesExist + data.totalDmsExist + data.totalChannelsExist;
-  const involvementRate = top / bottom;
+  let involvementRate = top / bottom;
+  console.log(top);
+  console.log(bottom);
+  if (isNaN(involvementRate)) involvementRate = 0;
   const temp = {
-    channelsJoined: data.users[uId].totalChannelsJoined,
-    dmsJoined: data.users[uId].totalDmsJoined,
-    messagesSent: data.users[uId].totalMessagesSent,
+    channelsJoined: data.users[uId].channelsJoined,
+    dmsJoined: data.users[uId].dmsJoined,
+    messagesSent: data.users[uId].messagesSent,
     involvementRate: involvementRate
   };
   console.log(temp);
 }
 
-export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1, usersStats, userStats };
+export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1, usersStatsV1, userStatsV1 };

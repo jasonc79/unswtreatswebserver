@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, errorMsg, requestClear } from './helperTests';
-import { requestUserSetName, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile } from './helperTests';
+import { requestChannelCreate, requestChannelJoin, requestUserSetName, requestMessageSend, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile, requestUserStats, requestUsersStats } from './helperTests';
 import { removeFile } from './helperTests';
 
 const email = 'email@gmail.com';
@@ -168,62 +168,57 @@ describe('Testing usersAllV1', () => {
   });
 });
 
-// describe('Testing usersStats', () => {
-//   test('equal 0', () => {
-//     const stats = requestUsersStats(authUser.token, 200);
-//     expect(stats.utilizationRate).toStrictEqual(0);
-//   });
-//   test('Pass situation equal 1', () => {
-//     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
-//     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
-//     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4);
-//     const channel = requestChannelCreate(authUser.token, 'name', true);
-//     requestChannelJoin(authUser2.token, channel.channelId);
-//     requestChannelJoin(authUser3.token, channel.channelId);
-//     requestChannelJoin(authUser4.token, channel.channelId);
-//     const stats = requestUsersStats(authUser.token);
-//     expect(stats.utilizationRate).toStrictEqual('1');
-//   });
-//   test('Pass situation equal 1/2', () => {
-//     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
-//     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
-//     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4);
-//     const channel = requestChannelCreate(authUser.token, 'name', true);
-//     requestChannelJoin(authUser2.token, channel.channelId);
-//     const stats = requestUsersStats(authUser.token);
-//     expect(stats.utilizationRate).toStrictEqual('1/2');
-//   });
-// });
+describe('Testing usersStats', () => {
+  test('equal 0', () => {
+    const stats = requestUsersStats(authUser.token, 200);
+    expect(stats.utilizationRate).toStrictEqual(0);
+  });
+  test('Pass situation equal 1', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+    const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    requestChannelJoin(authUser3.token, channel.channelId);
+    const stats = requestUsersStats(authUser.token);
+    expect(stats.utilizationRate).toStrictEqual('1');
+  });
+  test('Pass situation equal 1/2', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const stats = requestUsersStats(authUser.token);
+    expect(stats.utilizationRate).toStrictEqual('1/2');
+  });
+});
 
-// describe('Testing userStats', () => {
-//   test('equal 0', () => {
-//     const stats = requestUserStats(authUser.token, 200);
-//     expect(stats.involvementRate).toStrictEqual(0);
-//   });
-//   test('more than 1', () => {
-//     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
-//     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
-//     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4, 200);
-//     const channel = requestChannelCreate(authUser.token, 'name', true, 200);
-//     const channel2 = requestChannelCreate(authUser.token, 'name1', true, 200);
-//     const channel3 = requestChannelCreate(authUser.token, 'name2', true, 200);
-//     const channel4 = requestChannelCreate(authUser.token, 'name3', true, 200);
-//     requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
-//     requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
-//     const stats = requestUserStats(authUser.token, 200);
-//     expect(stats.involvementRate).toStrictEqual(1);
-//   });
+describe('Testing userStats', () => {
+  test('equal 0', () => {
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.involvementRate).toStrictEqual(0);
+  });
+  test('more than 1', () => {
+    requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser.token, 'name2', true, 200);
+    requestChannelCreate(authUser.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.involvementRate).toStrictEqual(1);
+  });
 //   test('more than 0 less than 1', () => {
 //     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
-//     const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
-//     const authUser4 = requestAuthRegister(email4, password4, nameFirst4, nameLast4, 200);
+//     requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
 //     const channel = requestChannelCreate(authUser.token, 'name', true, 200);
-//     const channel2 = requestChannelCreate(authUser.token, 'name1', true, 200);
-//     const channel3 = requestChannelCreate(authUser2.token, 'name2', true, 200);
-//     const channel4 = requestChannelCreate(authUser2.token, 'name3', true, 200);
+//     requestChannelCreate(authUser.token, 'name1', true, 200);
+//     requestChannelCreate(authUser2.token, 'name2', true, 200);
+//     requestChannelCreate(authUser2.token, 'name3', true, 200);
 //     requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
 //     requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
 //     const stats = requestUserStats(authUser.token, 200);
-//     expect(stats.involvementRate).toStrictEqual(any(Number));
+//     expect(stats.involvementRate).any(Number);
 //   });
-// });
+});
