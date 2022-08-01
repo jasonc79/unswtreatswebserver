@@ -153,9 +153,7 @@ function usersStatsV1(token: string) : (workspaceStats) {
   let top = 0;
   const bottom = data.users.length;
   for (const object of data.users) {
-    if (object.totalChannelsJoined > 0) {
-      top++;
-    } else if (object.totalDmsJoined > 0) {
+    if (object.totalChannelsJoined > 0 || object.totalDmsJoined > 0) {
       top++;
     }
   }
@@ -167,6 +165,7 @@ function usersStatsV1(token: string) : (workspaceStats) {
     utilizationRate: utilizationRate
   };
   console.log(temp);
+  return { workspaceStats: temp };
 }
 
 interface userStats {
@@ -195,6 +194,7 @@ function userStatsV1(token: string) : (userStats) {
     involvementRate: involvementRate
   };
   console.log(temp);
+  return { userStats: temp };
 }
 
 export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1, usersStatsV1, userStatsV1 };
