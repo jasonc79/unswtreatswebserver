@@ -12,6 +12,7 @@ function clearV1(): empty {
   data.channels = [];
   data.dms = [];
   data.standups = [];
+  data.resetCodes = [];
   setData(data);
   return {};
 }

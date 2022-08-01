@@ -90,6 +90,12 @@ interface Standup {
   isActive: boolean
 }
 
+// RESET CODES
+interface Codes {
+  code: string,
+  uId: number
+}
+
 // ERROR TYPES AND CONSTANTS
 type error = { error: string };
 
@@ -98,6 +104,7 @@ type Data = {
   channels: Channel[],
   dms: Dm[],
   standups: Standup[]
+  resetCodes: Codes[]
 }
 
 // EMPTY RETURN
@@ -113,7 +120,8 @@ let data: Data = {
   users: [],
   channels: [],
   dms: [],
-  standups: []
+  standups: [],
+  resetCodes: []
 };
 
 // Use get() to access the data
@@ -140,6 +148,6 @@ function loadData() {
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
-export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
 export { timeReturn, activeReturn, Standup, standupMsg };
+export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };
