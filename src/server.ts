@@ -345,6 +345,7 @@ app.delete('/clear/v1', (req, res, next) => {
   }
 });
 
+// =================================================================//
 // handles errors nicely
 app.use(errorHandler());
 

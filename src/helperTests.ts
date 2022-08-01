@@ -99,7 +99,7 @@ export function requestChannelInvite(token: string, channelId: number, uId: numb
 }
 
 export function requestChannelJoin(token: string, channelId: number, err?: number) {
-  return requestHelper('POST', '/channel/join/v3', { token: token }, { channelId });
+  return requestHelper('POST', '/channel/join/v3', { token: token }, { channelId }, err);
 }
 
 export function requestChannelMessages(token: string, channelId: number, start: number, err?: number) {

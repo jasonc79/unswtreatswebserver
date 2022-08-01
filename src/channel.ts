@@ -1,4 +1,4 @@
-import { error, errorMsg, UserInfo, Message, userReturn } from './dataStore';
+import { error, UserInfo, Message, userReturn, OWNER, empty } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { updateChannel } from './helper';
 import { userProfileV1 } from './users';
@@ -23,11 +23,11 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
 
 function channelDetailsV2(token: string, channelId: number) : (error | channelDetails) {
   if (!checkValidChannel(channelId)) {
-    return errorMsg;
+    throw HTTPError(400, 'Invalid channelId');
   } else if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Invalid token');
   } else if (!isMember(token, channelId)) {
-    return errorMsg;
+    throw HTTPError(403, 'Authorisd user is not a member of the channel');
   }
 
   const currChannel = returnValidChannel(channelId);
@@ -79,16 +79,22 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
  *    if the cahnnelId is invalid
  * @returns {} if there is no error
  */
-function channelJoinV1(token: string, channelId: number): (error | object) {
+function channelJoinV1(token: string, channelId: number): (error | empty) {
   // Check if channelId and token is valid
-  if (!checkValidToken(token) || !checkValidChannel(channelId)) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
+  } else if (!checkValidChannel(channelId)) {
+    throw HTTPError(400, 'Invalid channelId');
   }
   const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
+  const userIsMember = isMember(token, channel.channelId);
 
-  if ((channel.isPublic === false && user.permissionId === 2) || isMember(token, channel.channelId)) {
-    return errorMsg;
+  if (userIsMember) {
+    throw HTTPError(400, 'The authorised user is already a member of the channel');
+  }
+  if (channel.isPublic === false && user.permissionId !== OWNER && !userIsMember) {
+    throw HTTPError(403, 'The authorised user is not a global owner and has no access to a private channel');
   }
 
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
@@ -117,7 +123,7 @@ function channelJoinV1(token: string, channelId: number): (error | object) {
 
 function channelInviteV3(token: string, channelId: number, uId: number): (error | object) {
   if (!checkValidToken(token)) {
-    throw HTTPError(403, 'Invvalid token');
+    throw HTTPError(403, 'Invalid token');
   }
   // Checking if channelID and uId are valid
   const channel = returnValidChannel(channelId);

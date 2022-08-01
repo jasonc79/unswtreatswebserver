@@ -15,7 +15,7 @@ afterEach(() => {
 
 describe(('Testing clearV1'), () => {
   test('Cleared successfully', () => {
-    requestAuthRegister(email0, password0, nameFirst0, nameLast0);
+    requestAuthRegister(email0, password0, nameFirst0, nameLast0, 200);
     const clearReturn = requestClear();
     requestAuthLogin(email0, password0, 400);
     expect(clearReturn).toStrictEqual({});
