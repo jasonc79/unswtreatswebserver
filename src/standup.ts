@@ -67,6 +67,10 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
   };
 }
 
+function standupSendV1(token: string, channelId: number, message: string) {
+
+}
+
 function packMessage(token: string, id: number) {
   const data = getData();
   let packedMessage = '';
@@ -82,4 +86,4 @@ function packMessage(token: string, id: number) {
   setData(data);
 }
 
-export { standupStartV1, standupActiveV1 };
+export { standupStartV1, standupActiveV1, standupSendV1 };
