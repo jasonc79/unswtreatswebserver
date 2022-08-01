@@ -1,4 +1,4 @@
-import { error, Channel, userReturn, channelId, getData, setData } from './dataStore';
+import { error, Channel, userReturn, channelId, getData, setData, channelsJoined, channelsExist } from './dataStore';
 import { checkValidToken, returnValidUser } from './helper';
 import { userProfileV1 } from './users';
 import HTTPError from 'http-errors';
@@ -34,6 +34,7 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
   const data = getData();
   const user = returnValidUser(token);
   const channelId = data.channels.length;
+  const currTime = Math.floor((new Date()).getTime() / 1000);
 
   const newChannel : Channel = {
     channelId: channelId,
@@ -43,7 +44,29 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     ownerMembers: [user],
     isPublic: isPublic,
   };
+  // addMetric('channelsExist', 1);
+  // addMetric('channelsJoined', 1, user.uId);
+  const temp: channelsExist = {
+    numChannelsExist: data.totalChannelsExist += 1,
+    timeStamp: currTime,
+  };
+  // console.log(temp);
+  data.totalChannelsExist;
+  // console.log(data.totalChannelsExist);
+  data.channelsExist.push(temp);
+  // console.log(data.channelsExist)
   data.channels.push(newChannel);
+
+  const temp1: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+    timeStamp: currTime,
+  };
+  console.log(temp1);
+  data.users[user.uId].totalChannelsJoined;
+  console.log(data.users[user.uId].totalChannelsJoined)
+  data.users[user.uId].channelsJoined.push(temp1);
+  console.log(data.users[user.uId].channelsJoined)
+
   setData(data);
 
   return { channelId: channelId };
