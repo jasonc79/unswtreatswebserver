@@ -1,11 +1,18 @@
 import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { ELEMENT } from './auth';
+import crypto from 'crypto';
 
 // INCLUDES FUNCTIONS FOR:
+// - Get hash of a token
 // - Checking whether a function exits
 // - Returning an object
 // - Getting/returning using ids
 // - Checking whether a property is satisfied
 // - Updating objects in the datastore
+
+export function getHashOf(plaintext: string) {
+  return crypto.createHash('sha256').update(plaintext).digest('hex');
+}
 
 //= ==========================================================================//
 // CHECKING FUNCTIONS - RETURNS BOOLEAN                                      //
@@ -41,7 +48,7 @@ export function checkValidToken(token: token) : boolean {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return true;
       }
     }
@@ -146,7 +153,7 @@ export function returnValidUser(token: string) : User {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return user;
       }
     }
@@ -197,7 +204,7 @@ export function getIdfromToken(token: string) : number {
   const data: Data = getData();
   for (const user of data.users) {
     for (const existToken of user.token) {
-      if (existToken === token) {
+      if (getHashOf(existToken + ELEMENT) === token) {
         return user.uId;
       }
     }
