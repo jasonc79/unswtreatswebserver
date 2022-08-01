@@ -51,7 +51,6 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     timeStamp: currTime,
   };
   // console.log(temp);
-  data.totalChannelsExist;
   // console.log(data.totalChannelsExist);
   data.channelsExist.push(temp);
   // console.log(data.channelsExist)
@@ -62,10 +61,9 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     timeStamp: currTime,
   };
   console.log(temp1);
-  data.users[user.uId].totalChannelsJoined;
-  console.log(data.users[user.uId].totalChannelsJoined)
+  console.log(data.users[user.uId].totalChannelsJoined);
   data.users[user.uId].channelsJoined.push(temp1);
-  console.log(data.users[user.uId].channelsJoined)
+  console.log(data.users[user.uId].channelsJoined);
 
   setData(data);
 

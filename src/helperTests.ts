@@ -177,11 +177,11 @@ export function requestUserHandle(token: string, handleStr: string, err?: number
 }
 
 export function requestUserStats(token: string, err?: number) {
-  return requestHelper('GET', '/user/stats/v1', { token }, err);
+  return requestHelper('GET', '/user/stats/v1', { token: token }, {}, err);
 }
 
 export function requestUsersStats(token: string, err?: number) {
-  return requestHelper('GET', '/users/stats/v1', { token }, err);
+  return requestHelper('GET', '/users/stats/v1', { token: token }, {}, err);
 }
 
 // Message functions
@@ -202,11 +202,11 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
 }
 
 export function requestMessagePin(token: string, messageId: number, err?: number) {
-  return requestHelper('PUT', '/message/pin/v1', { token, messageId }, err);
+  return requestHelper('PUT', '/message/pin/v1', { token: token }, { messageId }, err);
 }
 
 export function requestMessageUnpin(token: string, messageId: number, err?: number) {
-  return requestHelper('PUT', '/message/unpin/v1', { token, messageId }, err);
+  return requestHelper('PUT', '/message/unpin/v1', { token: token }, { messageId }, err);
 }
 // Other functions
 export function requestClear() {

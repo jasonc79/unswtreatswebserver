@@ -357,9 +357,9 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
     };
     console.log(temp);
     data.users[uId].totalChannelsJoined += metricValue;
-    console.log(data.users[uId].totalChannelsJoined)
+    console.log(data.users[uId].totalChannelsJoined);
     data.users[uId].channelsJoined.push(temp);
-    console.log(data.users[uId].channelsJoined)
+    console.log(data.users[uId].channelsJoined);
   } else if (metricType === 'dmsJoined') {
     /// If metricType is dmsJoined
     // const currValue = data.users[uId].dmsJoined.length - 1;
@@ -392,7 +392,7 @@ export function addMetric(metricType: string, metricValue: number, uId?: number)
     data.totalChannelsExist += metricValue;
     console.log(data.totalChannelsExist);
     data.channelsExist.push(temp);
-    console.log(data.channelsExist)
+    console.log(data.channelsExist);
   } else if (metricType === 'dmsExist') {
     /// If metricType is dmsExist
     // const currValue = data.dmsExist.length - 1;
