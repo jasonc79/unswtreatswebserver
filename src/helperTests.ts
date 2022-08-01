@@ -162,6 +162,14 @@ export function requestUserHandle(token: string, handleStr: string, err?: number
   return requestHelper('PUT', '/user/profile/sethandle/v1', { token, handleStr }, err);
 }
 
+export function requestUserStats(token: string, err?: number) {
+  return requestHelper('GET', '/user/stats/v1', { token }, err);
+}
+
+export function requestUsersStats(token: string, err?: number) {
+  return requestHelper('GET', '/users/stats/v1', { token }, err);
+}
+
 // Message functions
 export function requestMessageSend(token: string, channelId: number, message: string, err?: number) {
   return requestHelper('POST', '/message/send/v2', { token, channelId, message }, err);

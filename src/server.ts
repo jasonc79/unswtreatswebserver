@@ -8,7 +8,7 @@ import errorHandler from 'middleware-http-errors';
 import { authRegisterV1, authLoginV1, authLogoutV1 } from './auth';
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
-import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
+import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1, userStatsV1, usersStatsV1 } from './users';
 import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messagePinV1, messageUnpinV1 } from './message';
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
@@ -206,6 +206,23 @@ app.get('/users/all/v1', (req, res, next) => {
   }
 });
 
+app.get('/user/stats/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(userStatsV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/users/stats/v1', (req, res, next) => {
+  try {
+    const token = req.query.token as string;
+    return res.json(usersStatsV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // Message functions
 app.post('/message/send/v2', (req, res, next) => {
