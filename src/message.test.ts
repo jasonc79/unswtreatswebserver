@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageSendlater, requestMessageSendlaterdm } from './helperTests';
 import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
@@ -10,7 +10,7 @@ const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
 function generateTimeStamp() {
-  return Math.floor(Date.now() / 1000);
+  return Math.floor((new Date()).getTime() / 1000);
 }
 
 function checkTimestamp(timestamp: number, expectedTimestamp: number) {
@@ -19,6 +19,50 @@ function checkTimestamp(timestamp: number, expectedTimestamp: number) {
    */
   expect(timestamp).toBeGreaterThanOrEqual(expectedTimestamp - 3);
   expect(timestamp).toBeLessThan(expectedTimestamp + 3);
+}
+
+function checkChannelMsg(authUser, channel, message, expectedTime) {
+  const messages = requestChannelMessages(authUser.token, channel.channelId, 0);
+  expect(message).toStrictEqual(
+    expect.objectContaining({
+      messageId: expect.any(Number),
+    })
+  );
+  expect(messages).toStrictEqual(
+    expect.objectContaining({
+      messages: [{
+        messageId: message.messageId,
+        uId: authUser.authUserId,
+        message: 'message',
+        timeSent: expect.any(Number)
+      }],
+      start: 0,
+      end: -1
+    })
+  );
+  checkTimestamp(messages.messages[0].timeSent, expectedTime);
+}
+
+function checkDmMsg(authUser, dm, message, expectedTime) {
+  const messages = requestDmMessages(authUser.token, dm.dmId, 0);
+  expect(message).toStrictEqual(
+    expect.objectContaining({
+      messageId: expect.any(Number),
+    })
+  );
+  expect(messages).toStrictEqual(
+    expect.objectContaining({
+      messages: [{
+        messageId: message.messageId,
+        uId: authUser.authUserId,
+        message: 'message',
+        timeSent: expect.any(Number)
+      }],
+      start: 0,
+      end: -1
+    })
+  );
+  checkTimestamp(messages.messages[0].timeSent, expectedTime);
 }
 
 beforeEach(() => {
@@ -695,3 +739,93 @@ describe('Testing messageRemoveV1', () => {
     });
   });
 });
+
+describe('Testing messageSendlaterV1', () => {
+  describe('error', () => {
+    test('invalid token', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSendlater('bad', channel.channelId, 'message', generateTimeStamp() + 1, 403);
+    });
+    test('channelId is invalid', () => {
+      requestMessageSendlater(authUser.token, 1, 'message', generateTimeStamp() + 1, 400);
+    });
+    test('length of message is less than 1', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSendlater(authUser.token, channel.channelId, '', generateTimeStamp() + 1, 400);
+    });
+    test('length of message is more than 1000', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = 'a'.repeat(1001);
+      requestMessageSendlater(authUser.token, channel.channelId, message, generateTimeStamp() + 1, 400);
+    });
+    test('user is not a member of channel', () => {
+      const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSendlater(authUser2.token, channel.channelId, 'message', generateTimeStamp() + 5, 403);
+    });
+    test('imput time is in the past', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      requestMessageSendlater(authUser.token, channel.channelId, 'message', generateTimeStamp() - 5, 400);
+    });
+  });
+  test('message sends', () => {
+    const channel = requestChannelCreate(authUser.token, 'name', false);
+    const message = requestMessageSendlater(authUser.token, channel.channelId, 'message', generateTimeStamp() + 1);
+    const expectedTime = generateTimeStamp() + 1;
+    setTimeout(() => checkChannelMsg(authUser, channel, message, expectedTime), 1000);
+  });
+});
+
+// describe('Testing messageSendlaterdmV1', () => {
+//   describe('error', () => {
+//     test('invalid token', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm('bad', dm.dmId, 'message', generateTimeStamp() + 1, 403);
+//     });
+//     test('channelId is invalid', () => {
+//       requestMessageSendlaterdm(authUser.token, 1, 'message', generateTimeStamp() + 1, 400);
+//     });
+//     test('length of message is less than 1', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, '', generateTimeStamp() + 1, 400);
+//     });
+//     test('length of message is more than 1000', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       const message = 'a'.repeat(1001);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, message, generateTimeStamp() + 1, 400);
+//     });
+//     test('user is not a member of dm', () => {
+//       const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2');
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser2.token, dm.dmId, 'message', generateTimeStamp() + 5, 403);
+//     });
+//     test('imput time is in the past', () => {
+//       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//       const uIds = [];
+//       uIds.push(uId1.authUserId);
+//       const dm = requestDmCreate(authUser.token, uIds);
+//       requestMessageSendlaterdm(authUser.token, dm.dmId, 'message', generateTimeStamp() - 5, 400);
+//     });
+//   });
+//   test('message sends', () => {
+//     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+//     const uIds = [];
+//     uIds.push(uId1.authUserId);
+//     const dm = requestDmCreate(authUser.token, uIds);
+//     const message = requestMessageSendlaterdm(authUser.token, dm.dmId, 'message', generateTimeStamp() + 1);
+//     const expectedTime = generateTimeStamp() + 1;
+//     setTimeout(() => checkDmMsg(authUser, dm, message, expectedTime), 1000);
+//   });
+// });

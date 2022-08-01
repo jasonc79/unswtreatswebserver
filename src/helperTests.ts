@@ -178,6 +178,31 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token, messageId }, err);
 }
+
+export function requestMessageSendlater(token: string, channelId: number, message: string, timeSent: number, err?: number) {
+  return requestHelper('POST', '/message/sendlater/v1', { token, channelId, message, timeSent }, err);
+}
+
+export function requestMessageSendlaterdm(token: string, dmId: number, message: string, timeSent: number, err?: number) {
+  return requestHelper('POST', '/message/sendlaterdm/v1', { token, dmId, message, timeSent }, err);
+}
+
+//============================================================================//
+// Standup functions 
+//============================================================================//
+export function requestStandupStart(token: string, channelId: number, length: number, err?: number) {
+  return requestHelper('POST', '/standup/start/v1', { token, channelId, length }, err);
+}
+
+export function requestStandupActive(token: string, channelId: number, err?: number) {
+  return requestHelper('GET', '/standup/active/v1', { token, channelId }, err);
+}
+
+export function requestStandupSend(token: string, channelId: number, message: string, err?: number) {
+  return requestHelper('POST', '/standup/send/v1', { token, channelId, message}, err);
+}
+
+
 // Other functions
 export function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {});
