@@ -171,7 +171,7 @@ describe('Testing usersAllV1', () => {
 describe('Testing usersStats', () => {
   test('equal 0', () => {
     const stats = requestUsersStats(authUser.token, 200);
-    expect(stats.utilizationRate).toStrictEqual(0);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(0);
   });
   test('Pass situation equal 1', () => {
     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
@@ -195,7 +195,7 @@ describe('Testing usersStats', () => {
 describe('Testing userStats', () => {
   test('equal 0', () => {
     const stats = requestUserStats(authUser.token, 200);
-    expect(stats.involvementRate).toStrictEqual(0);
+    expect(stats.userStats.involvementRate).toStrictEqual(0);
   });
   test('more than 1', () => {
     requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
