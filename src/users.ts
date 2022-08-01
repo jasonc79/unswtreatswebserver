@@ -1,4 +1,4 @@
-import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo } from './dataStore';
+import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser, getIdfromToken } from './helper';
 import { checkValidEmail } from './auth';
 import HTTPError from 'http-errors';
@@ -145,7 +145,9 @@ interface workspaceStats {
   utilizationRate: number,
 }
 
-function usersStatsV1(token: string) : (workspaceStats) {
+type returnWorkspaceStats = { workspaceStats: workspaceStats};
+
+function usersStatsV1(token: string) : (returnWorkspaceStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -172,10 +174,12 @@ interface userStats {
   channelsJoined: channelsJoined[],
   dmsJoined: dmsJoined[],
   messagesSent: messagesSent[],
-  involvementRate: number,  
+  involvementRate: number,
 }
 
-function userStatsV1(token: string) : (userStats) {
+type returnUserStats = { userStats: userStats};
+
+function userStatsV1(token: string) : (returnUserStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
