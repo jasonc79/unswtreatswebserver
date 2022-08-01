@@ -1,4 +1,4 @@
-import { error, getData, setData } from './dataStore';
+import { error, getData, setData, React } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -18,6 +18,8 @@ import {
   isOwner,
   isMemberDm,
   isOwnerDm,
+  checkReactId, 
+  returnValidMessage, 
 } from './helper';
 import HTTPError from 'http-errors';
 import { errorMsg } from './helperTests';
@@ -248,13 +250,43 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
 }
 
 function messageReactV1 (messageId: number, reactId: number): error | {} {
-   
-  return errorMsg; 
+  console.log(reactId); 
+  if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
+    throw HTTPError(400, 'Invalid messageId'); 
+  }
+
+  if (!checkReactId(reactId)) {
+    throw HTTPError(400, 'Invalid reactId'); 
+  }
+
+  const message = returnValidMessage(messageId); 
+  for (const react of message.reacts) {
+    if (react.isThisUserReacted === true) {
+      throw HTTPError(400, 'Message already contains a react from authorised user'); 
+    }
+  }
+
+  const data = getData(); 
+  // Another user has already reacted with same reactId
+  for (const react of message.reacts) {
+    if (reactId === react.reactId) {
+      react.uIds.push()// Current user
+      react.isThisUserReacted = true;
+    }
+  }
+  // First react of that reactId
+  const newReact : React = {
+    reactId: reactId, 
+    uIds: [], // Current user
+    isThisUserReacted: true, 
+  }
+  message.reacts.push(newReact); 
+  return {}; 
 }
 
 function messageUnreactV1 (messageId: number, reactId: number): error | {} {
    
-  return errorMsg; 
+  return {}; 
 }
 
 // helper function

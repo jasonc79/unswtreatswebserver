@@ -59,21 +59,6 @@ export function checkValidDm(id: number): boolean {
   return false;
 }
 
-export function checkValidReactId(id: number): boolean {
-  const data: Data = getData(); 
-  // Checking channel messages
-  for (const channel of data.channels) {
-    for (const message of channel.messages) {
-      
-    }
-  }
-
-  // Checking dm messages
-
-
-  return true; 
-}
-
 /**
  * returns true if the message exists in some channel, and false otherwise
  */
@@ -126,6 +111,16 @@ export function checkDmMessageSender(token: string, messageId: number) : boolean
     return true;
   }
   return false;
+}
+
+export function checkReactId(id: number) {
+  const validReacts = [1]; // 1 for like react, can add more in the future
+  for (const react of validReacts) {
+    if (react === id) {
+      return true; 
+    }
+  }
+  return false; 
 }
 //= ==========================================================================//
 // RETURN FUNCTIONS - RETURNS AN OBJECT                                      //
@@ -200,6 +195,17 @@ export function returnValidMessagefromDm(messageId: number) : Message {
       return message;
     }
   }
+}
+
+export function returnValidMessage(messageId: number): Message {
+  let message; 
+  if (!checkValidChannelMessage(messageId)) {
+    message = returnValidMessagefromDm(messageId); 
+  } 
+  if (!checkValidDmMessage(messageId)) {
+    message = returnValidMessagefromChannel(messageId); 
+  } 
+  return message; 
 }
 
 //= ==========================================================================//
