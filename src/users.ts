@@ -138,7 +138,14 @@ function usersAllV1(token: string) : error | allUserReturn {
   return { users: userDetails };
 }
 
-function usersStatsV1(token: string) {
+interface workspaceStats {
+  channelsExist: channelsExist[],
+  dmsExist: dmsExist[],
+  messagesExist: messagesExist[],
+  utilizationRate: number,
+}
+
+function usersStatsV1(token: string) : (workspaceStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
@@ -162,7 +169,14 @@ function usersStatsV1(token: string) {
   console.log(temp);
 }
 
-function userStatsV1(token: string) {
+interface userStats {
+  channelsJoined: channelsJoined[],
+  dmsJoined: dmsJoined[],
+  messagesSent: messagesSent[],
+  involvementRate: number,  
+}
+
+function userStatsV1(token: string) : (userStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
   }
