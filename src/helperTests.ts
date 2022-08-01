@@ -190,11 +190,11 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
 }
 
 export function requestMessageReact(messageId: number, reactId: number, err?: number) {
-  return requestHelper('POST', 'message/react/v1', {messageId, reactId}, err);
+  return requestHelper('POST', '/message/react/v1', {messageId, reactId}, err);
 }
 
 export function requestMessageUnreact(messageId: number, reactId: number, err?: number) {
-  return requestHelper('POST', 'message/unreact/v1', {messageId, reactId}, err);
+  return requestHelper('POST', '/message/unreact/v1', {messageId, reactId}, err);
 }
 
 // Other functions
