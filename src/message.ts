@@ -1,4 +1,4 @@
-import { error, getData, setData } from './dataStore';
+import { error, getData, setData, Message, Channel, Dm } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -53,12 +53,8 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   }
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
-  const newMessage = {
-    messageId: Math.floor(Math.random() * Date.now()),
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-  };
+  const newMessage = createMessage(token, message);
+
   for (const channel of data.channels) {
     if (channel.channelId === cuurentChannel.channelId) {
       channel.messages.push(newMessage);
@@ -85,12 +81,7 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
 
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
-  const newMessage = {
-    messageId: Math.floor(Math.random() * Date.now()),
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-  };
+  const newMessage = createMessage(token, message);
 
   for (const dm of data.dms) {
     if (dm.dmId === cuurentDm.dmId) {
@@ -246,31 +237,89 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
+function messageShareV1(token: string, ogMessageId: number, message: string, channelId: number, dmId: number) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  } else if (!checkValidChannel(channelId) && !checkValidDm(dmId)) {
+    throw HTTPError(400, 'Channel ID does not refer to a valid channel');
+  } else if (channelId != -1 && dmId != -1) {
+    throw HTTPError(400, 'Neither dmId or channelId is -1');
+  } else if (message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be less than 1000 inclusive');
+  } 
+  const isOgMessage = checkValidChannelMessage(ogMessageId);
+  const isOgDm = checkValidDmMessage(ogMessageId);
+  let ogMessage: Message;
+  let newMessageId: number;
+
+  if (!isOgMessage && !isOgDm) {
+    throw HTTPError(400, 'ogMessageId does not refer to valid channel that the authorised user has joined');
+  } else if (isOgMessage) {
+    ogMessage = returnValidMessagefromChannel(ogMessageId);
+  } else if (isOgDm) {
+    ogMessage = returnValidMessagefromDm(ogMessageId);
+  }
+  let concatMessage = concatMessageString(ogMessage.message, message);
+  // Sharing a message with a channel
+  if (dmId === -1) {
+    if (!isMember(token, channelId)) {
+      throw HTTPError(403, 'Authorised user is not a member of the channel they are sharing a message to');
+    } 
+    newMessageId = (messageSendV1(token, channelId, concatMessage) as messageId).messageId;
+  }  // Sharing a message with a dm
+  if (channelId === -1) {
+    if (!isMemberDm(token, dmId)) {
+      throw HTTPError(403, 'Authorised user is not a member of the dm they are sharing a message to');
+    } 
+    newMessageId = (messageSenddmV1(token, dmId, concatMessage) as messageId).messageId;
+    console.log(getData().dms[dmId].messages);
+  }
+  return {sharedMessageId: newMessageId};
+}
+
 // helper function
+const genEditMessage = (dataProp: Channel[] | Dm[]) => {
+  return (id: number, message: string) : Channel[] | Dm[] => {
+    for (const item of dataProp) {
+      for (const msg of item.messages) {
+        if (msg.messageId === id) {
+          msg.message = message;
+        }
+      }
+    }
+    return dataProp;
+  }
+}
+
 function editMessage(token: string, id: number, message: string, prop: string) {
-  const data = getData();
+  let data = getData();
   if (message.length === 0) {
     messageRemoveV1(token, id);
     return;
   }
+  const editMessageChannel = genEditMessage(data.channels);
+  const editMessageDm = genEditMessage(data.dms);
   if (prop === 'dms') {
-    for (const item of data.dms) {
-      for (const msg of item.messages) {
-        if (msg.messageId === id) {
-          msg.message = message;
-        }
-      }
-    }
+    data.dms = editMessageDm(id, message) as Dm[];
   } else if (prop === 'channels') {
-    for (const item of data.channels) {
-      for (const msg of item.messages) {
-        if (msg.messageId === id) {
-          msg.message = message;
-        }
-      }
-    }
+    data.channels = editMessageChannel(id, message) as Channel[];
   }
   setData(data);
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 };
+function createMessage(token: string, messageStr: string): Message {
+  let message: Message = {
+    messageId: Math.floor(Math.random() * Date.now()),
+    uId: getIdfromToken(token),
+    message: messageStr,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+  }
+  return message;
+}
+
+function concatMessageString(ogMessage: string, optionalMessage: string): string {
+  let newMessage = optionalMessage + '\n= = = = =\n' + ogMessage + '\n= = = = =\n'; 
+  return newMessage;
+}
+
+export { messageSendV1, messageSenddmV1, messageShareV1, messageEditV1, messageRemoveV1 };

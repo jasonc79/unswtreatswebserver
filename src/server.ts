@@ -9,7 +9,7 @@ import { authRegisterV1, authLoginV1, authLogoutV1, authPasswordRequest, authPas
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { messageSendV1, messageSenddmV1, messageShareV1, messageEditV1, messageRemoveV1 } from './message';
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 
@@ -233,6 +233,7 @@ app.get('/users/all/v2', (req, res, next) => {
 
 // ================================================================ //
 // Message functions
+
 app.post('/message/send/v2', (req, res, next) => {
   try {
     const token = req.headers.token as string;
@@ -273,6 +274,15 @@ app.delete('/message/remove/v2', (req, res, next) => {
   }
 });
 
+app.post('/message/share/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const {ogMessageId, message, channelId, dmId} = req.body;
+    return res.json(messageShareV1(token, ogMessageId, message, channelId, dmId));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v2', (req, res, next) => {
