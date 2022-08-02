@@ -1,4 +1,5 @@
 import { timeReturn, activeReturn, getData, setData, standupMsg } from './dataStore';
+import {requestMessageSend} from './helperTests';
 import {
   checkValidToken,
   checkValidChannel,
@@ -16,6 +17,7 @@ function sleep(ms: number) {
 }
 
 function standupStartV1(token: string, channelId: number, length: number) : timeReturn {
+  console.log(getData().standups);
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -42,8 +44,12 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   };
   data.standups.push(newStandup);
   setData(data);
-  console.log('\nat active token', token);
-  packMessage(token, channelId, seconds);
+  setTimeout(() => {
+    packMessage(token, channelId);
+    const index = data.standups.findIndex(standup => standup.channelId === channelId);
+    data.standups.splice(index);
+    setData(data);
+  }, seconds * 1000);
   
   // setTimeout(() => {
   //   packMessage(token, channelId)
@@ -73,6 +79,7 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
       }
     }
   }
+  
   return {
     isActive: false,
     timeFinish: null
@@ -111,29 +118,35 @@ function updateStandupMsg(channelId: number, newMsg: standupMsg) {
       index = i;
     }
   }
-  console.log('at data: ',data.standups[index].messages);
   setData(data);
 }
 
-async function packMessage(token: string, id: number, seconds: number) {
-  console.log('at packmessage ', token, '\n');
-  await sleep(seconds * 1000);
+function packMessage(token: string, id: number) {
   const data = getData();
+  
   let packedMessage = '';
-  let numMessages = 0;
+  let isMessage = false;
   for (const standup of data.standups) {
     if (standup.channelId === id) {
-      numMessages = standup.messages.length;
-      console.log(standup.messages);
+      isMessage = true;
       for (const msg of standup.messages) {
-        packedMessage = packMessage + msg.handle + ': ' + msg.message + '\n';
+        packedMessage = packedMessage + msg.handle + ': ' + msg.message + '\n';
       }
     }
   }
   data.standups = data.standups.filter(function(a) { return a.channelId != id; });
-  if (numMessages != 0) {
-    messageSendV1(token, id, packedMessage);
-  }
+  const newMessage = {
+    messageId: Math.floor(Math.random() * Date.now()),
+    uId: 0,
+    message: packedMessage,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+  };
+  data.channels[id].messages.push(newMessage);
+  // if (isMessage) {
+    
+  //   // messageSendV1(token, id, packedMessage);
+  // }
+  console.log(data.channels[id].messages);
   setData(data);
 }
 
