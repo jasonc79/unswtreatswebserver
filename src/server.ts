@@ -276,7 +276,7 @@ app.delete('/message/remove/v2', (req, res, next) => {
 app.post('/message/share/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    const {ogMessageId, message, channelId, dmId} = req.body;
+    const { ogMessageId, message, channelId, dmId } = req.body;
     return res.json(messageShareV1(token, ogMessageId, message, channelId, dmId));
   } catch (err) {
     next(err);

@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageShare} from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageShare } from './helperTests';
 import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
@@ -9,10 +9,9 @@ const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
-
-// ===========================================================================// 
+// ===========================================================================//
 // HELPER FUNCTIONS
-//============================================================================//
+//= ===========================================================================//
 function generateTimeStamp() {
   return Math.floor(Date.now() / 1000);
 }
@@ -31,19 +30,19 @@ function sendMessage(messageStr: string) : {channelId: number, ogMessageId: numb
   return {
     channelId: channel.channelId,
     ogMessageId: message.messageId
-  }
+  };
 }
 
 function sendDmMessage(messageStr: string) : {dmId: number, ogMessageIdDm: number} {
   const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
   const uIds = [user.authUserId];
   const dm = requestDmCreate(authUser.token, uIds);
-  const channel = requestChannelCreate(authUser.token, 'name', false);
+  requestChannelCreate(authUser.token, 'name', false);
   const message = requestMessageSenddm(authUser.token, dm.dmId, messageStr);
   return {
     dmId: dm.dmId,
     ogMessageIdDm: message.messageId
-  }
+  };
 }
 
 beforeEach(() => {
@@ -57,10 +56,9 @@ afterEach(() => {
   requestClear();
 });
 
-
-// ===========================================================================// 
+// ===========================================================================//
 // Tests
-//============================================================================//
+//= ===========================================================================//
 describe('Testing messageSendV1', () => {
   describe('error', () => {
     test('invalid token', () => {
@@ -726,33 +724,33 @@ describe('Testing messageRemoveV1', () => {
 });
 
 describe('Testing messageShare', () => {
-  const optionalMsg = 'optional message'; 
+  const optionalMsg = 'optional message';
   const messageStr = 'message';
   describe('Error cases', () => {
     test('invalid token', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
       requestMessageShare(authUser.token + 1, ogMessageId, optionalMsg, channelId, -1, 403);
     });
     test('Both channelId and dmId are invalid', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
       requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId + 1, 1, 400);
     });
     test('Neither channelId nor dmId are -1', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
-      const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
+      const { dmId } = sendDmMessage(messageStr);
       requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId + 1, dmId + 1, 400);
     });
     test('OgMessageId is not valid for channel', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
       requestMessageShare(authUser.token, ogMessageId + 1, optionalMsg, channelId, -1, 400);
     });
     test('OgMessageId is not valid for dm', () => {
-      const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
+      const { dmId, ogMessageIdDm } = sendDmMessage(messageStr);
       requestMessageShare(authUser.token, ogMessageIdDm + 1, optionalMsg, -1, dmId, 400);
     });
     test('Length of message is more than 1000 characters (channel)', () => {
       const longMessage = 'a'.repeat(1001);
-      const {channelId, ogMessageId} = sendMessage(messageStr);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
       requestMessageShare(authUser.token, ogMessageId, longMessage, channelId, -1, 400);
     });
     test('ChannelId is valid but authorised user has not joined channel', () => {
@@ -766,17 +764,16 @@ describe('Testing messageShare', () => {
       const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
       const notMember = requestAuthRegister('email2@email.com', password, nameFirst, nameLast);
       const uIds = [user.authUserId];
-      const {dmId} = requestDmCreate(authUser.token, uIds);
-      const {channelId} = requestChannelCreate(notMember.token, 'name', false);
-      const {messageId} = requestMessageSend(notMember.token, channelId, messageStr);
+      const { dmId } = requestDmCreate(authUser.token, uIds);
+      const { channelId } = requestChannelCreate(notMember.token, 'name', false);
+      const { messageId } = requestMessageSend(notMember.token, channelId, messageStr);
       requestMessageShare(notMember.token, messageId, optionalMsg, -1, dmId, 403);
     });
-    
   });
   describe('Success', () => {
     test('New messag from channel is sent to channel', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
-      const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId, -1, 200);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
+      const { sharedMessageId } = requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId, -1, 200);
       const messages = requestChannelMessages(authUser.token, channelId, 0);
       expect(messages).toStrictEqual(
         expect.objectContaining({
@@ -800,9 +797,9 @@ describe('Testing messageShare', () => {
       );
     });
     test('New message from dm is sent to channel', () => {
-      const {channelId} = requestChannelCreate(authUser.token, 'name', false);
-      const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
-      const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, channelId, -1, 200);
+      const { channelId } = requestChannelCreate(authUser.token, 'name', false);
+      const { ogMessageIdDm } = sendDmMessage(messageStr);
+      const { sharedMessageId } = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, channelId, -1, 200);
       const messages = requestChannelMessages(authUser.token, channelId, 0);
       expect(messages).toStrictEqual(
         expect.objectContaining({
@@ -820,8 +817,8 @@ describe('Testing messageShare', () => {
       );
     });
     test('New message from dm is sent to dm', () => {
-      const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
-      const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, -1, dmId, 200);
+      const { dmId, ogMessageIdDm } = sendDmMessage(messageStr);
+      const { sharedMessageId } = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, -1, dmId, 200);
       const messages = requestDmMessages(authUser.token, dmId, 0);
       expect(messages).toStrictEqual(
         expect.objectContaining({
@@ -845,8 +842,8 @@ describe('Testing messageShare', () => {
       );
     });
     test('No change to new message when og message is removed', () => {
-      const {channelId, ogMessageId} = sendMessage(messageStr);
-      const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId, -1, 200);
+      const { channelId, ogMessageId } = sendMessage(messageStr);
+      const { sharedMessageId } = requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId, -1, 200);
       requestMessageRemove(authUser.token, ogMessageId);
       const messages = requestChannelMessages(authUser.token, channelId, 0);
       expect(messages).toStrictEqual(
@@ -864,8 +861,5 @@ describe('Testing messageShare', () => {
         })
       );
     });
-    
   });
-  
-
 });

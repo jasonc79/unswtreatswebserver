@@ -242,11 +242,11 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
     throw HTTPError(403, 'Token is invalid');
   } else if (!checkValidChannel(channelId) && !checkValidDm(dmId)) {
     throw HTTPError(400, 'Channel ID does not refer to a valid channel');
-  } else if (channelId != -1 && dmId != -1) {
+  } else if (channelId !== -1 && dmId !== -1) {
     throw HTTPError(400, 'Neither dmId or channelId is -1');
   } else if (message.length > 1000) {
     throw HTTPError(400, 'Length of message must be less than 1000 inclusive');
-  } 
+  }
   const isOgMessage = checkValidChannelMessage(ogMessageId);
   const isOgDm = checkValidDmMessage(ogMessageId);
   let ogMessage: Message;
@@ -259,22 +259,22 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
   } else if (isOgDm) {
     ogMessage = returnValidMessagefromDm(ogMessageId);
   }
-  let concatMessage = concatMessageString(ogMessage.message, message);
+  const concatMessage = concatMessageString(ogMessage.message, message);
   // Sharing a message with a channel
   if (dmId === -1) {
     if (!isMember(token, channelId)) {
       throw HTTPError(403, 'Authorised user is not a member of the channel they are sharing a message to');
-    } 
+    }
     newMessageId = (messageSendV1(token, channelId, concatMessage) as messageId).messageId;
-  }  // Sharing a message with a dm
+  } // Sharing a message with a dm
   if (channelId === -1) {
     if (!isMemberDm(token, dmId)) {
       throw HTTPError(403, 'Authorised user is not a member of the dm they are sharing a message to');
-    } 
+    }
     newMessageId = (messageSenddmV1(token, dmId, concatMessage) as messageId).messageId;
     console.log(getData().dms[dmId].messages);
   }
-  return {sharedMessageId: newMessageId};
+  return { sharedMessageId: newMessageId };
 }
 
 // helper function
@@ -288,11 +288,11 @@ const genEditMessage = (dataProp: Channel[] | Dm[]) => {
       }
     }
     return dataProp;
-  }
-}
+  };
+};
 
 function editMessage(token: string, id: number, message: string, prop: string) {
-  let data = getData();
+  const data = getData();
   if (message.length === 0) {
     messageRemoveV1(token, id);
     return;
@@ -308,17 +308,17 @@ function editMessage(token: string, id: number, message: string, prop: string) {
 }
 
 function createMessage(token: string, messageStr: string): Message {
-  let message: Message = {
+  const message: Message = {
     messageId: Math.floor(Math.random() * Date.now()),
     uId: getIdfromToken(token),
     message: messageStr,
     timeSent: Math.floor((new Date()).getTime() / 1000),
-  }
+  };
   return message;
 }
 
 function concatMessageString(ogMessage: string, optionalMessage: string): string {
-  let newMessage = optionalMessage + '\n= = = = =\n' + ogMessage + '\n= = = = =\n'; 
+  const newMessage = optionalMessage + '\n= = = = =\n' + ogMessage + '\n= = = = =\n';
   return newMessage;
 }
 
