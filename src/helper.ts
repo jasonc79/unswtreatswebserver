@@ -132,7 +132,7 @@ export function checkReactId(id: number) {
 
 export function checkAlreadyReacted(messageId: number, reactId: number): number {
   const message = returnValidMessage(messageId); 
-  if ('reacts' in message) {
+  if ("reacts" in message) {
     for (const react of message.reacts) {
       if (react.reactId === reactId) {
         if (react.isThisUserReacted === true) {
@@ -142,6 +142,7 @@ export function checkAlreadyReacted(messageId: number, reactId: number): number 
       }
     }
   }
+  
   return 0; 
   // 0 : No current reacts in that reactId
   // 1 : Already reacts with that reactId but not from the authorised user
@@ -212,7 +213,7 @@ export function returnValidMessagefromChannel(messageId: number) : Message {
 }
 
 /**
- * returns the details about a message given the dm and messageId
+ * returns the details about a message given the channel and messageId
  */
 export function returnValidMessagefromDm(messageId: number) : Message {
   const dm = getDmfromMessage(messageId);

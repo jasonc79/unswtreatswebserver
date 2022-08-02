@@ -303,39 +303,39 @@ function messageReactV1 (token: token, messageId: number, reactId: number): erro
 }
 
 function messageUnreactV1 (messageId: number, reactId: number): error | {} {
-  // if (!checkValidToken(token)) {
-  //   throw HTTPError(403, 'Token is invalid');
-  // }
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
 
-  // if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
-  //   throw HTTPError(400, 'Invalid messageId'); 
-  // }
+  if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
+    throw HTTPError(400, 'Invalid messageId'); 
+  }
 
-  // if (!checkReactId(reactId)) {
-  //   throw HTTPError(400, 'Invalid reactId'); 
-  // }
+  if (!checkReactId(reactId)) {
+    throw HTTPError(400, 'Invalid reactId'); 
+  }
 
-  // if (!checkAlreadyReacted(messageId, reactId)) {
-  //   throw HTTPError(400, 'Message does not contain react from authorised user'); 
-  // }
+  if (!checkAlreadyReacted(messageId, reactId)) {
+    throw HTTPError(400, 'Message does not contain react from authorised user'); 
+  }
 
-  // const data = getData(); 
-  // const userId = returnValidUser(token); 
-  // const user = userProfileV1(token, userId.uId) as userReturn;
-  // const message = returnValidMessage(messageId);   
+  const data = getData(); 
+  const userId = returnValidUser(token); 
+  const user = userProfileV1(token, userId.uId) as userReturn;
+  const message = returnValidMessage(messageId);   
 
-  // // Usual unreact
-  // for (const react of message.reacts) {
-  //   if (reactId === react.reactId) {
-  //     for (const uId of react.uIds) {
-  //       if (uId === userId.uId) {
+  // Usual unreact
+  for (const react of message.reacts) {
+    if (reactId === react.reactId) {
+      for (const uId of react.uIds) {
+        if (uId === userId.uId) {
 
-  //       }
-  //     }
-  //   }
-  // }
+        }
+      }
+    }
+  }
 
-  // // Last react
+  // Last react
   return {}; 
 }
 
