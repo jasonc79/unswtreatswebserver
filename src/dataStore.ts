@@ -41,7 +41,7 @@ interface Message {
 
 interface React {
   reactId: number, 
-  uIds: uId[], 
+  uIds: number[], 
   isThisUserReacted: boolean
 }
 

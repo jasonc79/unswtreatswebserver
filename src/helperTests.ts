@@ -203,13 +203,12 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token: token }, { messageId }, err);
 }
- HEAD
 
-export function requestMessageReact(messageId: number, reactId: number, err?: number) {
+export function requestMessageReact(token: string, messageId: number, reactId: number, err?: number) {
   return requestHelper('POST', '/message/react/v1', { token: token }, {messageId, reactId}, err);
 }
 
-export function requestMessageUnreact(messageId: number, reactId: number, err?: number) {
+export function requestMessageUnreact(token: string, messageId: number, reactId: number, err?: number) {
   return requestHelper('POST', '/message/unreact/v1', { token: token }, {messageId, reactId}, err);
 }
 

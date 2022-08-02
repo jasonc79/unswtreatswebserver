@@ -129,6 +129,25 @@ export function checkReactId(id: number) {
   }
   return false; 
 }
+
+export function checkAlreadyReacted(messageId: number, reactId: number): number {
+  const message = returnValidMessage(messageId); 
+  if ('reacts' in message) {
+    for (const react of message.reacts) {
+      if (react.reactId === reactId) {
+        if (react.isThisUserReacted === true) {
+          return 2; 
+        }
+        return 1; 
+      }
+    }
+  }
+  return 0; 
+  // 0 : No current reacts in that reactId
+  // 1 : Already reacts with that reactId but not from the authorised user
+  // 2 : Already reacts with that reactId, including authorised user 
+}
+
 //= ==========================================================================//
 // RETURN FUNCTIONS - RETURNS AN OBJECT                                      //
 //= ==========================================================================//
@@ -193,7 +212,7 @@ export function returnValidMessagefromChannel(messageId: number) : Message {
 }
 
 /**
- * returns the details about a message given the channel and messageId
+ * returns the details about a message given the dm and messageId
  */
 export function returnValidMessagefromDm(messageId: number) : Message {
   const dm = getDmfromMessage(messageId);

@@ -1,4 +1,4 @@
-import { error, getData, setData, React } from './dataStore';
+import { error, getData, setData, userReturn, React, token } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -7,10 +7,12 @@ import {
   checkValidDmMessage,
   checkChannelMessageSender,
   checkDmMessageSender,
+  checkAlreadyReacted, 
   returnValidChannel,
   returnValidDm,
   returnValidMessagefromChannel,
   returnValidMessagefromDm,
+  returnValidUser,
   getIdfromToken,
   getChannelfromMessage,
   getDmfromMessage,
@@ -23,6 +25,7 @@ import {
 } from './helper';
 import HTTPError from 'http-errors';
 import { errorMsg } from './helperTests';
+import { userProfileV1 } from './users';
 
 type messageId = { messageId: number };
 
@@ -249,8 +252,11 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-function messageReactV1 (messageId: number, reactId: number): error | {} {
-  console.log(reactId); 
+function messageReactV1 (token: token, messageId: number, reactId: number): error | {} {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+
   if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
     throw HTTPError(400, 'Invalid messageId'); 
   }
@@ -259,33 +265,77 @@ function messageReactV1 (messageId: number, reactId: number): error | {} {
     throw HTTPError(400, 'Invalid reactId'); 
   }
 
-  const message = returnValidMessage(messageId); 
-  for (const react of message.reacts) {
-    if (react.isThisUserReacted === true) {
-      throw HTTPError(400, 'Message already contains a react from authorised user'); 
-    }
+  const checkReacts = checkAlreadyReacted(messageId, reactId); 
+  console.log(checkReacts); 
+  if (checkReacts === 2) {
+    throw HTTPError(400, 'Message already contains react from authorised user'); 
   }
-
+  
   const data = getData(); 
+  const user = returnValidUser(token);
+  const message = returnValidMessage(messageId); 
+  console.log(message.reacts);
+
   // Another user has already reacted with same reactId
-  for (const react of message.reacts) {
-    if (reactId === react.reactId) {
-      react.uIds.push()// Current user
-      react.isThisUserReacted = true;
+  if (checkReacts === 1) {
+    for (const react of message.reacts) {
+      if (reactId === react.reactId) {
+        react.uIds.push(user.uId); 
+        react.isThisUserReacted = true;
+      }
+    }
+  } else {
+    const newReact : React = {
+      reactId: reactId, 
+      uIds: [ user.uId ], 
+      isThisUserReacted: true, 
+    }
+    // First react 
+    if (!('reacts' in message)) {
+      message.reacts = [ newReact ];  
+    // First react of that reactId
+    } else {
+      message.reacts.push(newReact); 
     }
   }
-  // First react of that reactId
-  const newReact : React = {
-    reactId: reactId, 
-    uIds: [], // Current user
-    isThisUserReacted: true, 
-  }
-  message.reacts.push(newReact); 
+  setData(data);
   return {}; 
 }
 
 function messageUnreactV1 (messageId: number, reactId: number): error | {} {
-   
+  // if (!checkValidToken(token)) {
+  //   throw HTTPError(403, 'Token is invalid');
+  // }
+
+  // if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
+  //   throw HTTPError(400, 'Invalid messageId'); 
+  // }
+
+  // if (!checkReactId(reactId)) {
+  //   throw HTTPError(400, 'Invalid reactId'); 
+  // }
+
+  // if (!checkAlreadyReacted(messageId, reactId)) {
+  //   throw HTTPError(400, 'Message does not contain react from authorised user'); 
+  // }
+
+  // const data = getData(); 
+  // const userId = returnValidUser(token); 
+  // const user = userProfileV1(token, userId.uId) as userReturn;
+  // const message = returnValidMessage(messageId);   
+
+  // // Usual unreact
+  // for (const react of message.reacts) {
+  //   if (reactId === react.reactId) {
+  //     for (const uId of react.uIds) {
+  //       if (uId === userId.uId) {
+
+  //       }
+  //     }
+  //   }
+  // }
+
+  // // Last react
   return {}; 
 }
 
