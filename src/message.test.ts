@@ -774,7 +774,7 @@ describe('Testing messageShare', () => {
     
   });
   describe('Success', () => {
-    test('New message is sent to channel', () => {
+    test('New messag from channel is sent to channel', () => {
       const {channelId, ogMessageId} = sendMessage(messageStr);
       const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageId, optionalMsg, channelId, -1, 200);
       const messages = requestChannelMessages(authUser.token, channelId, 0);
@@ -799,7 +799,27 @@ describe('Testing messageShare', () => {
         })
       );
     });
-    test('New message is sent to dm', () => {
+    test('New message from dm is sent to channel', () => {
+      const {channelId} = requestChannelCreate(authUser.token, 'name', false);
+      const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
+      const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, channelId, -1, 200);
+      const messages = requestChannelMessages(authUser.token, channelId, 0);
+      expect(messages).toStrictEqual(
+        expect.objectContaining({
+          messages: [
+            {
+              messageId: sharedMessageId,
+              uId: authUser.authUserId,
+              message: expect.any(String),
+              timeSent: expect.any(Number)
+            },
+          ],
+          start: 0,
+          end: -1
+        })
+      );
+    });
+    test('New message from dm is sent to dm', () => {
       const {dmId, ogMessageIdDm} = sendDmMessage(messageStr);
       const {sharedMessageId} = requestMessageShare(authUser.token, ogMessageIdDm, optionalMsg, -1, dmId, 200);
       const messages = requestDmMessages(authUser.token, dmId, 0);
