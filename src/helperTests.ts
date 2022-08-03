@@ -157,7 +157,7 @@ export function requestDmMessages(token: string, dmId: number, start: number, er
 
 // User functions
 export function requestUserProfile(token: string, uId: number, err?: number) {
-  return requestHelper('GET', '/user/profile/v2', { token: token }, { uId }, err);
+  return requestHelper('GET', '/user/profile/v3', { token: token }, { uId }, err);
 }
 
 export function requestAllUsers(token: string, err?: number) {
@@ -165,17 +165,16 @@ export function requestAllUsers(token: string, err?: number) {
 }
 
 export function requestUserSetName(token: string, nameFirst: string, nameLast: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/setname/v1', { token: token }, { nameFirst, nameLast }, err);
+  return requestHelper('PUT', '/user/profile/setname/v2', { token: token }, { nameFirst, nameLast }, err);
 }
 
 export function requestUserEmail(token: string, email: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/setemail/v1', { token: token }, { email }, err);
+  return requestHelper('PUT', '/user/profile/setemail/v2', { token: token }, { email }, err);
 }
 
 export function requestUserHandle(token: string, handleStr: string, err?: number) {
-  return requestHelper('PUT', '/user/profile/sethandle/v1', { token: token }, { handleStr }, err);
+  return requestHelper('PUT', '/user/profile/sethandle/v2', { token: token }, { handleStr }, err);
 }
-
 // Message functions
 export function requestMessageSend(token: string, channelId: number, message: string, err?: number) {
   return requestHelper('POST', '/message/send/v2', { token: token }, { channelId, message }, err);
@@ -199,6 +198,10 @@ export function requestMessageSendlater(token: string, channelId: number, messag
 
 export function requestMessageSendlaterdm(token: string, dmId: number, message: string, timeSent: number, err?: number) {
   return requestHelper('POST', '/message/sendlaterdm/v1', { token: token }, { dmId, message, timeSent }, err);
+}
+
+export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
+  return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
 }
 
 //= ===========================================================================//
