@@ -262,9 +262,10 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
   if (message.length < 1 || message.length > 1000) {
     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
-  let msgId;
+  const msgId = Math.floor(Math.random() * Date.now());
   const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
-  setTimeout(() => { msgId = messageSendV1(token, channelId, message); }, seconds * 1000);
+  setTimeout(() => { sendChannelMessage(token, channelId, message, msgId); }, seconds * 1000);
+  // console.log('msgId =', msgId);
   return { messageId: msgId };
 }
 
@@ -278,16 +279,51 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
   if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
     throw HTTPError(400, 'timeSent is a time in the past');
   }
-  if (!isMember(token, dmId)) {
+  if (!isMemberDm(token, dmId)) {
     throw HTTPError(403, 'The authorised user is not a member of the channel');
   }
   if (message.length < 1 || message.length > 1000) {
     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
-  let msg;
+  const msgId = Math.floor(Math.random() * Date.now());
   const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
-  setTimeout(() => { msg = messageSenddmV1(token, dmId, message); }, seconds * 1000);
-  return { messageId: msg.messageId };
+  setTimeout(() => { sendDmMessage(token, dmId, message, msgId); }, seconds * 1000);
+  return { messageId: msgId };
+}
+
+function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentChannel = returnValidChannel(channelId);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+  };
+  for (const channel of data.channels) {
+    if (channel.channelId === cuurentChannel.channelId) {
+      channel.messages.push(newMessage);
+    }
+  }
+  setData(data);
+}
+
+function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentDm = returnValidDm(dmId);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+  };
+
+  for (const dm of data.dms) {
+    if (dm.dmId === cuurentDm.dmId) {
+      dm.messages.push(newMessage);
+    }
+  }
+  setData(data);
 }
 
 function editMessage(token: string, id: number, message: string, prop: string) {

@@ -276,7 +276,8 @@ app.delete('/message/remove/v2', (req, res, next) => {
 
 app.post('/message/sendlater/v1', (req, res, next) => {
   try {
-    const { token, channelId, message, timeSent } = req.body;
+    const token = req.headers.token as string;
+    const { channelId, message, timeSent } = req.body;
     return res.json(messageSendlaterV1(token, channelId, message, timeSent));
   } catch (err) {
     next(err);
@@ -285,7 +286,8 @@ app.post('/message/sendlater/v1', (req, res, next) => {
 
 app.post('/message/sendlaterdm/v1', (req, res, next) => {
   try {
-    const { token, dmId, message, timeSent } = req.body;
+    const token = req.headers.token as string;
+    const { dmId, message, timeSent } = req.body;
     return res.json(messageSendlaterdmV1(token, dmId, message, timeSent));
   } catch (err) {
     next(err);
@@ -379,7 +381,7 @@ app.get('/standup/active/v1', (req, res, next) => {
 app.post('/standup/send/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    const {channelId, message} = req.body;
+    const { channelId, message } = req.body;
     return res.json(standupSendV1(token, channelId, message));
   } catch (err) {
     next(err);
