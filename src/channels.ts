@@ -1,6 +1,6 @@
 import { error, Channel, userReturn, channelId, getData, setData } from './dataStore';
 import { checkValidToken, returnValidUser } from './helper';
-import { userProfileV1 } from './users';
+import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
 
 type channelReturn = {
@@ -68,7 +68,7 @@ function channelsListV1(token: string) : channelsList | error {
   }
   const data = getData();
   const uId = returnValidUser(token);
-  const user = userProfileV1(token, uId.uId) as userReturn;
+  const user = userProfileV3(token, uId.uId) as userReturn;
   const channels = [];
 
   for (const channel of data.channels) {

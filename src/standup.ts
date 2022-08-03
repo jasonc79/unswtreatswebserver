@@ -1,11 +1,10 @@
-import { timeReturn, activeReturn, getData, setData, standupMsg } from './dataStore';
+import { timeReturn, activeReturn, getData, setData, standupMsg, Standup } from './dataStore';
 import {
   checkValidToken,
   checkValidChannel,
   isMember,
   isActive,
-  returnValidUser,
-  getHashOf
+  returnValidUser
 } from './helper';
 import HTTPError from 'http-errors';
 import { messageSendV1 } from './message';
@@ -29,7 +28,7 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   const data = getData();
   const finish = Math.floor((new Date()).getTime() / 1000) + length;
   const seconds = finish - Math.floor((new Date()).getTime() / 1000);
-  const newStandup = {
+  const newStandup: Standup = {
     channelId: channelId,
     messages: [],
     timeFinish: finish,
@@ -40,7 +39,7 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   setTimeout(() => {
     packMessage(token, channelId);
   }, seconds * 1000);
-  
+
   return { timeFinish: finish };
 }
 
@@ -65,7 +64,7 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
       }
     }
   }
-  
+
   return {
     isActive: false,
     timeFinish: null
@@ -84,9 +83,9 @@ function standupSendV1(token: string, channelId: number, message: string) {
   } else if (!isMember(token, channelId)) {
     throw HTTPError(403, 'The authorised user is not a member of the channel');
   }
-  //TO DO:  Ignore notifications
+  // TO DO:  Ignore notifications
   const user = returnValidUser(token);
-  let newMsg = {
+  const newMsg = {
     handle: user.handleStr,
     message: message
   };
@@ -95,13 +94,11 @@ function standupSendV1(token: string, channelId: number, message: string) {
 }
 
 function updateStandupMsg(channelId: number, newMsg: standupMsg) {
-  let data = getData();
-  let index = 0;
+  const data = getData();
   const standupLength = data.standups.length;
-  for (let i = 0 ; i < standupLength; i++) {
+  for (let i = 0; i < standupLength; i++) {
     if (data.standups[i].channelId === channelId) {
       data.standups[i].messages.push(newMsg);
-      index = i;
     }
   }
   setData(data);
@@ -113,24 +110,17 @@ function packMessage(token: string, id: number) {
   let isMessage = false;
   for (const standup of data.standups) {
     if (standup.channelId === id) {
-
       for (const msg of standup.messages) {
         isMessage = true;
         packedMessage = packedMessage + msg.handle + ': ' + msg.message + '\n';
       }
     }
   }
-  data.standups = data.standups.filter(function(a) { return a.channelId != id; });
+  data.standups = data.standups.filter(function(a) { return a.channelId !== id; });
   setData(data);
-  const newMessage = {
-    messageId: Math.floor(Math.random() * Date.now()),
-    uId: 0,
-    message: packedMessage,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-  };
-   if (isMessage) {
-      messageSendV1(token, id, packedMessage);
-   }
+  if (isMessage) {
+    messageSendV1(token, id, packedMessage);
+  }
 }
 
 export { standupStartV1, standupActiveV1, standupSendV1 };

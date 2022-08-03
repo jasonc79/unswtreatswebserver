@@ -1,14 +1,10 @@
-import { authUserReturn, requestAuthRegister, requestChannelCreate, requestChannelMessages, requestMessageSend } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestChannelCreate, requestChannelMessages } from './helperTests';
 import { requestStandupStart, requestStandupActive, requestStandupSend } from './helperTests';
 import { removeFile, requestClear } from './helperTests';
 
 let authUser: authUserReturn;
 type channelIdReturn = {
   channelId: number
-}
-type activeStandup = {
-  isActive: boolean,
-  timeFinish: number
 }
 
 const standupSeconds = 1;
@@ -23,8 +19,8 @@ const email2 = 'hayden2@gmail.com';
 const password2 = 'hayden1234';
 const nameFirst2 = 'Hayden2';
 const nameLast2 = 'Smith2';
-//============================================================================//
-// HELPER FUNCTIONS 
+//= ===========================================================================//
+// HELPER FUNCTIONS
 const sleep = (ms:number) => new Promise(r => setTimeout(r, ms));
 async function pause(seconds: number) {
   await sleep(seconds * 1000);
@@ -44,7 +40,7 @@ beforeEach(() => {
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
 
-//============================================================================//
+//= ===========================================================================//
 
 describe('Testing standupStartV1', () => {
   describe('error cases', () => {
@@ -132,7 +128,7 @@ describe('Testing standupActiveV1', () => {
 });
 
 describe('Testing standupSendV1', () => {
-  const msg =  'Standup starting :)';
+  const msg = 'Standup starting :)';
   describe('Active standups', () => {
     describe('Error cases', () => {
       test('invalid token', () => {
@@ -142,7 +138,7 @@ describe('Testing standupSendV1', () => {
       test('channelId is valid but auth user is not a member of the channel', () => {
         const channel = createActiveStandup();
         const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
-        requestStandupSend(authUser2.token, channel.channelId, msg, 403); 
+        requestStandupSend(authUser2.token, channel.channelId, msg, 403);
       });
       test('invalid channelId', () => {
         const channel = createActiveStandup();
