@@ -192,6 +192,10 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token: token }, { messageId }, err);
 }
+
+export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
+  return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
+}
 // Other functions
 export function requestClear() {
   return requestHelper('DELETE', '/clear/v1', {}, {});
