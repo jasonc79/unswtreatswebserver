@@ -33,7 +33,7 @@ afterEach(() => {
   requestClear();
 });
 
-describe('Testing userProfileV1', () => {
+describe('Testing userProfileV3', () => {
   test('invalid token', () => {
     const uId = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
     requestUserProfile('invalidtoken', uId.authUserId, 403);
@@ -97,7 +97,7 @@ describe('Testing userSetEmailV1', () => {
   });
 });
 
-describe('Testing userSetHandleV1', () => {
+describe('Testing userSetHandleV2', () => {
   test('invalid token', () => {
     requestUserHandle('invalidToken', 'validhandle', 403);
   });
@@ -123,7 +123,7 @@ describe('Testing userSetHandleV1', () => {
   });
 });
 
-describe('Testing usersAllV1', () => {
+describe('Testing usersAllV2', () => {
   test('invalid token', () => {
     requestAllUsers('invalidtoken', 403);
   });
