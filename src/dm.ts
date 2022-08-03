@@ -1,6 +1,6 @@
 import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
-import { userProfileV1 } from './users';
+import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
 
 /**
@@ -26,7 +26,7 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   }
 
   const authUserId = returnValidUser(token);
-  const authUser = userProfileV1(token, authUserId.uId) as userReturn;
+  const authUser = userProfileV3(token, authUserId.uId) as userReturn;
 
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
@@ -46,7 +46,7 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   const DmMembers = [];
   DmMembers.push(authUser.user);
   for (const uId of uIds) {
-    const DmMember = userProfileV1(token, uId) as userReturn;
+    const DmMember = userProfileV3(token, uId) as userReturn;
     DmMembers.push(DmMember.user);
   }
   const dmName: string = generateDmName(DmMembers);
@@ -209,7 +209,7 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   }
 
   const data = getData();
-  const user = userProfileV1(token, getIdfromToken(token)) as userReturn;
+  const user = userProfileV3(token, getIdfromToken(token)) as userReturn;
 
   let leaveDm: Dm;
   for (const dm of data.dms) {
