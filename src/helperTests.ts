@@ -201,19 +201,19 @@ export function requestMessageSendlaterdm(token: string, dmId: number, message: 
   return requestHelper('POST', '/message/sendlaterdm/v1', { token: token }, { dmId, message, timeSent }, err);
 }
 
-//============================================================================//
-// Standup functions 
-//============================================================================//
+//= ===========================================================================//
+// Standup functions
+//= ===========================================================================//
 export function requestStandupStart(token: string, channelId: number, length: number, err?: number) {
-  return requestHelper('POST', '/standup/start/v1', { token: token}, {channelId, length }, err);
+  return requestHelper('POST', '/standup/start/v1', { token: token }, { channelId, length }, err);
 }
 
 export function requestStandupActive(token: string, channelId: number, err?: number) {
-  return requestHelper('GET', '/standup/active/v1', { token: token}, {channelId }, err);
+  return requestHelper('GET', '/standup/active/v1', { token: token }, { channelId }, err);
 }
 
 export function requestStandupSend(token: string, channelId: number, message: string, err?: number) {
-  return requestHelper('POST', '/standup/send/v1', { token: token}, {channelId, message}, err);
+  return requestHelper('POST', '/standup/send/v1', { token: token }, { channelId, message }, err);
 }
 
 // Other functions
