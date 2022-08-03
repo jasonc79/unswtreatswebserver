@@ -1,4 +1,4 @@
-import { error, getData, setData } from './dataStore';
+import { error, getData, setData, messagesExist } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -54,11 +54,12 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   }
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   const newMessage = {
     messageId: Math.floor(Math.random() * Date.now()),
     uId: getIdfromToken(token),
     message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
+    timeSent: currTime,
     isPinned: false,
   };
   for (const channel of data.channels) {
@@ -66,6 +67,15 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
       channel.messages.push(newMessage);
     }
   }
+
+  ///
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: currTime,
+  };
+  data.messagesExist.push(temp);
+  ///
+
   setData(data);
 
   return { messageId: newMessage.messageId };

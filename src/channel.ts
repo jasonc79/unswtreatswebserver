@@ -177,7 +177,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
 
-function channelMessagesV3(token: string, channelId: number, start: number): (messagesUnder50 | messagesOver50 ) {
+function channelMessagesV3(token: string, channelId: number, start: number): (messagesUnder50 | messagesOver50) {
   // const uId = returnValidUser(token);
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
