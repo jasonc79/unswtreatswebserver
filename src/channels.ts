@@ -46,25 +46,18 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
   };
   // addMetric('channelsExist', 1);
   // addMetric('channelsJoined', 1, user.uId);
-  const temp: channelsExist = {
-    numChannelsExist: data.totalChannelsExist += 1,
-    timeStamp: currTime,
-  };
-  // console.log(temp);
-  // console.log(data.totalChannelsExist);
-  data.channelsExist.push(temp);
-  // console.log(data.channelsExist)
-  data.channels.push(newChannel);
-
-  const temp1: channelsJoined = {
+  const temp: channelsJoined = {
     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
     timeStamp: currTime,
   };
-  console.log(temp1);
-  console.log(data.users[user.uId].totalChannelsJoined);
-  data.users[user.uId].channelsJoined.push(temp1);
-  console.log(data.users[user.uId].channelsJoined);
+  data.users[user.uId].channelsJoined.push(temp);
 
+  const temp1: channelsExist = {
+    numChannelsExist: data.totalChannelsExist += 1,
+    timeStamp: currTime,
+  };
+  data.channelsExist.push(temp1);
+  
   setData(data);
 
   return { channelId: channelId };

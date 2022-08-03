@@ -164,7 +164,8 @@ describe('Testing standupSendV1', () => {
             messageId: expect.any(Number),
             uId: authUser.authUserId,
             message: packedMsg,
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            isPinned: false
           }],
           start: 0,
           end: -1

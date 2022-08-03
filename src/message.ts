@@ -413,22 +413,27 @@ function messagePinV1(token: string, messageId: number): (object) {
   // check if there is a matching id in channels
   let message;
   for (const channel of data.channels) {
+    /// find messageId in message[] of each channel
     message = channel.messages.find(message => message.messageId === messageId);
     if (message !== undefined) {
+      /// if message exists check if user has owner permissions
       if (!isOwner(token, channel.channelId) && !isGlobalOwner(token)) {
         throw HTTPError(403, 'messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel');
       }
     }
   }
   for (const dm of data.dms) {
+    /// find messageId in message[] of each dm
     message = dm.messages.find(message => message.messageId === messageId);
     if (message !== undefined) {
+      /// if message exists check if user has owner permissions
       if (!isOwnerDm(token, dm.dmId) && !isGlobalOwner(token)) {
         throw HTTPError(403, 'messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM');
       }
     }
   }
   if (message === undefined) {
+    /// if message was not found return this error.
     throw HTTPError(400, 'messageId is not a valid message within a channel or DM that the authorised user has joined');
   }
   if (message.isPinned === true) {

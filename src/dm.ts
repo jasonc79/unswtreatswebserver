@@ -225,6 +225,14 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
       return item.uId !== user.user.uId;
     });
   }
+
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  const temp: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalDmsJoined += -1,
+    timeStamp: currTime,
+  };
+  data.users[user.uId].channelsJoined.push(temp);
+
   setData(data);
   return {};
 };

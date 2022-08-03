@@ -1,4 +1,4 @@
-import { error, UserInfo, Message, userReturn, OWNER, empty } from './dataStore';
+import { error, UserInfo, Message, userReturn, OWNER, empty, getData, setData } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { updateChannel } from './helper';
 import { userProfileV3 } from './users';
@@ -100,6 +100,16 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
   channel.allMembers.push(user);
   updateChannel(channelId, channel);
+
+  const data = getData();
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  const temp: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+    timeStamp: currTime,
+  };
+  data.users[user.uId].channelsJoined.push(temp);
+  setData(data);
+  
   return {};
 }
 /**
@@ -151,6 +161,16 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
   }
   channel.allMembers.push(user);
   updateChannel(channelId, channel);
+  
+  const data = getData();
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  const temp: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+    timeStamp: currTime,
+  };
+  data.users[user.uId].channelsJoined.push(temp);
+  setData(data);
+  
   return {};
 }
 
@@ -243,6 +263,16 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
   currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
   updateChannel(channelId, currChannel);
+
+  const data = getData();
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  const temp: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalChannelsJoined += -1,
+    timeStamp: currTime,
+  };
+  data.users[user.uId].channelsJoined.push(temp);
+  setData(data);
+
   return {};
 }
 
