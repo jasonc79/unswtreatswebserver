@@ -73,7 +73,7 @@ function packMessage(token: string, id: number) {
   for (const standup of data.standups) {
     if (standup.channelId === id) {
       for (const msg of standup.messages) {
-        packedMessage = packMessage + msg.handle + ': ' + msg.message + '\n';
+        packedMessage = packedMessage + msg.handle + ': ' + msg.message + '\n';
       }
     }
   }

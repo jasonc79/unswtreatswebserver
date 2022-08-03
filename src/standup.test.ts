@@ -9,6 +9,11 @@ const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function pause(seconds: number) {
+  await sleep(seconds * 1000);
+}
+
 beforeEach(() => {
   removeFile();
   requestClear();
@@ -46,6 +51,9 @@ describe('Testing standupStartV1', () => {
   });
 
   describe('passes', () => {
+    afterEach(() => {
+      return pause(3);
+    });
     test('standup is started', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       const standup = requestStandupStart(authUser.token, channel.channelId, 5);
