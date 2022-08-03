@@ -440,6 +440,9 @@ app.use(errorHandler());
 // for logging errors
 app.use(morgan('dev'));
 
+// to access profile pics folder
+app.use('/static', express.static('profilepics'));
+
 // start server
 const server = app.listen(PORT, HOST, () => {
   console.log(`⚡️ Server listening on port ${PORT} at ${HOST}`);
