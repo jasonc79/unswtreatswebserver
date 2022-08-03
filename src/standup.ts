@@ -141,6 +141,7 @@ function packMessage(token: string, id: number) {
     message: packedMessage,
     timeSent: Math.floor((new Date()).getTime() / 1000),
   };
+  console.log(data.channels);
   data.channels[id].messages.push(newMessage);
   // if (isMessage) {
     
