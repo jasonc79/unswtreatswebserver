@@ -1,9 +1,10 @@
 import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV1 } from './users';
+import HTTPError from 'http-errors';
 
 /**
- * dmCreateV1
+ * dmCreateV2
  *
  * Creates a DM where uIds contains the user(s) that this DM is directed to.
  * The user with the token is the owner of the DM.
@@ -19,9 +20,9 @@ import { userProfileV1 } from './users';
  * @returns { dmId } on no error
  */
 type dmId = { dmId: number };
-const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
+const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Invalid token');
   }
 
   const authUserId = returnValidUser(token);
@@ -30,13 +31,13 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
   // Any uId in uIds does not refer to a valid user
   for (const u of uIds) {
     if (!checkValidUser(u)) {
-      return errorMsg;
+      throw HTTPError(400, 'uId does not refer to a valid user');
     }
   }
   // There are duplicate uIds in uIds
   const uniqueIds = Array.from(new Set(uIds));
   if (uIds.length !== uniqueIds.length) {
-    return errorMsg;
+    throw HTTPError(400, 'Duplicate uIds');
   }
 
   const data = getData();
@@ -63,7 +64,7 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
 };
 
 /**
- * dmDetailsV1
+ * dmDetailsV2
  *
  * Given a DM with ID dmId that the authorised user is a member of,
  * provide basic details about the DM.
@@ -79,15 +80,19 @@ const dmCreateV1 = (token: string, uIds: number[]): dmId | error => {
  * @returns { name, members } on no error
  */
 type dmDetails = { name: string, members: UserInfo[] };
-const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
-  // Check if dmId  is valid
-  if (!checkValidDm(dmId) || !checkValidToken(token)) {
-    return errorMsg;
+const dmDetailsV2 = (token: string, dmId: number): dmDetails | error => {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
   }
 
-  // Check if authorised user is member of dm
+  // Check if dmId  is valid
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'dmId is invalid');
+  }
+
+  // Check if authorised user is member of dm and token is vaild
   if (!isMemberDm(token, dmId)) {
-    return errorMsg;
+    throw HTTPError(403, 'Authorised user is not a member of the DM');
   }
 
   const dm = returnValidDm(dmId);
@@ -98,7 +103,7 @@ const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
 };
 
 /**
- * dmListV1
+ * dmListV2
  *
  * Returns the array of DMs that the user is a member of.
  *
@@ -108,7 +113,7 @@ const dmDetailsV1 = (token: string, dmId: number): dmDetails | error => {
  * Return Values:
  * @returns { } on no error
  */
-const dmListV1 = (token: string): dmReturn | error => {
+const dmListV2 = (token: string): dmReturn | error => {
   if (!checkValidToken(token)) {
     return errorMsg;
   }
@@ -131,7 +136,7 @@ const dmListV1 = (token: string): dmReturn | error => {
 };
 
 /**
- * dmRemoveV1
+ * dmRemoveV2
  *
  * Remove an existing DM, so all members are no longer in the DM.
  * This can only be done by the original creator of the DM.
@@ -147,13 +152,21 @@ const dmListV1 = (token: string): dmReturn | error => {
  *    when dmId is valid and the authorised user is no longer in the DM
  * @returns { } on no error
  */
-const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error => {
-  if (!checkValidDm(dmId) || !checkValidToken(token)) {
-    return errorMsg;
+const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error => {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
   }
 
-  if (!isOwnerDm(token, dmId) || !isMemberDm(token, dmId)) {
-    return errorMsg;
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'dmId is invalid');
+  }
+
+  if (!isOwnerDm(token, dmId)) {
+    throw HTTPError(403, 'Authorised user is not the original DM creator');
+  }
+
+  if (!isMemberDm(token, dmId)) {
+    throw HTTPError(403, 'Authorised user is no longer in the DM');
   }
 
   const data = getData();
@@ -166,7 +179,7 @@ const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error 
 };
 
 /**
- * dmLeaveV1
+ * dmLeaveV2
  *
  * Given a DM ID, the user is removed as a member of this DM
  * The creator is allowed to leave and the DM will still exist if this happens.
@@ -182,22 +195,38 @@ const dmRemoveV1 = (token: string, dmId: number): Record<string, never> | error 
  *    when dmId is valid and the authorised user is no longer in the DM
  * @returns { } on no error
  */
-const dmLeaveV1 = (token: string, dmId: number) : error | object => {
-  if (!checkValidToken(token) || !checkValidDm(dmId) || !isMemberDm(token, dmId)) {
-    return errorMsg;
+const dmLeaveV2 = (token: string, dmId: number) : error | object => {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
   }
+
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'dmId is not valid');
+  }
+
+  if (!isMemberDm(token, dmId)) {
+    throw HTTPError(403, 'Authorised user is not a member of the DM');
+  }
+
   const data = getData();
-  const dm = returnValidDm(dmId);
   const user = userProfileV1(token, getIdfromToken(token)) as userReturn;
-  dm.members = dm.members.filter((item) => {
+
+  let leaveDm: Dm;
+  for (const dm of data.dms) {
+    if (dm.dmId === dmId) {
+      leaveDm = dm;
+    }
+  }
+
+  leaveDm.members = leaveDm.members.filter((item) => {
     return item.uId !== user.user.uId;
   });
   if (isOwnerDm(token, dmId)) {
-    dm.owners = dm.owners.filter((item) => {
+    leaveDm.owners = leaveDm.owners.filter((item) => {
       return item.uId !== user.user.uId;
     });
-    setData(data);
   }
+  setData(data);
   return {};
 };
 
@@ -240,13 +269,15 @@ const generateDmName = (DmMembers: UserInfo[]): string => {
 
 type messagesUnder50 = { messages: Message[], start: number, end: -1 };
 type messagesOver50 = { messages: Message[], start: number, end: number };
-function dmMessagesV1(token: string, dmId: number, start: number): (error | messagesUnder50 | messagesOver50) {
-  if (!checkValidDm(dmId) || !checkValidToken(token)) {
-    return errorMsg;
+function dmMessagesV2(token: string, dmId: number, start: number): (messagesUnder50 | messagesOver50) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid token');
   }
-
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'dmlId does not refer to a valid DM');
+  }
   if (!isMemberDm(token, dmId)) {
-    return errorMsg;
+    throw HTTPError(403, 'dmId is valid and the authorised user is not a member of the DM');
   }
 
   const currDm = returnValidDm(dmId);
@@ -255,7 +286,7 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
   const final = start + 50;
 
   if (dmMsg.length < start) {
-    return errorMsg;
+    throw HTTPError(400, 'start is greater than the total number of messages in the channel');
   }
 
   for (let i = start; i < final; i++) {
@@ -274,5 +305,4 @@ function dmMessagesV1(token: string, dmId: number, start: number): (error | mess
     end: final,
   };
 }
-
-export { dmCreateV1, dmLeaveV1, dmMessagesV1, dmDetailsV1, dmListV1, dmRemoveV1 };
+export { dmCreateV2, dmLeaveV2, dmMessagesV2, dmDetailsV2, dmListV2, dmRemoveV2 };
