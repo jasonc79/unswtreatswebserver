@@ -10,7 +10,6 @@ type activeStandup = {
   isActive: boolean,
   timeFinish: number
 }
-const seconds = 1000;
 
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
@@ -56,6 +55,9 @@ describe('Testing standupStartV1', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       requestStandupStart(authUser.token, channel.channelId, 1);
       requestStandupStart(authUser.token, channel.channelId, 1, 400);
+    });
+    afterEach(() => {
+      return pause(1);
     });
   });
 
