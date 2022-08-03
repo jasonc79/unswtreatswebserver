@@ -71,6 +71,12 @@ interface ChannelInfo {
   name: string,
 }
 
+// RESET CODES
+interface Codes {
+  code: string,
+  uId: number
+}
+
 // ERROR TYPES AND CONSTANTS
 type error = { error: string };
 
@@ -78,18 +84,24 @@ type Data = {
   users: User[],
   channels: Channel[],
   dms: Dm[],
+  resetCodes: Codes[]
 }
+
+// EMPTY RETURN
+type empty = object;
 
 // CONSTANTS //
 const errorMsg = { error: 'error' };
+const fileName = 'data.json';
+const OWNER = 1;
+const MEMBER = 2;
 
 let data: Data = {
   users: [],
   channels: [],
   dms: [],
+  resetCodes: []
 };
-
-const fileName = 'data.json';
 
 // Use get() to access the data
 function getData(): Data {
@@ -115,5 +127,5 @@ function loadData() {
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
-export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token };
-export { error, errorMsg };
+export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
+export { error, errorMsg, empty, OWNER, MEMBER };

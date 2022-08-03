@@ -1,4 +1,4 @@
-import { getData, setData, Data } from './dataStore';
+import { getData, setData, Data, empty } from './dataStore';
 /**
  * clearV1
  * Resets the internal data of the application to its initial state
@@ -6,11 +6,12 @@ import { getData, setData, Data } from './dataStore';
  * @returns {} when no error
  */
 
-function clearV1(): object {
+function clearV1(): empty {
   const data: Data = getData();
   data.users = [];
   data.channels = [];
   data.dms = [];
+  data.resetCodes = [];
   setData(data);
   return {};
 }
