@@ -74,6 +74,7 @@ interface Message {
   timeSent: number,
   isPinned: boolean,
 }
+type MessageId = { messageId: number };
 
 // DM TYPES AND INTERFACES
 interface Dm {
@@ -88,6 +89,8 @@ interface DmInfo {
   dmId: number,
   name: string,
 }
+
+type dmId = { dmId: number };
 
 type dmReturn = { dms: DmInfo[] };
 
@@ -106,6 +109,25 @@ interface Channel {
 interface ChannelInfo {
   channelId: number,
   name: string,
+}
+
+// STANDUP TYPES AND INTERFACES
+type timeReturn = { timeFinish: number };
+type activeReturn = {
+    isActive: boolean,
+    timeFinish: number
+};
+
+type standupMsg = {
+  handle: string,
+  message: string
+}
+
+interface Standup {
+  channelId: number,
+  messages: standupMsg[],
+  timeFinish: number,
+  isActive: boolean
 }
 
 // RESET CODES
@@ -127,6 +149,8 @@ type Data = {
   totalMessagesExist: number,
   totalDmsExist: number,
   totalChannelsExist: number,
+
+  standups: Standup[]
   resetCodes: Codes[]
 }
 
@@ -149,6 +173,7 @@ let data: Data = {
   totalMessagesExist: 0,
   totalDmsExist: 0,
   totalChannelsExist: 0,
+  standups: [],
   resetCodes: []
 };
 
@@ -175,7 +200,8 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
 export { channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist };
+export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn };
+export { timeReturn, activeReturn, Standup, standupMsg };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };

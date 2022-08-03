@@ -315,6 +315,16 @@ export function isGlobalOwner(token: string) : boolean {
   return false;
 }
 
+export function isActive(channelId: number) : boolean {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //= ==========================================================================//
 // UPDATES THE DATASTORE                                                     //
 //= ==========================================================================//

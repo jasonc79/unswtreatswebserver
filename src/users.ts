@@ -1,4 +1,4 @@
-import { error, errorMsg, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
+import { error, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser, getIdfromToken } from './helper';
 import { checkValidEmail } from './auth';
 import HTTPError from 'http-errors';
@@ -24,9 +24,13 @@ Return Value:
     Returns { error: 'error' } on an invalid authUserId or uId
 */
 
-function userProfileV1(token: string, uId: number) : error | userReturn {
-  if (!checkValidUser(uId) || !checkValidToken(token)) {
-    return errorMsg;
+function userProfileV3(token: string, uId: number) : error | userReturn {
+  if (!checkValidUser(uId)) {
+    throw HTTPError(400, 'uId does not refer to a valid user');
+  }
+
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid Token');
   }
   const user = returnValidId(uId);
   return {
@@ -54,13 +58,18 @@ Return Value:
     Returns {} on no error
 */
 
-function userSetNameV1(token: string, nameFirst: string, nameLast: string) : object | error {
+function userSetNameV2(token: string, nameFirst: string, nameLast: string) : object | error {
   const firstNameLength = nameFirst.length;
   const lastNameLength = nameLast.length;
-  if (!checkValidToken(token) || firstNameLength > 50 || firstNameLength < 1 || lastNameLength > 50 || lastNameLength < 1) {
-    return errorMsg;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid Token');
   }
-
+  if (firstNameLength > 50 || firstNameLength < 1) {
+    throw HTTPError(400, 'length of nameFirst is not between 1 and 50 characters inclusive');
+  }
+  if (lastNameLength > 50 || lastNameLength < 1) {
+    throw HTTPError(400, 'length of nameLast is not between 1 and 50 characters inclusive');
+  }
   const user = returnValidUser(token);
   user.nameFirst = nameFirst;
   user.nameLast = nameLast;
@@ -79,14 +88,14 @@ Return Value:
     Returns {error: 'error'}  when email is already being used by another user
     Returns {} on no error
  */
-function userSetEmailV1(token: string, email: string) {
+function userSetEmailV2(token: string, email: string) {
   email = email.toLowerCase();
   if (!checkValidEmail(email)) {
-    return errorMsg;
-  } else if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(400, 'email entered is not a valid email');
   }
-
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid Token');
+  }
   const user = returnValidUser(token);
   user.email = email;
   updateUser(user.uId, user);
@@ -106,33 +115,35 @@ Return Value:
     Returns {error: 'error'}  on handle without non-alphanumeric characters
     Returns {} on no error
  */
-function userSetHandleV1(token: string, handleStr: string) {
+function userSetHandleV2(token: string, handleStr: string) {
   const handleLength = handleStr.length;
-  if (handleLength > 20 || handleLength < 3 || handleStr.match(/^[0-9A-Za-z]+$/) === null) {
-    return errorMsg;
-  } else if (!checkValidToken(token)) {
-    return errorMsg;
+  if (handleLength > 20 || handleLength < 3) {
+    throw HTTPError(400, 'length of handleStr is not between 3 and 20 characters inclusive');
+  }
+  if (handleStr.match(/^[0-9A-Za-z]+$/) === null) {
+    throw HTTPError(400, 'handleStr contains characters that are not alphanumeric');
+  }
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Invalid Token');
   }
   const user = returnValidUser(token);
   // Cannot update handle str (same handlestr)
   if (handleStr.localeCompare(user.handleStr) === 0) {
-    return errorMsg;
+    throw HTTPError(400, 'the handle is already used by another user');
   }
-
   user.handleStr = handleStr;
   updateUser(user.uId, user);
-
   return {};
 }
 
-function usersAllV1(token: string) : error | allUserReturn {
+function usersAllV2(token: string) : error | allUserReturn {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Invalid Token');
   }
   const users = getData().users;
   const userDetails: UserInfo[] = [];
   for (const member of users) {
-    const current = userProfileV1(token, member.uId) as userReturn;
+    const current = userProfileV3(token, member.uId) as userReturn;
     userDetails.push(current.user);
   }
   return { users: userDetails };
@@ -200,5 +211,4 @@ function userStatsV1(token: string) : (returnUserStats) {
   console.log(temp);
   return { userStats: temp };
 }
-
-export { userProfileV1, userSetNameV1, userSetEmailV1, userSetHandleV1, usersAllV1, usersStatsV1, userStatsV1 };
+export { userProfileV3, userSetNameV2, userSetEmailV2, userSetHandleV2, usersAllV2, usersStatsV1, userStatsV1 };

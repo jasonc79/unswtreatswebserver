@@ -1,4 +1,4 @@
-import { error, getData, setData, messagesExist } from './dataStore';
+import { error, getData, setData, Message, Channel, Dm, MessageId, messagesExist } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -22,8 +22,6 @@ import {
 } from './helper';
 import HTTPError from 'http-errors';
 
-type messageId = { messageId: number };
-
 /**
  * messageSendV1
  * Sends a message to a specified channel
@@ -39,7 +37,7 @@ type messageId = { messageId: number };
  *    if the channelId is invalid
  * @returns { messageId: messageId } if a message is sent without any errors
  */
-function messageSendV1(token: string, channelId: number, message: string) : messageId | error {
+function messageSendV1(token: string, channelId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -54,14 +52,8 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   }
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
-  const currTime = Math.floor((new Date()).getTime() / 1000);
-  const newMessage = {
-    messageId: Math.floor(Math.random() * Date.now()),
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: currTime,
-    isPinned: false,
-  };
+  const newMessage = createMessage(token, message);
+
   for (const channel of data.channels) {
     if (channel.channelId === cuurentChannel.channelId) {
       channel.messages.push(newMessage);
@@ -71,7 +63,7 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   ///
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
-    timeStamp: currTime,
+    timeStamp: Math.floor((new Date()).getTime() / 1000),
   };
   data.messagesExist.push(temp);
   ///
@@ -81,7 +73,7 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   return { messageId: newMessage.messageId };
 }
 
-function messageSenddmV1(token: string, dmId: number, message: string) : messageId | error {
+function messageSenddmV1(token: string, dmId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -97,19 +89,22 @@ function messageSenddmV1(token: string, dmId: number, message: string) : message
 
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
-  const newMessage = {
-    messageId: Math.floor(Math.random() * Date.now()),
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-    isPinned: false,
-  };
+  const newMessage = createMessage(token, message);
 
   for (const dm of data.dms) {
     if (dm.dmId === cuurentDm.dmId) {
       dm.messages.push(newMessage);
     }
   }
+
+  ///
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: Math.floor((new Date()).getTime() / 1000),
+  };
+  data.messagesExist.push(temp);
+  ///
+
   setData(data);
   return { messageId: newMessage.messageId };
 }
@@ -259,29 +254,153 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
+function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : MessageId | error {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidChannel(channelId)) {
+    throw HTTPError(400, 'Channel ID does not refer to a valid channel');
+  }
+  if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
+    throw HTTPError(400, 'timeSent is a time in the past');
+  }
+  if (!isMember(token, channelId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the channel');
+  }
+  if (message.length < 1 || message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
+  }
+  const msgId = Math.floor(Math.random() * Date.now());
+  const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
+  setTimeout(() => { sendChannelMessage(token, channelId, message, msgId); }, seconds * 1000);
+  // console.log('msgId =', msgId);
+  return { messageId: msgId };
+}
+
+function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : MessageId | error {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'Dm ID does not refer to a valid dm');
+  }
+  if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
+    throw HTTPError(400, 'timeSent is a time in the past');
+  }
+  if (!isMemberDm(token, dmId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the channel');
+  }
+  if (message.length < 1 || message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
+  }
+  const msgId = Math.floor(Math.random() * Date.now());
+  const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
+  setTimeout(() => { sendDmMessage(token, dmId, message, msgId); }, seconds * 1000);
+  return { messageId: msgId };
+}
+
+function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentChannel = returnValidChannel(channelId);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+    isPinned: false,
+  };
+  for (const channel of data.channels) {
+    if (channel.channelId === cuurentChannel.channelId) {
+      channel.messages.push(newMessage);
+    }
+  }
+  setData(data);
+}
+
+function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentDm = returnValidDm(dmId);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+    isPinned: false,
+  };
+
+  for (const dm of data.dms) {
+    if (dm.dmId === cuurentDm.dmId) {
+      dm.messages.push(newMessage);
+    }
+  }
+  setData(data);
+}
+
+function messageShareV1(token: string, ogMessageId: number, message: string, channelId: number, dmId: number) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  } else if (!checkValidChannel(channelId) && !checkValidDm(dmId)) {
+    throw HTTPError(400, 'Channel ID does not refer to a valid channel');
+  } else if (channelId !== -1 && dmId !== -1) {
+    throw HTTPError(400, 'Neither dmId or channelId is -1');
+  } else if (message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be less than 1000 inclusive');
+  }
+  const isOgMessage = checkValidChannelMessage(ogMessageId);
+  const isOgDm = checkValidDmMessage(ogMessageId);
+  let ogMessage: Message;
+  let newMessageId: number;
+
+  if (!isOgMessage && !isOgDm) {
+    throw HTTPError(400, 'ogMessageId does not refer to valid channel or channel that the authorised user has joined');
+  } else if (isOgMessage) {
+    ogMessage = returnValidMessagefromChannel(ogMessageId);
+  } else if (isOgDm) {
+    ogMessage = returnValidMessagefromDm(ogMessageId);
+  }
+  const concatMessage = concatMessageString(ogMessage.message, message);
+  // Sharing a message with a channel
+  if (dmId === -1) {
+    if (!isMember(token, channelId)) {
+      throw HTTPError(403, 'Authorised user is not a member of the channel they are sharing a message to');
+    }
+    newMessageId = (messageSendV1(token, channelId, concatMessage) as MessageId).messageId;
+  } // Sharing a message with a dm
+  if (channelId === -1) {
+    if (!isMemberDm(token, dmId)) {
+      throw HTTPError(403, 'Authorised user is not a member of the dm they are sharing a message to');
+    }
+    newMessageId = (messageSenddmV1(token, dmId, concatMessage) as MessageId).messageId;
+  }
+  return { sharedMessageId: newMessageId };
+}
+
 // helper function
+const genEditMessage = (dataProp: Channel[] | Dm[]) => {
+  return (id: number, message: string) : Channel[] | Dm[] => {
+    for (const item of dataProp) {
+      for (const msg of item.messages) {
+        if (msg.messageId === id) {
+          msg.message = message;
+        }
+      }
+    }
+    return dataProp;
+  };
+};
+
 function editMessage(token: string, id: number, message: string, prop: string) {
   const data = getData();
   if (message.length === 0) {
     messageRemoveV1(token, id);
     return;
   }
+  const editMessageChannel = genEditMessage(data.channels);
+  const editMessageDm = genEditMessage(data.dms);
   if (prop === 'dms') {
-    for (const item of data.dms) {
-      for (const msg of item.messages) {
-        if (msg.messageId === id) {
-          msg.message = message;
-        }
-      }
-    }
+    data.dms = editMessageDm(id, message) as Dm[];
   } else if (prop === 'channels') {
-    for (const item of data.channels) {
-      for (const msg of item.messages) {
-        if (msg.messageId === id) {
-          msg.message = message;
-        }
-      }
-    }
+    data.channels = editMessageChannel(id, message) as Channel[];
   }
   setData(data);
 }
@@ -353,4 +472,21 @@ function messageUnpinV1(token: string, messageId: number): (object) {
   setData(data);
   return {};
 }
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messagePinV1, messageUnpinV1 };
+
+function createMessage(token: string, messageStr: string): Message {
+  const message: Message = {
+    messageId: Math.floor(Math.random() * Date.now()),
+    uId: getIdfromToken(token),
+    message: messageStr,
+    timeSent: Math.floor((new Date()).getTime() / 1000),
+    isPinned: false,
+  };
+  return message;
+}
+
+function concatMessageString(ogMessage: string, optionalMessage: string): string {
+  const newMessage = optionalMessage + '\n= = = = =\n' + ogMessage + '\n= = = = =\n';
+  return newMessage;
+}
+
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1 };

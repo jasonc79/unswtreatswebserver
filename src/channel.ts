@@ -1,7 +1,7 @@
 import { error, UserInfo, Message, userReturn, OWNER, empty } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { updateChannel } from './helper';
-import { userProfileV1 } from './users';
+import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
@@ -286,7 +286,7 @@ function channelAddOwnerV2(token: string, channelId: number, uId: number): (obje
   if (!isMemberFromId(uId, channelId)) {
     throw HTTPError(400, 'uId refers to a user who is not a member of the channel');
   }
-  const newOwnerProfile = userProfileV1(token, uId) as userReturn;
+  const newOwnerProfile = userProfileV3(token, uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
   currChannel.ownerMembers.push(newOwnerProfile.user);
   updateChannel(channelId, currChannel);
@@ -330,7 +330,7 @@ function channelRemoveOwnerV2(token: string, channelId: number, uId: number): (o
   if (!isOwnerFromId(uId, channelId)) {
     throw HTTPError(400, 'uId refers to a user who is not an owner of the channel');
   }
-  const user = userProfileV1(token, uId) as userReturn;
+  const user = userProfileV3(token, uId) as userReturn;
   const currChannel = returnValidChannel(channelId);
   if (currChannel.ownerMembers.length === 1) {
     throw HTTPError(400, 'uId refers to a user who is currently the only owner of the channel');

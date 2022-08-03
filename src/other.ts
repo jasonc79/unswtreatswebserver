@@ -17,6 +17,7 @@ function clearV1(): empty {
   data.totalMessagesExist = 0;
   data.totalDmsExist = 0;
   data.totalChannelsExist = 0;
+  data.standups = [];
   data.resetCodes = [];
   setData(data);
   return {};
