@@ -246,7 +246,50 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-// helper function
+function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : messageId | error {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidChannel(channelId)) {
+    throw HTTPError(400, 'Channel ID does not refer to a valid channel');
+  }
+  if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
+    throw HTTPError(400, 'timeSent is a time in the past');
+  }
+  if (!isMember(token, channelId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the channel');
+  }
+  if (message.length < 1 || message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
+  }
+  let msgId;
+  const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
+  setTimeout(() => { msgId = messageSendV1(token, channelId, message); }, seconds * 1000);
+  return { messageId: msgId };
+}
+
+function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : messageId | error {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  if (!checkValidDm(dmId)) {
+    throw HTTPError(400, 'Dm ID does not refer to a valid dm');
+  }
+  if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
+    throw HTTPError(400, 'timeSent is a time in the past');
+  }
+  if (!isMember(token, dmId)) {
+    throw HTTPError(403, 'The authorised user is not a member of the channel');
+  }
+  if (message.length < 1 || message.length > 1000) {
+    throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
+  }
+  let msg;
+  const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
+  setTimeout(() => { msg = messageSenddmV1(token, dmId, message); }, seconds * 1000);
+  return { messageId: msg.messageId };
+}
+
 function editMessage(token: string, id: number, message: string, prop: string) {
   const data = getData();
   if (message.length === 0) {
@@ -273,4 +316,4 @@ function editMessage(token: string, id: number, message: string, prop: string) {
   setData(data);
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 };
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1 };

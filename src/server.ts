@@ -9,7 +9,8 @@ import { authRegisterV1, authLoginV1, authLogoutV1, authPasswordRequest, authPas
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1 } from './message';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1 } from './message';
+import { standupStartV1, standupActiveV1 } from './standup';
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 
@@ -273,6 +274,24 @@ app.delete('/message/remove/v2', (req, res, next) => {
   }
 });
 
+app.post('/message/sendlater/v1', (req, res, next) => {
+  try {
+    const { token, channelId, message, timeSent } = req.body;
+    return res.json(messageSendlaterV1(token, channelId, message, timeSent));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/sendlaterdm/v1', (req, res, next) => {
+  try {
+    const { token, dmId, message, timeSent } = req.body;
+    return res.json(messageSendlaterdmV1(token, dmId, message, timeSent));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v2', (req, res, next) => {
@@ -334,6 +353,29 @@ app.get('/dm/messages/v2', (req, res, next) => {
     next(err);
   }
 });
+// ================================================================ //
+// Standup functions
+
+app.post('/standup/start/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { channelId, length } = req.body;
+    return res.json(standupStartV1(token, channelId, length));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/standup/active/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const channelId = parseInt(req.query.channelId as string);
+    return res.json(standupActiveV1(token, channelId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ================================================================ //
 // Other functions
 
