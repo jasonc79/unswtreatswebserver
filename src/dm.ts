@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn } from './dataStore';
+import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
@@ -19,7 +19,6 @@ import HTTPError from 'http-errors';
  *    when there are duplicate 'uId's in uIds
  * @returns { dmId } on no error
  */
-type dmId = { dmId: number };
 const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');

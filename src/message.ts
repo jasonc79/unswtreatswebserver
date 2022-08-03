@@ -1,4 +1,4 @@
-import { error, getData, setData, Message, Channel, Dm } from './dataStore';
+import { error, getData, setData, Message, Channel, Dm, MessageId } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -21,8 +21,6 @@ import {
 } from './helper';
 import HTTPError from 'http-errors';
 
-type messageId = { messageId: number };
-
 /**
  * messageSendV1
  * Sends a message to a specified channel
@@ -38,7 +36,7 @@ type messageId = { messageId: number };
  *    if the channelId is invalid
  * @returns { messageId: messageId } if a message is sent without any errors
  */
-function messageSendV1(token: string, channelId: number, message: string) : messageId | error {
+function messageSendV1(token: string, channelId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -65,7 +63,7 @@ function messageSendV1(token: string, channelId: number, message: string) : mess
   return { messageId: newMessage.messageId };
 }
 
-function messageSenddmV1(token: string, dmId: number, message: string) : messageId | error {
+function messageSenddmV1(token: string, dmId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -237,7 +235,7 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : messageId | error {
+function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -260,7 +258,7 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
   return { messageId: msgId };
 }
 
-function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : messageId | error {
+function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -345,13 +343,13 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
     if (!isMember(token, channelId)) {
       throw HTTPError(403, 'Authorised user is not a member of the channel they are sharing a message to');
     }
-    newMessageId = (messageSendV1(token, channelId, concatMessage) as messageId).messageId;
+    newMessageId = (messageSendV1(token, channelId, concatMessage) as MessageId).messageId;
   } // Sharing a message with a dm
   if (channelId === -1) {
     if (!isMemberDm(token, dmId)) {
       throw HTTPError(403, 'Authorised user is not a member of the dm they are sharing a message to');
     }
-    newMessageId = (messageSenddmV1(token, dmId, concatMessage) as messageId).messageId;
+    newMessageId = (messageSenddmV1(token, dmId, concatMessage) as MessageId).messageId;
   }
   return { sharedMessageId: newMessageId };
 }

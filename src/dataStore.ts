@@ -37,6 +37,7 @@ interface Message {
   message: string,
   timeSent: number
 }
+type MessageId = { messageId: number };
 
 // DM TYPES AND INTERFACES
 interface Dm {
@@ -51,6 +52,8 @@ interface DmInfo {
   dmId: number,
   name: string,
 }
+
+type dmId = { dmId: number };
 
 type dmReturn = { dms: DmInfo[] };
 
@@ -147,7 +150,7 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
+export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn };
 export { timeReturn, activeReturn, Standup, standupMsg };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };
