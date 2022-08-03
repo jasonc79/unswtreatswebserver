@@ -1,4 +1,4 @@
-import { authUserReturn, requestAuthRegister, requestChannelCreate, requestChannelMessages } from './helperTests';
+import { authUserReturn, requestAuthRegister, requestChannelCreate, requestChannelMessages, requestMessageSend } from './helperTests';
 import { requestStandupStart, requestStandupActive, requestStandupSend } from './helperTests';
 import { removeFile, requestClear } from './helperTests';
 
@@ -11,6 +11,8 @@ type activeStandup = {
   timeFinish: number
 }
 
+const standupSeconds = 1;
+
 const email = 'hayden@gmail.com';
 const password = 'hayden123';
 const nameFirst = 'Hayden';
@@ -21,10 +23,19 @@ const email2 = 'hayden2@gmail.com';
 const password2 = 'hayden1234';
 const nameFirst2 = 'Hayden2';
 const nameLast2 = 'Smith2';
-
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+//============================================================================//
+// HELPER FUNCTIONS 
+const sleep = (ms:number) => new Promise(r => setTimeout(r, ms));
 async function pause(seconds: number) {
   await sleep(seconds * 1000);
+}
+
+function createActiveStandup(): channelIdReturn {
+  const channel = requestChannelCreate(authUser.token, 'name', false);
+  requestStandupStart(authUser.token, channel.channelId, 1, 200);
+  const isActiveStandup = requestStandupActive(authUser.token, channel.channelId, 200);
+  expect(isActiveStandup.isActive).toStrictEqual(true);
+  return channel;
 }
 
 beforeEach(() => {
@@ -32,6 +43,8 @@ beforeEach(() => {
   requestClear();
   authUser = requestAuthRegister(email, password, nameFirst, nameLast);
 });
+
+//============================================================================//
 
 describe('Testing standupStartV1', () => {
   describe('error cases', () => {
@@ -51,25 +64,25 @@ describe('Testing standupStartV1', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       requestStandupStart(user.token, channel.channelId, 1, 403);
     });
-    test('active standup is already running in the channel', async () => {
+    test('active standup is already running in the channel', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
       requestStandupStart(authUser.token, channel.channelId, 1);
       requestStandupStart(authUser.token, channel.channelId, 1, 400);
-    });
-    afterEach(() => {
-      return pause(1);
     });
   });
 
   describe('passes', () => {
     test('standup is started', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
-      const standup = requestStandupStart(authUser.token, channel.channelId, 5);
+      const standup = requestStandupStart(authUser.token, channel.channelId, 1);
       expect(standup).toStrictEqual(
         expect.objectContaining({
           timeFinish: expect.any(Number),
         })
       );
+    });
+    afterEach(() => {
+      return pause(standupSeconds);
     });
   });
 });
@@ -112,16 +125,11 @@ describe('Testing standupActiveV1', () => {
         })
       );
     });
+    afterEach(() => {
+      return pause(standupSeconds);
+    });
   });
 });
-
-function createActiveStandup(): channelIdReturn {
-  const channel = requestChannelCreate(authUser.token, 'name', false);
-  requestStandupStart(authUser.token, channel.channelId, 1, 200);
-  const isActiveStandup = requestStandupActive(authUser.token, channel.channelId, 200);
-  expect(isActiveStandup.isActive).toStrictEqual(true);
-  return channel;
-}
 
 describe('Testing standupSendV1', () => {
   const msg =  'Standup starting :)';
@@ -147,12 +155,13 @@ describe('Testing standupSendV1', () => {
       });
     });
     describe('Pass cases', () => {
-      test('Message is sent by the user', () => {
-        console.log(authUser.token);
+      test('Message is sent by the user', async () => {
         const channel = createActiveStandup();
         expect(requestStandupSend(authUser.token, channel.channelId, msg, 200)).toStrictEqual({});
+        await new Promise((r) => setTimeout(r, 2000));
         const channelMsg = requestChannelMessages(authUser.token, channel.channelId, 0, 200);
-        const packedMsg = `${handleStr}: ${msg}`;
+        const packedMsg = `${handleStr}: ${msg}\n`;
+
         // CHANGE THIS CASE WHEN NESSAGE/PIN IS IMPLEMENTED
         expect(channelMsg).toStrictEqual({
           messages: [{
@@ -167,14 +176,16 @@ describe('Testing standupSendV1', () => {
         // TEST CASE NO @ should be parsed as proper tags
       });
     });
+    afterEach(() => {
+      return pause(standupSeconds);
+    });
   });
-  // describe('Inactive standups', () => {
-  //   test('Error is returned', () => {
-  //     const channel = requestChannelCreate(authUser.token, 'name', false);
-  //     const isActiveStandup = requestStandupActive(authUser.token, channel.channelId, 200);
-  //     expect(isActiveStandup.isActive).toStrictEqual(false);
-  //     requestStandupSend(authUser.token, channel.channelId, msg, 400);
-  //   });
-   
-  // });
+  describe('Inactive standups', () => {
+    test('Error is returned', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const isActiveStandup = requestStandupActive(authUser.token, channel.channelId, 200);
+      expect(isActiveStandup.isActive).toStrictEqual(false);
+      requestStandupSend(authUser.token, channel.channelId, msg, 400);
+    });
+  });
 });

@@ -1,23 +1,16 @@
 import { timeReturn, activeReturn, getData, setData, standupMsg } from './dataStore';
-import {requestMessageSend} from './helperTests';
 import {
   checkValidToken,
   checkValidChannel,
   isMember,
   isActive,
-  returnValidUser
+  returnValidUser,
+  getHashOf
 } from './helper';
-import { messageSendV1 } from './message';
 import HTTPError from 'http-errors';
-
-function sleep(ms: number) {
-  return new Promise(
-    resolve => setTimeout(resolve, ms)
-  );
-}
+import { messageSendV1 } from './message';
 
 function standupStartV1(token: string, channelId: number, length: number) : timeReturn {
-  console.log(getData().standups);
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -46,15 +39,8 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   setData(data);
   setTimeout(() => {
     packMessage(token, channelId);
-    const index = data.standups.findIndex(standup => standup.channelId === channelId);
-    data.standups.splice(index);
-    setData(data);
   }, seconds * 1000);
   
-  // setTimeout(() => {
-  //   packMessage(token, channelId)
-  // }, seconds * 1000);
-  //console.log('return', token);
   return { timeFinish: finish };
 }
 
@@ -123,32 +109,28 @@ function updateStandupMsg(channelId: number, newMsg: standupMsg) {
 
 function packMessage(token: string, id: number) {
   const data = getData();
-  
   let packedMessage = '';
   let isMessage = false;
   for (const standup of data.standups) {
     if (standup.channelId === id) {
-      isMessage = true;
+
       for (const msg of standup.messages) {
+        isMessage = true;
         packedMessage = packedMessage + msg.handle + ': ' + msg.message + '\n';
       }
     }
   }
   data.standups = data.standups.filter(function(a) { return a.channelId != id; });
+  setData(data);
   const newMessage = {
     messageId: Math.floor(Math.random() * Date.now()),
     uId: 0,
     message: packedMessage,
     timeSent: Math.floor((new Date()).getTime() / 1000),
   };
-  console.log(data.channels);
-  data.channels[id].messages.push(newMessage);
-  // if (isMessage) {
-    
-  //   // messageSendV1(token, id, packedMessage);
-  // }
-  console.log(data.channels[id].messages);
-  setData(data);
+   if (isMessage) {
+      messageSendV1(token, id, packedMessage);
+   }
 }
 
 export { standupStartV1, standupActiveV1, standupSendV1 };
