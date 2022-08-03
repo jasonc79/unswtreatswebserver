@@ -148,6 +148,6 @@ function loadData() {
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, Dm, DmInfo, dmReturn };
+export { timeReturn, activeReturn, Standup, standupMsg };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
-export { timeReturn, activeReturn, Standup };
 export { error, errorMsg, empty, OWNER, MEMBER };

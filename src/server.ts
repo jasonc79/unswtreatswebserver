@@ -10,7 +10,7 @@ import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV1, usersAllV1, userSetNameV1, userSetEmailV1, userSetHandleV1 } from './users';
 import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1 } from './message';
-import { standupStartV1, standupActiveV1 } from './standup';
+import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 
@@ -376,6 +376,15 @@ app.get('/standup/active/v1', (req, res, next) => {
   }
 });
 
+app.post('/standup/send/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const {channelId, message} = req.body;
+    return res.json(standupSendV1(token, channelId, message));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // Other functions
 
