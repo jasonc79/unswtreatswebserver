@@ -13,6 +13,7 @@ import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, message
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
+import { uploadPhotoV1 } from './userprofile'; 
 
 // Set up web app, use JSON
 const app = express();
@@ -231,6 +232,16 @@ app.get('/users/all/v2', (req, res, next) => {
     next(err);
   }
 });
+
+app.post('/user/profile/uploadphoto/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string; 
+    const { imgUrl, xStart, yStart, xEnd, yEnd } = req.body;
+    return res.json(uploadPhotoV1(token, imgUrl, xStart, yStart, xEnd, yEnd));
+  } catch (err) {
+    next (err); 
+  }
+}); 
 
 // ================================================================ //
 // Message functions
