@@ -253,7 +253,7 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
   let newMessageId: number;
 
   if (!isOgMessage && !isOgDm) {
-    throw HTTPError(400, 'ogMessageId does not refer to valid channel that the authorised user has joined');
+    throw HTTPError(400, 'ogMessageId does not refer to valid channel or channel that the authorised user has joined');
   } else if (isOgMessage) {
     ogMessage = returnValidMessagefromChannel(ogMessageId);
   } else if (isOgDm) {
@@ -272,7 +272,6 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
       throw HTTPError(403, 'Authorised user is not a member of the dm they are sharing a message to');
     }
     newMessageId = (messageSenddmV1(token, dmId, concatMessage) as messageId).messageId;
-    console.log(getData().dms[dmId].messages);
   }
   return { sharedMessageId: newMessageId };
 }
