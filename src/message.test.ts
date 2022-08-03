@@ -723,20 +723,20 @@ describe('Testing message/react/v1', () => {
       requestMessageReact(authUser.token, message.messageId, 1, 400);
     });
 
-    test('1 react ', () => {
+    test('1 react', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
       const react = requestMessageReact(authUser.token, message.messageId, 1);
       expect(react).toStrictEqual({}); 
     });
 
-    test('2 reacts ', () => {
+    test('2 reacts', () => {
       const authUser1 = requestAuthRegister("email@email.com", "password", "John", "Apples"); 
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      requestMessageReact(authUser.token, message.messageId, 1);
-      const react = requestMessageReact(authUser1.token, message.messageId, 1);
+      requestMessageReact(authUser1.token, message.messageId, 1);
+      const react = requestMessageReact(authUser.token, message.messageId, 1);
       expect(react).toStrictEqual({}); 
     });
-  }); 
+  });
 
   describe('Testing in dm messsages', () => {
     beforeEach(() => {
@@ -744,7 +744,7 @@ describe('Testing message/react/v1', () => {
       const uIds = [];
       uIds.push(uId1.authUserId);
       dm = requestDmCreate(authUser.token, uIds);
-    })
+    });
 
     test('messageId is not a valid message', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
@@ -809,7 +809,7 @@ describe('Testing message/unreact/v1', () => {
       const uIds = [];
       uIds.push(uId1.authUserId);
       dm = requestDmCreate(authUser.token, uIds);
-    })
+    });
 
     test('messageId is not a valid message', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
@@ -837,5 +837,4 @@ describe('Testing message/unreact/v1', () => {
     });
   })
 });
-
 */

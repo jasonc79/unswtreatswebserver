@@ -287,7 +287,7 @@ app.post('/message/unreact/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
     const { messageId, reactId } = req.body; 
-    return res.json(messageUnreactV1(messageId, reactId)); 
+    return res.json(messageUnreactV1(token, messageId, reactId)); 
   } catch (err) {
     next(err); 
   }

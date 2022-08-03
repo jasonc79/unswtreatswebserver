@@ -1,4 +1,4 @@
-import { error, getData, setData, userReturn, React, token } from './dataStore';
+import { error, getData, setData, userReturn, React, Message } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -22,6 +22,7 @@ import {
   isOwnerDm,
   checkReactId, 
   returnValidMessage, 
+  checkMessageSource, 
 } from './helper';
 import HTTPError from 'http-errors';
 import { errorMsg } from './helperTests';
@@ -252,7 +253,7 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-function messageReactV1 (token: token, messageId: number, reactId: number): error | {} {
+function messageReactV1 (token: string, messageId: number, reactId: number): error | {} {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -266,43 +267,59 @@ function messageReactV1 (token: token, messageId: number, reactId: number): erro
   }
 
   const checkReacts = checkAlreadyReacted(messageId, reactId); 
-  console.log(checkReacts); 
+  console.log(checkReacts);
   if (checkReacts === 2) {
     throw HTTPError(400, 'Message already contains react from authorised user'); 
   }
   
-  const data = getData(); 
   const user = returnValidUser(token);
-  const message = returnValidMessage(messageId); 
-  console.log(message.reacts);
+  const data = getData();
+  let currMessage: Message;
+  if (checkMessageSource(messageId) === 0) {
+    for (const dm of data.dms) {
+      for (const message of dm.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  } else if (checkMessageSource(messageId) === 1) {
+    for (const channel of data.channels) {
+      for (const message of channel.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message; 
+        }
+      }
+    }
+  }
 
   // Another user has already reacted with same reactId
   if (checkReacts === 1) {
-    for (const react of message.reacts) {
+    for (const react of currMessage.reacts) {
       if (reactId === react.reactId) {
-        react.uIds.push(user.uId); 
+        react.uIds.push(user.uId);
         react.isThisUserReacted = true;
       }
     }
   } else {
     const newReact : React = {
-      reactId: reactId, 
-      uIds: [ user.uId ], 
-      isThisUserReacted: true, 
+      reactId: reactId,
+      uIds: [ user.uId ],
+      isThisUserReacted: true,
     }
-    // First react 
-    if (!('reacts' in message)) {
-      message.reacts = [ newReact ];  
+    // First react
+    if (!('reacts' in currMessage)) {
+      currMessage.reacts = [ newReact ];
     // First react of that reactId
     } else {
-      message.reacts.push(newReact); 
+      currMessage.reacts.push(newReact);
     }
   }
   setData(data);
-  return {}; 
+  return {};
 }
 
-function messageUnreactV1 (messageId: number, reactId: number): error | {} {
+function messageUnreactV1 (token: string, messageId: number, reactId: number): error | {} {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
@@ -321,15 +338,31 @@ function messageUnreactV1 (messageId: number, reactId: number): error | {} {
 
   const data = getData(); 
   const userId = returnValidUser(token); 
-  const user = userProfileV1(token, userId.uId) as userReturn;
-  const message = returnValidMessage(messageId);   
-
+  const data = getData();
+  let currMessage: Message;
+  if (checkMessageSource(messageId) === 0) {
+    for (const dm of data.dms) {
+      for (const message of dm.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  } else if (checkMessageSource(messageId) === 1) {
+    for (const channel of data.channels) {
+      for (const message of channel.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message; 
+        }
+      }
+    }
+  }
   // Usual unreact
-  for (const react of message.reacts) {
+  for (const react of currMessage.reacts) {
     if (reactId === react.reactId) {
       for (const uId of react.uIds) {
         if (uId === userId.uId) {
-
+          // remove uId 
         }
       }
     }

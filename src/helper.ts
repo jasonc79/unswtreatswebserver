@@ -130,6 +130,28 @@ export function checkReactId(id: number) {
   return false; 
 }
 
+export function checkMessageSource(messageId: number): number {
+  let messageSource: number; 
+  if (!checkValidChannelMessage(messageId)) {
+    messageSource = 0; // Message is located in a DM
+  } 
+  if (!checkValidDmMessage(messageId)) {
+    messageSource = 1; // Message is located in a channel
+  } 
+  return messageSource;
+}
+
+export function returnValidMessage(messageId: number): Message {
+  let message; 
+  if (!checkValidChannelMessage(messageId)) {
+    message = returnValidMessagefromDm(messageId); 
+  } 
+  if (!checkValidDmMessage(messageId)) {
+    message = returnValidMessagefromChannel(messageId); 
+  } 
+  return message; 
+}
+
 export function checkAlreadyReacted(messageId: number, reactId: number): number {
   const message = returnValidMessage(messageId); 
   if ("reacts" in message) {
@@ -222,17 +244,6 @@ export function returnValidMessagefromDm(messageId: number) : Message {
       return message;
     }
   }
-}
-
-export function returnValidMessage(messageId: number): Message {
-  let message; 
-  if (!checkValidChannelMessage(messageId)) {
-    message = returnValidMessagefromDm(messageId); 
-  } 
-  if (!checkValidDmMessage(messageId)) {
-    message = returnValidMessagefromChannel(messageId); 
-  } 
-  return message; 
 }
 
 //= ==========================================================================//
