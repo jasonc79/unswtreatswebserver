@@ -244,13 +244,21 @@ describe('Testing dm/leave/v2', () => {
 });
 
 describe('Testing dmMessagesV1', () => {
+  test('Invalid token', () => {
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    expect(dm).toStrictEqual({ dmId: dm.dmId });
+    requestDmMessages('bad', dm.dmId, 0, 403);
+  });
   test('Empty messages', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
     expect(dm).toStrictEqual({ dmId: dm.dmId });
-    const messages = requestDmMessages(authUser2.token, dm.dmId, 0);
+    const messages = requestDmMessages(authUser2.token, dm.dmId, 0, 200);
     expect(messages).toStrictEqual(
       expect.objectContaining({
         messages: [],

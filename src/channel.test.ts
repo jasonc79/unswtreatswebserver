@@ -16,6 +16,10 @@ afterEach(() => {
 });
 
 describe('Testing channelMessagesV1', () => {
+  test('Invalid token', () => {
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelMessages('bad', channel.channelId, 0, 403);
+  });
   test('Empty messages', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     const messages = requestChannelMessages(authUser.token, channel.channelId, 0, 200);
@@ -331,6 +335,13 @@ describe('Testing channelRemoveOwnerV1', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     requestChannelJoin(authUser2.token, channel.channelId, 200);
     requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser2.authUserId, 403);
+  });
+  test('invalid token', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(authUser2.token, channel.channelId, 200);
+    requestChannelRemoveOwner('bad', channel.channelId, authUser2.authUserId, 403);
   });
 });
 

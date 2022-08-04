@@ -60,7 +60,6 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   data.dms.push(newDm);
 
   const currTime = Math.floor((new Date()).getTime() / 1000);
-  console.log(DmMembers);
   for (const member of newDm.members) {
     const temp: dmsJoined = {
       numDmsJoined: data.users[member.uId].totalDmsJoined += 1,
