@@ -90,7 +90,7 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
   const user = returnValidUser(token);
   const channel = returnValidChannel(channelId);
   const userIsMember = isMember(token, channel.channelId);
-
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   if (userIsMember) {
     throw HTTPError(400, 'The authorised user is already a member of the channel');
   }
@@ -103,14 +103,12 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
   updateChannel(channelId, channel);
 
   const data = getData();
-  const currTime = Math.floor((new Date()).getTime() / 1000);
   const temp: channelsJoined = {
     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
     timeStamp: currTime,
   };
   data.users[user.uId].channelsJoined.push(temp);
   setData(data);
-
   return {};
 }
 
@@ -147,6 +145,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
   }
   // Checking if uId and authUserID are members
   const authUserId = getIdfromToken(token);
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   let uIdMember = false;
   let authUserIdMember = false;
   for (const member of channel.allMembers) {
@@ -165,7 +164,6 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
   updateChannel(channelId, channel);
 
   const data = getData();
-  const currTime = Math.floor((new Date()).getTime() / 1000);
   const temp: channelsJoined = {
     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
     timeStamp: currTime,
@@ -249,6 +247,7 @@ function channelMessagesV3(token: string, channelId: number, start: number): (me
  *    token invalid
  *    channelId is invalid
  *    user is not part of channel
+ *    user is starter of an active startup
  * @returns { object } on no error
  */
 
@@ -261,19 +260,19 @@ function channelLeaveV2(token: string, channelId: number): (object) {
     throw HTTPError(403, 'ChannelId is valid and the authorised user is not a member of the channel');
   }
   const user = returnValidUser(token);
+  const currChannel = returnValidChannel(channelId);
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   if (isActive(channelId)) {
     const standUp = returnActiveStandup(channelId);
     if (standUp.uId === user.uId) {
       throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
     }
   }
-  const currChannel = returnValidChannel(channelId);
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
   currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
   updateChannel(channelId, currChannel);
 
   const data = getData();
-  const currTime = Math.floor((new Date()).getTime() / 1000);
   const temp: channelsJoined = {
     numChannelsJoined: data.users[user.uId].totalChannelsJoined += -1,
     timeStamp: currTime,

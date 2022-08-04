@@ -55,32 +55,24 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
   const newMessage = createMessage(token, message);
-
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   for (const channel of data.channels) {
     if (channel.channelId === cuurentChannel.channelId) {
       channel.messages.push(newMessage);
     }
   }
-
-  const user = returnValidUser(token);
-  const timeStamp = Math.floor((new Date()).getTime() / 1000);
-  ///
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
-  data.messagesExist.push(temp);
-
-  ///
   const temp1: messagesSent = {
     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
     timeStamp: timeStamp,
   };
+  data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
-  ///
-
   setData(data);
-
   return { messageId: newMessage.messageId };
 }
 
@@ -97,33 +89,26 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
   if (message.length < 1 || message.length > 1000) {
     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
-
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
   const newMessage = createMessage(token, message);
-
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   for (const dm of data.dms) {
     if (dm.dmId === cuurentDm.dmId) {
       dm.messages.push(newMessage);
     }
   }
-
-  const user = returnValidUser(token);
-  const timeStamp = Math.floor((new Date()).getTime() / 1000);
-  ///
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
-  data.messagesExist.push(temp);
-
-  ///
   const temp1: messagesSent = {
     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
     timeStamp: timeStamp,
   };
+  data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
-
   setData(data);
   return { messageId: newMessage.messageId };
 }
@@ -244,13 +229,11 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           dm.messages = messageList;
         }
       }
-      ///
       const temp: messagesExist = {
         numMessagesExist: data.totalMessagesExist += -1,
         timeStamp: timeStamp,
       };
       data.messagesExist.push(temp);
-
       setData(data);
       return {};
     } else {
@@ -274,13 +257,11 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           channel.messages = messageList;
         }
       }
-      ///
       const temp: messagesExist = {
         numMessagesExist: data.totalMessagesExist += -1,
         timeStamp: timeStamp,
       };
       data.messagesExist.push(temp);
-
       setData(data);
       return {};
     } else {
@@ -338,6 +319,7 @@ function sendChannelMessage(token: string, channelId: number, message: string, m
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
   const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
   const newMessage = {
     messageId: msgId,
     uId: getIdfromToken(token),
@@ -350,22 +332,16 @@ function sendChannelMessage(token: string, channelId: number, message: string, m
       channel.messages.push(newMessage);
     }
   }
-
-  ///
-  const user = returnValidUser(token);
-
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
-  data.messagesExist.push(temp);
-
   const temp1: messagesSent = {
     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
     timeStamp: timeStamp,
   };
+  data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
-
   setData(data);
 }
 
@@ -373,6 +349,7 @@ function sendDmMessage(token: string, dmId: number, message: string, msgId: numb
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
   const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
   const newMessage = {
     messageId: msgId,
     uId: getIdfromToken(token),
@@ -380,28 +357,21 @@ function sendDmMessage(token: string, dmId: number, message: string, msgId: numb
     timeSent: timeStamp,
     isPinned: false,
   };
-
   for (const dm of data.dms) {
     if (dm.dmId === cuurentDm.dmId) {
       dm.messages.push(newMessage);
     }
   }
-
-  ///
-  const user = returnValidUser(token);
-
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
-  data.messagesExist.push(temp);
-
   const temp1: messagesSent = {
     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
     timeStamp: timeStamp,
   };
+  data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
-
   setData(data);
 }
 

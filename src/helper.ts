@@ -357,5 +357,3 @@ export function updateChannel(channelId: number, channel: Channel) {
   }
   setData(data);
 }
-
-/// if not remove 1 by one make uId an array(uId[])
