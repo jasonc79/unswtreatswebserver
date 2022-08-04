@@ -13,6 +13,8 @@
     "cors": "^2.8.5",
     "express": "^4.18.0",
     "http-errors": "^2.0.0",
+    "image-size": "^1.0.2",
+    "jimp": "^0.16.1",
     "middleware-http-errors": "^0.1.1",
     "morgan": "^1.10.0",
     "nodemailer": "^6.7.7",

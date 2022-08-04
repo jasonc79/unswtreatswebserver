@@ -1,9 +1,10 @@
-import { error, getData, setData } from './dataStore';
+import { error } from './dataStore';
 import HTTPError from 'http-errors';
 import request from 'sync-request'; 
 import fs from 'fs'; 
 import { checkValidToken } from './helper';
-const sharp = require('sharp'); 
+const sizeOf = require('image-size'); 
+const Jimp = require('jimp');
 
 function uploadPhotoV1(token: string, imgUrl: string, xStart: number, yStart: number, xEnd: number, yEnd: number): {} | error {
     if (!checkValidToken(token)) {
@@ -12,17 +13,17 @@ function uploadPhotoV1(token: string, imgUrl: string, xStart: number, yStart: nu
 
     const res = request('GET', imgUrl);
     const body = res.getBody();
-    fs.writeFileSync(`profilepics/${ token }.jpg`, body, { flag: 'w' });
+    const image = `profilepics/${ token }.jpg`;
+    fs.writeFileSync(image, body, { flag: 'w' });
+
     if (res.statusCode !== 200) {
         throw HTTPError(400, 'Error when attempting to retrieve image'); 
     }
 
-    // Outside dimensions - change this
-        // If start < 0
-        // If end > image height/ width 
-    // if () {
-    //     throw HTTPError(400, 'Crop bounds are outside dimensions of the image');
-    // }
+    const dimensions = sizeOf(image); 
+    if (xStart < 0 || yStart < 0 || xEnd > dimensions.width || yEnd > dimensions.height) {
+        throw HTTPError(400, 'Crop bounds are outside dimensions of the image');
+    }
 
     if (xEnd <= xStart || yEnd <= yStart) {
         throw HTTPError(400, 'Invalid crop bounds'); 
@@ -32,7 +33,22 @@ function uploadPhotoV1(token: string, imgUrl: string, xStart: number, yStart: nu
     if (fileType !== 'jpg') {
         throw HTTPError(400, 'Image uploaded is not a JPG')
     }
-     
+    
+    // Cropping the image
+    // Jimp.read('lenna.png', (err, lenna) => {
+    //     if (err) throw err;
+    //     lenna
+    //       .resize(256, 256) // resize
+    //       .quality(60) // set JPEG quality
+    //       .greyscale() // set greyscale
+    //       .write('lena-small-bw.jpg'); // save
+    //   });
+    // image.crop( x, y, w, h );         // crop to the given region
+    const imageName = `profilepics/${ token }`;
+    Jimp.read(image, (err, imageName ) => {
+        if (err) throw err; 
+        imageName.crop(xStart, yStart, xEnd, yEnd); 
+    })
     return {}; 
 }; 
 
