@@ -31,18 +31,18 @@ type userReturn = { user: UserInfo };
 type allUserReturn = { users: UserInfo[] };
 
 // MESSAGE TYPES AND INTERFACES
+interface React {
+  reactId: number,
+  uIds: number[],
+  isThisUserReacted: boolean
+}
+
 interface Message {
   messageId: number,
   uId: number,
   message: string,
-  timeSent: number, 
-  reacts?: React[] 
-}
-
-interface React {
-  reactId: number, 
-  uIds: number[], 
-  isThisUserReacted: boolean
+  timeSent: number,
+  reacts?: React[]
 }
 
 // DM TYPES AND INTERFACES
@@ -78,7 +78,7 @@ interface ChannelInfo {
   name: string,
 }
 
-type channelReturn = { channels: ChannelInfo[] }; 
+type channelReturn = { channels: ChannelInfo[] };
 
 // RESET CODES
 interface Codes {

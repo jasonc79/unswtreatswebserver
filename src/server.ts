@@ -13,7 +13,7 @@ import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, message
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 
-// Set up web app, use JSON 
+// Set up web app, use JSON
 const app = express();
 app.use(express.json());
 // Use middleware that allows for access from other domains
@@ -276,22 +276,22 @@ app.delete('/message/remove/v2', (req, res, next) => {
 app.post('/message/react/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    const { messageId, reactId } = req.body; 
-    return res.json(messageReactV1(token, messageId, reactId)); 
+    const { messageId, reactId } = req.body;
+    return res.json(messageReactV1(token, messageId, reactId));
   } catch (err) {
-    next(err); 
+    next(err);
   }
-})
+});
 
 app.post('/message/unreact/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    const { messageId, reactId } = req.body; 
-    return res.json(messageUnreactV1(token, messageId, reactId)); 
+    const { messageId, reactId } = req.body;
+    return res.json(messageUnreactV1(token, messageId, reactId));
   } catch (err) {
-    next(err); 
+    next(err);
   }
-})
+});
 
 // ================================================================ //
 // dm functions

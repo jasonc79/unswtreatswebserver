@@ -1,4 +1,4 @@
-import { error, getData, setData, userReturn, React, Message } from './dataStore';
+import { error, getData, setData, React, Message } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -7,7 +7,7 @@ import {
   checkValidDmMessage,
   checkChannelMessageSender,
   checkDmMessageSender,
-  checkAlreadyReacted, 
+  checkAlreadyReacted,
   returnValidChannel,
   returnValidDm,
   returnValidMessagefromChannel,
@@ -20,13 +20,10 @@ import {
   isOwner,
   isMemberDm,
   isOwnerDm,
-  checkReactId, 
-  returnValidMessage, 
-  checkMessageSource, 
+  checkReactId,
+  checkMessageSource,
 } from './helper';
 import HTTPError from 'http-errors';
-import { errorMsg } from './helperTests';
-import { userProfileV1 } from './users';
 
 type messageId = { messageId: number };
 
@@ -253,25 +250,25 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 }
 
-function messageReactV1 (token: string, messageId: number, reactId: number): error | {} {
+function messageReactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
 
   if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
-    throw HTTPError(400, 'Invalid messageId'); 
+    throw HTTPError(400, 'Invalid messageId');
   }
 
   if (!checkReactId(reactId)) {
-    throw HTTPError(400, 'Invalid reactId'); 
+    throw HTTPError(400, 'Invalid reactId');
   }
 
-  const checkReacts = checkAlreadyReacted(token, messageId, reactId); 
+  const checkReacts = checkAlreadyReacted(token, messageId, reactId);
   console.log(checkReacts);
   if (checkReacts === 2) {
-    throw HTTPError(400, 'Message already contains react from authorised user'); 
+    throw HTTPError(400, 'Message already contains react from authorised user');
   }
-  
+
   const user = returnValidUser(token);
   const data = getData();
 
@@ -289,7 +286,7 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
     for (const channel of data.channels) {
       for (const message of channel.messages) {
         if (message.messageId === messageId) {
-          currMessage = message; 
+          currMessage = message;
         }
       }
     }
@@ -305,12 +302,12 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
   } else {
     const newReact : React = {
       reactId: reactId,
-      uIds: [ user.uId ],
+      uIds: [user.uId],
       isThisUserReacted: true,
-    }
+    };
     // First react
     if (!('reacts' in currMessage)) {
-      currMessage.reacts = [ newReact ];
+      currMessage.reacts = [newReact];
     // First react of that reactId
     } else {
       currMessage.reacts.push(newReact);
@@ -321,24 +318,24 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
   return {};
 }
 
-function messageUnreactV1 (token: string, messageId: number, reactId: number): error | {} {
+function messageUnreactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
 
   if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
-    throw HTTPError(400, 'Invalid messageId'); 
+    throw HTTPError(400, 'Invalid messageId');
   }
 
   if (!checkReactId(reactId)) {
-    throw HTTPError(400, 'Invalid reactId'); 
+    throw HTTPError(400, 'Invalid reactId');
   }
 
   if (!checkAlreadyReacted(token, messageId, reactId)) {
-    throw HTTPError(400, 'Message does not contain react from authorised user'); 
+    throw HTTPError(400, 'Message does not contain react from authorised user');
   }
 
-  const user = returnValidUser(token); 
+  const user = returnValidUser(token);
   const data = getData();
 
   // Finding current message
@@ -355,7 +352,7 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
     for (const channel of data.channels) {
       for (const message of channel.messages) {
         if (message.messageId === messageId) {
-          currMessage = message; 
+          currMessage = message;
         }
       }
     }
@@ -367,20 +364,20 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
         // Usual unreact
         if (react.uIds.length > 1) {
           react.uIds = react.uIds.filter((item) => {
-            return item !== user.uId; 
+            return item !== user.uId;
           });
           react.isThisUserReacted = false;
         // Last unreact of that reactId
         } else {
           currMessage.reacts = currMessage.reacts.filter((item) => {
-            return item.reactId !== react.reactId; 
+            return item.reactId !== react.reactId;
           });
         }
       }
     }
   }
 
-  return {}; 
+  return {};
 }
 
 // helper function

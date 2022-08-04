@@ -11,8 +11,6 @@ const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 
-const reactId = 1; 
-
 function generateTimeStamp() {
   return Math.floor(Date.now() / 1000);
 }
@@ -701,14 +699,14 @@ describe('Testing messageRemoveV1', () => {
 });
 
 describe('Testing message/react/v1', () => {
-  describe('Testing in channel messages', () => { 
+  describe('Testing in channel messages', () => {
     beforeEach(() => {
       channel = requestChannelCreate(authUser.token, 'name', true);
-    })
+    });
 
     test('messageId is not a valid message', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      const messageId = message.messageId + 1; 
+      const messageId = message.messageId + 1;
       requestMessageReact(authUser.token, messageId, 1, 400);
     });
 
@@ -726,15 +724,15 @@ describe('Testing message/react/v1', () => {
     test('1 react', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
       const react = requestMessageReact(authUser.token, message.messageId, 1);
-      expect(react).toStrictEqual({}); 
+      expect(react).toStrictEqual({});
     });
 
     test('2 reacts', () => {
-      const authUser1 = requestAuthRegister("email@email.com", "password", "John", "Apples"); 
+      const authUser1 = requestAuthRegister('email@email.com', 'password', 'John', 'Apples');
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
       requestMessageReact(authUser1.token, message.messageId, 1);
       const react = requestMessageReact(authUser.token, message.messageId, 1);
-      expect(react).toStrictEqual({}); 
+      expect(react).toStrictEqual({});
     });
   });
 
@@ -747,46 +745,46 @@ describe('Testing message/react/v1', () => {
     });
 
     test('messageId is not a valid message', () => {
-      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      const messageId = message.messageId + 1; 
-      requestMessageReact(authUser.token, messageId, 1, 400);     
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      const messageId = message.messageId + 1;
+      requestMessageReact(authUser.token, messageId, 1, 400);
     });
 
     test('reactId is not valid', () => {
-      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      requestMessageReact(authUser.token, message.messageId, -1, 400);     
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      requestMessageReact(authUser.token, message.messageId, -1, 400);
     });
 
     test('Message already contains a react', () => {
-      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      requestMessageReact(authUser.token, message.messageId, 1);     
-      requestMessageReact(authUser.token, message.messageId, 1, 400);     
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      requestMessageReact(authUser.token, message.messageId, 1);
+      requestMessageReact(authUser.token, message.messageId, 1, 400);
     });
 
     test('Valid inputs', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
       const react = requestMessageReact(authUser.token, message.messageId, 1);
-      expect(react).toStrictEqual({}); 
+      expect(react).toStrictEqual({});
     });
-  })
+  });
 });
 
 describe('Testing message/unreact/v1', () => {
-  describe('Testing in channel messages', () => { 
+  describe('Testing in channel messages', () => {
     beforeEach(() => {
       channel = requestChannelCreate(authUser.token, 'name', true);
-    })
+    });
 
     test('messageId is not a valid message', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      requestMessageReact(authUser.token, message.messageId, 1); 
-      const messageId = message.messageId + 1; 
+      requestMessageReact(authUser.token, message.messageId, 1);
+      const messageId = message.messageId + 1;
       requestMessageUnreact(authUser.token, messageId, 1, 400);
     });
 
     test('reactId is not valid', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
-      requestMessageReact(authUser.token, message.messageId, 1); 
+      requestMessageReact(authUser.token, message.messageId, 1);
       requestMessageUnreact(authUser.token, message.messageId, -1, 400);
     });
 
@@ -798,10 +796,10 @@ describe('Testing message/unreact/v1', () => {
     test('Valid inputs', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message');
       requestMessageReact(authUser.token, message.messageId, 1);
-      const unreact = requestMessageUnreact(authUser.token, message.messageId, 1); 
-      expect(unreact).toStrictEqual({}); 
+      const unreact = requestMessageUnreact(authUser.token, message.messageId, 1);
+      expect(unreact).toStrictEqual({});
     });
-  }); 
+  });
 
   describe('Testing in dm messsages', () => {
     beforeEach(() => {
@@ -813,28 +811,27 @@ describe('Testing message/unreact/v1', () => {
 
     test('messageId is not a valid message', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
-      requestMessageReact(authUser.token, message.messageId, 1);     
-      const messageId = message.messageId + 1; 
-      requestMessageUnreact(authUser.token, messageId, 1, 400);     
+      requestMessageReact(authUser.token, message.messageId, 1);
+      const messageId = message.messageId + 1;
+      requestMessageUnreact(authUser.token, messageId, 1, 400);
     });
 
     test('reactId is not valid', () => {
-      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      requestMessageReact(authUser.token, message.messageId, -1, 400);     
-      requestMessageUnreact(authUser.token, message.messageId, -1, 400);     
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      requestMessageReact(authUser.token, message.messageId, -1, 400);
+      requestMessageUnreact(authUser.token, message.messageId, -1, 400);
     });
 
     test('Message does not contain a react', () => {
-      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      requestMessageUnreact(authUser.token, message.messageId, 1, 400);     
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
+      requestMessageUnreact(authUser.token, message.messageId, 1, 400);
     });
 
     test('Valid inputs', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
       requestMessageReact(authUser.token, message.messageId, 1);
-      const unreact = requestMessageUnreact(authUser.token, message.messageId, 1); 
-      expect(unreact).toStrictEqual({}); 
+      const unreact = requestMessageUnreact(authUser.token, message.messageId, 1);
+      expect(unreact).toStrictEqual({});
     });
-  })
+  });
 });
-
