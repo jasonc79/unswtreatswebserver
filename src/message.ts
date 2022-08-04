@@ -20,6 +20,7 @@ import {
   isOwnerDm,
 } from './helper';
 import HTTPError from 'http-errors';
+import { notifyTag } from './notifications';
 
 /**
  * messageSendV1
@@ -59,7 +60,7 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
     }
   }
   setData(data);
-
+  notifyTag(token, message, channelId, -1);
   return { messageId: newMessage.messageId };
 }
 
@@ -87,6 +88,7 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
     }
   }
   setData(data);
+  notifyTag(token, message, -1, dmId);
   return { messageId: newMessage.messageId };
 }
 

@@ -1,6 +1,6 @@
-import { getData, setData, Message, Dm, DmInfo, userReturn, UserInfo, Notification } from './dataStore';
+import { getData, User, Notification, userReturn } from './dataStore';
 import { updateUser, checkValidToken, returnValidUser, returnValidChannel, returnValidDm, returnValidId, getIdfromToken } from './helper';
-
+import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
 
 /** NotificationsV1
@@ -22,6 +22,7 @@ export function notificationsV1(token: string) {
       notificationsArray.shift();
     }
   }
+  
   notificationsArray = notificationsArray.reverse();
   return { notifications: notificationsArray };
 }
@@ -35,8 +36,40 @@ export function notificationsV1(token: string) {
  * @param {number} dmId 
  */
 export function notifyTag(token: string, message: string, channelId: number, dmId:number ) {
+    const authUser = returnValidUser(token);
+    const {user} = userProfileV3(token, authUser.uId) as userReturn;
+    
 
+    
+    let handleArray = extractHandle(message);
+    
+    for (const handle of handleArray) {
+        let userFromHandle = getUserfromHandle(handle);
+        if (userFromHandle !== undefined) {
+            // Notify when tagged in a channel
+            if (dmId === -1) {
+                const channel = returnValidChannel(channelId);
+                const notificationMessage = `${user.handleStr} tagged you in ${channel.name}: ${message.slice(0,20)}`;
+                const newNotification = createNotification(channelId, -1, notificationMessage);
+                userFromHandle.notifications.push(newNotification);
+            } else if (channelId === -1) {
+                const dm = returnValidDm(dmId);
+                const notificationMessage = `${user.handleStr} tagged you in ${dm.name}: ${message.slice(0,20)}`;
+                const newNotification = createNotification(-1, dmId, notificationMessage);
+                userFromHandle.notifications.push(newNotification);
+            }
+            updateUser(userFromHandle.uId, userFromHandle);
+            // Notify when tagged in a dm
+        }
+    }
 }
+
+function getUserfromHandle(handleStr: string): User | undefined{
+    let data = getData();
+    let user = data.users.find((user: User) => user.handleStr === handleStr);
+    return user;
+}
+
 
 /**notifyUserInvite
  * Notify the user when they are added to a channel or dm
@@ -77,3 +110,22 @@ function createNotification(channelId: number, dmId: number, notificationMessage
   };
   return notification;
 }
+
+function extractHandle(message: string) : string[] {
+    let newArray: string[] = message.split(/[^a-zA-Z0-9@]/);
+    newArray = newArray.filter((string) => string.includes('@'));
+    let handleArray = [];
+    newArray.forEach((string) => {
+      if(string.includes('@')) {
+        let index = string.indexOf('@');
+        string = string.substring(index + 1);
+      }
+      let newString = string.split('@');
+      for (let s of newString) {
+        handleArray.push(s);
+      }
+    });
+    return handleArray;
+  }
+  
+  

@@ -77,7 +77,7 @@ beforeEach(() => {
         {
           channelId: channel.channelId,
           dmId: -1,
-          notificationMessage: `${handleStr} tagged you in ${channel.name}: ${expectedMsg}`
+          notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
         }
       ]
     });
@@ -102,6 +102,21 @@ describe('Testing notifications', () => {
         const tagMsg = '@haydensmith0, here';
         const expectedMsg = tagMsg;
         testTagChannel(user.token, tagMsg, expectedMsg,'send');
+      });
+      test('User is notified when tagged once in a dm', () => {
+        const tagMsg = '@haydensmith0, here';
+        const expectedMsg = tagMsg;
+        const {dmId} = createDm();
+        requestMessageSenddm(authUser.token, dmId, tagMsg);
+         expect(requestNotifications(user.token)).toStrictEqual({
+          notifications: [
+            {
+              channelId: -1,
+              dmId: dmId,
+              notificationMessage: `${handleStr} tagged you in ${dmName}: ${expectedMsg}`
+            }
+          ]
+        });
       });
       test('User is notified once when tagged twice in a channel', () => {
         const tagMsg = '@haydensmith0, here';
