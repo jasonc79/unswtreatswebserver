@@ -24,42 +24,7 @@ type channelsList = { channels: channelReturn[] };
  *    invald name length
  * @returns { channelId } when no error
  */
-// function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
-//   if (!checkValidToken(token)) {
-//     throw HTTPError(403, 'Token is invalid');
-//   }
-//   if (name.length < 1 || name.length > 20) {
-//     throw HTTPError(400, 'Length of name must be 1-20 inclusive');
-//   }
-//   const data = getData();
-//   const user = returnValidUser(token);
-//   const channelId = data.channels.length;
-//   const currTime = Math.floor((new Date()).getTime() / 1000);
-//   const newChannel : Channel = {
-//     channelId: channelId,
-//     name: name,
-//     messages: [],
-//     allMembers: [user],
-//     ownerMembers: [user],
-//     isPublic: isPublic,
-//   };
-//   const temp: channelsJoined = {
-//     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
-//     timeStamp: currTime,
-//   };
-//   const temp1: channelsExist = {
-//     numChannelsExist: data.totalChannelsExist += 1,
-//     timeStamp: currTime,
-//   };
 
-//   data.users[user.uId].channelsJoined.push(temp);
-//   data.channelsExist.push(temp1);
-//   data.channels.push(newChannel);
-
-//   setData(data);
-
-//   return { channelId: channelId };
-// }
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');

@@ -38,45 +38,6 @@ import HTTPError from 'http-errors';
  *    if the channelId is invalid
  * @returns { messageId: messageId } if a message is sent without any errors
  */
-// function messageSendV1(token: string, channelId: number, message: string) : MessageId | error {
-//   if (!checkValidToken(token)) {
-//     throw HTTPError(403, 'Token is invalid');
-//   }
-//   if (!checkValidChannel(channelId)) {
-//     throw HTTPError(400, 'Channel ID does not refer to a valid channel');
-//   }
-//   if (!isMember(token, channelId)) {
-//     throw HTTPError(403, 'The authorised user is not a member of the channel');
-//   }
-//   if (message.length < 1 || message.length > 1000) {
-//     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
-//   }
-//   const data = getData();
-//   const cuurentChannel = returnValidChannel(channelId);
-//   const newMessage = createMessage(token, message);
-//   const user = returnValidUser(token);
-//   const timeStamp = Math.floor((new Date()).getTime() / 1000);
-//   const temp: messagesExist = {
-//     numMessagesExist: data.totalMessagesExist += 1,
-//     timeStamp: timeStamp,
-//   };
-//   const temp1: messagesSent = {
-//     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
-//     timeStamp: timeStamp,
-//   };
-
-//   for (const channel of data.channels) {
-//     if (channel.channelId === cuurentChannel.channelId) {
-//       channel.messages.push(newMessage);
-//     }
-//   }
-
-//   data.messagesExist.push(temp);
-//   data.users[user.uId].messagesSent.push(temp1);
-//   setData(data);
-
-//   return { messageId: newMessage.messageId };
-// }
 
 function messageSendV1(token: string, channelId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
@@ -167,47 +128,6 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
   return { messageId: newMessage.messageId };
 }
 
-// function messageSenddmV1(token: string, dmId: number, message: string) : MessageId | error {
-//   if (!checkValidToken(token)) {
-//     throw HTTPError(403, 'Token is invalid');
-//   }
-//   if (!checkValidDm(dmId)) {
-//     throw HTTPError(400, 'Dm ID does not refer to a valid dm');
-//   }
-//   if (!isMemberDm(token, dmId)) {
-//     throw HTTPError(403, 'The authorised user is not a member of the dm');
-//   }
-//   if (message.length < 1 || message.length > 1000) {
-//     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
-//   }
-
-//   const data = getData();
-//   const cuurentDm = returnValidDm(dmId);
-//   const newMessage = createMessage(token, message);
-//   const user = returnValidUser(token);
-//   const timeStamp = Math.floor((new Date()).getTime() / 1000);
-//   const temp: messagesExist = {
-//     numMessagesExist: data.totalMessagesExist += 1,
-//     timeStamp: timeStamp,
-//   };
-//   const temp1: messagesSent = {
-//     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
-//     timeStamp: timeStamp,
-//   };
-
-//   for (const dm of data.dms) {
-//     if (dm.dmId === cuurentDm.dmId) {
-//       dm.messages.push(newMessage);
-//     }
-//   }
-
-//   data.messagesExist.push(temp);
-//   data.users[user.uId].messagesSent.push(temp1);
-
-//   setData(data);
-//   return { messageId: newMessage.messageId };
-// }
-
 /**
  * messageEditV1
  * If the user matches the person who sent the message and the message is valid,
@@ -282,91 +202,7 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
  *
  * @returns {} if message is removed with no errors
  */
-// function messageRemoveV1(token: string, messageId: number) : object | error {
-//   if (!checkValidToken(token)) {
-//     throw HTTPError(403, 'Token is invalid');
-//   }
-//   if (!checkValidDmMessage(messageId) && !checkValidChannelMessage(messageId)) {
-//     throw HTTPError(400, 'Message ID does not refer to a valid message');
-//   }
-//   let dm;
-//   let channel;
-//   if (checkValidDmMessage(messageId)) {
-//     dm = getDmfromMessage(messageId);
-//     if (!isMemberDm(token, dm.dmId)) {
-//       throw HTTPError(400, 'The authorised user is not a member of the dm');
-//     }
-//   } else {
-//     channel = getChannelfromMessage(messageId);
-//     if (!isMember(token, channel.channelId)) {
-//       throw HTTPError(400, 'The authorised user is not a member of the channel');
-//     }
-//   }
 
-//   const data = getData();
-//   const timeStamp = Math.floor((new Date()).getTime() / 1000);
-
-//   if (checkValidDmMessage(messageId)) {
-//     if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
-//       const currentDm = getDmfromMessage(messageId);
-//       const messageDetails = returnValidMessagefromDm(messageId);
-//       const messageList = [];
-
-//       for (const message of currentDm.messages) {
-//         if (message.messageId !== messageDetails.messageId) {
-//           messageList.push(message);
-//         }
-//       }
-
-//       for (const dm of data.dms) {
-//         if (dm.dmId === currentDm.dmId) {
-//           dm.messages = messageList;
-//         }
-//       }
-
-//       const temp: messagesExist = {
-//         numMessagesExist: data.totalMessagesExist += -1,
-//         timeStamp: timeStamp,
-//       };
-//       data.messagesExist.push(temp);
-
-//       setData(data);
-//       return {};
-//     } else {
-//       throw HTTPError(403, 'User is not an owner of the dm');
-//     }
-//   } else if (checkValidChannelMessage(messageId)) {
-//     if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
-//       const currentChannel = getChannelfromMessage(messageId);
-//       const messageDetails = returnValidMessagefromChannel(messageId);
-
-//       const messageList = [];
-
-//       for (const message of currentChannel.messages) {
-//         if (message.messageId !== messageDetails.messageId) {
-//           messageList.push(message);
-//         }
-//       }
-
-//       for (const channel of data.channels) {
-//         if (channel.channelId === currentChannel.channelId) {
-//           channel.messages = messageList;
-//         }
-//       }
-
-//       const temp: messagesExist = {
-//         numMessagesExist: data.totalMessagesExist += -1,
-//         timeStamp: timeStamp,
-//       };
-//       data.messagesExist.push(temp);
-
-//       setData(data);
-//       return {};
-//     } else {
-//       throw HTTPError(403, 'User is not an owner of the channel');
-//     }
-//   }
-// }
 function messageRemoveV1(token: string, messageId: number) : object | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -498,71 +334,6 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
   return { messageId: msgId };
 }
 
-// function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
-//   const data = getData();
-//   const cuurentChannel = returnValidChannel(channelId);
-//   const timeStamp = Math.floor((new Date()).getTime() / 1000);
-//   const user = returnValidUser(token);
-//   const newMessage = {
-//     messageId: msgId,
-//     uId: getIdfromToken(token),
-//     message: message,
-//     timeSent: timeStamp,
-//     isPinned: false,
-//   };
-//   const temp: messagesExist = {
-//     numMessagesExist: data.totalMessagesExist += 1,
-//     timeStamp: timeStamp,
-//   };
-//   const temp1: messagesSent = {
-//     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
-//     timeStamp: timeStamp,
-//   };
-
-//   for (const channel of data.channels) {
-//     if (channel.channelId === cuurentChannel.channelId) {
-//       channel.messages.push(newMessage);
-//     }
-//   }
-
-//   data.messagesExist.push(temp);
-//   data.users[user.uId].messagesSent.push(temp1);
-
-//   setData(data);
-// }
-
-// function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
-//   const data = getData();
-//   const cuurentDm = returnValidDm(dmId);
-//   const timeStamp = Math.floor((new Date()).getTime() / 1000);
-//   const user = returnValidUser(token);
-//   const temp: messagesExist = {
-//     numMessagesExist: data.totalMessagesExist += 1,
-//     timeStamp: timeStamp,
-//   };
-//   const temp1: messagesSent = {
-//     numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
-//     timeStamp: timeStamp,
-//   };
-//   const newMessage = {
-//     messageId: msgId,
-//     uId: getIdfromToken(token),
-//     message: message,
-//     timeSent: timeStamp,
-//     isPinned: false,
-//   };
-
-//   for (const dm of data.dms) {
-//     if (dm.dmId === cuurentDm.dmId) {
-//       dm.messages.push(newMessage);
-//     }
-//   }
-
-//   data.messagesExist.push(temp);
-//   data.users[user.uId].messagesSent.push(temp1);
-
-//   setData(data);
-// }
 function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
