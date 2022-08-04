@@ -1,4 +1,4 @@
-import { error, getData, setData, Message, Channel, Dm, MessageId } from './dataStore';
+import { error, getData, setData, Message, Channel, Dm, MessageId, React } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -7,10 +7,12 @@ import {
   checkValidDmMessage,
   checkChannelMessageSender,
   checkDmMessageSender,
+  checkAlreadyReacted,
   returnValidChannel,
   returnValidDm,
   returnValidMessagefromChannel,
   returnValidMessagefromDm,
+  returnValidUser,
   getIdfromToken,
   getChannelfromMessage,
   getDmfromMessage,
@@ -18,6 +20,8 @@ import {
   isOwner,
   isMemberDm,
   isOwnerDm,
+  checkReactId,
+  checkMessageSource,
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -280,6 +284,137 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
   return { messageId: msgId };
 }
 
+function messageReactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+
+  if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
+    throw HTTPError(400, 'Invalid messageId');
+  }
+
+  if (!checkReactId(reactId)) {
+    throw HTTPError(400, 'Invalid reactId');
+  }
+
+  const checkReacts = checkAlreadyReacted(token, messageId, reactId);
+  console.log(checkReacts);
+  if (checkReacts === 2) {
+    throw HTTPError(400, 'Message already contains react from authorised user');
+  }
+
+  const user = returnValidUser(token);
+  const data = getData();
+
+  // Finding current message
+  let currMessage: Message;
+  if (checkMessageSource(messageId) === 0) {
+    for (const dm of data.dms) {
+      for (const message of dm.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  } else if (checkMessageSource(messageId) === 1) {
+    for (const channel of data.channels) {
+      for (const message of channel.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  }
+
+  // Another user has already reacted with same reactId
+  if (checkReacts === 1) {
+    for (const react of currMessage.reacts) {
+      if (reactId === react.reactId) {
+        react.uIds.push(user.uId);
+      }
+    }
+  } else {
+    const newReact : React = {
+      reactId: reactId,
+      uIds: [user.uId],
+      isThisUserReacted: true,
+    };
+    // First react
+    if (!('reacts' in currMessage)) {
+      currMessage.reacts = [newReact];
+    // First react of that reactId
+    } else {
+      currMessage.reacts.push(newReact);
+    }
+  }
+  console.log(currMessage.reacts);
+  setData(data);
+  return {};
+}
+
+function messageUnreactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+
+  if (!checkValidChannelMessage(messageId) && !checkValidDmMessage(messageId)) {
+    throw HTTPError(400, 'Invalid messageId');
+  }
+
+  if (!checkReactId(reactId)) {
+    throw HTTPError(400, 'Invalid reactId');
+  }
+
+  if (!checkAlreadyReacted(token, messageId, reactId)) {
+    throw HTTPError(400, 'Message does not contain react from authorised user');
+  }
+
+  const user = returnValidUser(token);
+  const data = getData();
+
+  // Finding current message
+  let currMessage: Message;
+  if (checkMessageSource(messageId) === 0) {
+    for (const dm of data.dms) {
+      for (const message of dm.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  } else if (checkMessageSource(messageId) === 1) {
+    for (const channel of data.channels) {
+      for (const message of channel.messages) {
+        if (message.messageId === messageId) {
+          currMessage = message;
+        }
+      }
+    }
+  }
+
+  if (currMessage.reacts.length > 1) {
+    for (const react of currMessage.reacts) {
+      if (reactId === react.reactId) {
+        // Usual unreact
+        if (react.uIds.length > 1) {
+          react.uIds = react.uIds.filter((item) => {
+            return item !== user.uId;
+          });
+          react.isThisUserReacted = false;
+        // Last unreact of that reactId
+        } else {
+          currMessage.reacts = currMessage.reacts.filter((item) => {
+            return item.reactId !== react.reactId;
+          });
+        }
+      }
+    }
+  }
+
+  return {};
+}
+
+// helper function
 function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
@@ -399,4 +534,5 @@ function concatMessageString(ogMessage: string, optionalMessage: string): string
   return newMessage;
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1 };
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messageReactV1, messageUnreactV1 };
+

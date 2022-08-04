@@ -15,6 +15,17 @@ export type authUserReturn = {
   token: string,
   authUserId: number
 }
+
+export type createDmReturn = {
+  dmId: number,
+  name: string,
+}
+
+export type createChannelReturn = {
+  channelId: number,
+  name: string
+}
+
 type headers = {
   token?: string
 }
@@ -207,6 +218,14 @@ export function requestMessageSendlaterdm(token: string, dmId: number, message: 
 
 export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
   return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
+}
+
+export function requestMessageReact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/react/v1', { token: token }, { messageId, reactId }, err);
+}
+
+export function requestMessageUnreact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/unreact/v1', { token: token }, { messageId, reactId }, err);
 }
 
 //= ===========================================================================//
