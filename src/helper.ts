@@ -152,15 +152,18 @@ export function returnValidMessage(messageId: number): Message {
   return message; 
 }
 
-export function checkAlreadyReacted(messageId: number, reactId: number): number {
+export function checkAlreadyReacted(token: string, messageId: number, reactId: number): number {
   const message = returnValidMessage(messageId); 
+  const user =  returnValidUser(token); 
   if ("reacts" in message) {
     for (const react of message.reacts) {
       if (react.reactId === reactId) {
-        if (react.isThisUserReacted === true) {
+        if (react.uIds.includes(user.uId)) {
+          react.isThisUserReacted = true;
           return 2; 
         }
-        return 1; 
+        return 1;
+        react.isThisUserReacted = false; 
       }
     }
   }

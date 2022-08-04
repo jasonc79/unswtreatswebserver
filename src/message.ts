@@ -266,7 +266,7 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
     throw HTTPError(400, 'Invalid reactId'); 
   }
 
-  const checkReacts = checkAlreadyReacted(messageId, reactId); 
+  const checkReacts = checkAlreadyReacted(token, messageId, reactId); 
   console.log(checkReacts);
   if (checkReacts === 2) {
     throw HTTPError(400, 'Message already contains react from authorised user'); 
@@ -300,7 +300,6 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
     for (const react of currMessage.reacts) {
       if (reactId === react.reactId) {
         react.uIds.push(user.uId);
-        react.isThisUserReacted = true;
       }
     }
   } else {
@@ -317,6 +316,7 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
       currMessage.reacts.push(newReact);
     }
   }
+  console.log(currMessage.reacts);
   setData(data);
   return {};
 }
@@ -334,7 +334,7 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
     throw HTTPError(400, 'Invalid reactId'); 
   }
 
-  if (!checkAlreadyReacted(messageId, reactId)) {
+  if (!checkAlreadyReacted(token, messageId, reactId)) {
     throw HTTPError(400, 'Message does not contain react from authorised user'); 
   }
 
@@ -374,7 +374,7 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
         } else {
           currMessage.reacts = currMessage.reacts.filter((item) => {
             return item.reactId !== react.reactId; 
-          })
+          });
         }
       }
     }
