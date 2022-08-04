@@ -12,19 +12,7 @@ const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
 const tooShortQueryStr = '';
-const tooLongQueryStr = `qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
-qqqqqqqqqq`;
+const tooLongQueryStr = 'a'.repeat(1001);
 
 // ===========================================================================//
 // HELPER FUNCTIONS
@@ -1094,7 +1082,7 @@ describe('Testing searchV1', () => {
       })
     );
   });
-  test('Success case 2', () => {
+  test('Success case with both channelMessage and dmMessage', () => {
     const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
     const channel = requestChannelCreate(user.token, 'name', true);
     const dm = requestDmCreate(authUser.token, [user.authUserId]);
@@ -1114,6 +1102,24 @@ describe('Testing searchV1', () => {
             messageId: dmMessage.messageId,
             uId: user.authUserId,
             message: 'message1',
+            timeSent: expect.any(Number)
+          },
+        ],
+      })
+    );
+  });
+  test('Test case-sensitivity', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    const message = requestMessageSend(user.token, channel.channelId, 'MEssaGe');
+    const messageList = requestSearch(user.token, 'meSs', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: message.messageId,
+            uId: user.authUserId,
+            message: 'MEssaGe',
             timeSent: expect.any(Number)
           },
         ],

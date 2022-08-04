@@ -374,6 +374,7 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
  */
 
 function searchV1(token: string, queryStr: string) {
+  queryStr = queryStr.toLowerCase();
   const queryStrLength = queryStr.length;
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -389,14 +390,14 @@ function searchV1(token: string, queryStr: string) {
   const dmList = returnDmListFromUId(uId);
   for (const channel of channelList) {
     for (const message of channel.messages) {
-      if (message.message.includes(queryStr)) {
+      if (message.message.toLowerCase().includes(queryStr)) {
         messages.push(message);
       }
     }
   }
   for (const dm of dmList) {
     for (const message of dm.messages) {
-      if (message.message.includes(queryStr)) {
+      if (message.message.toLowerCase().includes(queryStr)) {
         messages.push(message);
       }
     }

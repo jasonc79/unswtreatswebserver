@@ -252,16 +252,14 @@ export function removeUser(uId: number) {
   }
   // Remove user from all dm
   for (const dm of data.dms) {
-    const memberList = [];
+    let memberList = [];
     for (const members of dm.members) {
       if (members.uId !== uId) {
         memberList.push(members);
       }
     }
     dm.members = memberList;
-  }
-  for (const dm of data.dms) {
-    const memberList = [];
+    memberList = [];
     for (const members of dm.owners) {
       if (members.uId !== uId) {
         memberList.push(members);

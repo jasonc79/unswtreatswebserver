@@ -1,6 +1,6 @@
 import { authUserReturn, requestAuthRegister, requestClear, requestChannelCreate, requestDmCreate, requestMessageSend, requestChannelJoin } from './helperTests';
 import { removeFile } from './helperTests';
-import { requestUserPermissionChange, requestAdminRemove, requestMessageSenddm } from './helperTests';
+import { requestUserPermissionChange, requestAdminRemove, requestMessageSenddm, requestChannelMessages, requestUserProfile, requestDmMessages } from './helperTests';
 
 let authUser: authUserReturn;
 const email = 'hayden@gmail.com';
@@ -23,28 +23,16 @@ describe('Testing admin remove', () => {
   describe('Error Cases', () => {
     test('Invalid Token', () => {
       const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
-      const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
-      requestChannelJoin(user.token, channel1.channelId);
-      requestMessageSend(authUser.token, channel1.channelId, 'message');
       requestAdminRemove('Invalid Token', user.uId, 403);
     });
     test('uId does not refer to a valid user', () => {
-      const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
-      const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
-      requestChannelJoin(user.token, channel1.channelId);
-      requestMessageSend(authUser.token, channel1.channelId, 'message');
       requestAdminRemove(authUser.token, -1, 400);
     });
     test('uId refers to user who is the only global owner', () => {
-      const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
-      requestMessageSend(authUser.token, channel1.channelId, 'message');
       requestAdminRemove(authUser.token, authUser.authUserId, 400);
     });
     test('User is not a global owner', () => {
       const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
-      const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
-      requestChannelJoin(user.token, channel1.channelId);
-      requestMessageSend(authUser.token, channel1.channelId, 'message');
       requestAdminRemove(user.token, authUser.authUserId, 403);
     });
   });
@@ -53,23 +41,119 @@ describe('Testing admin remove', () => {
       const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
       const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
       requestChannelJoin(user.token, channel1.channelId);
-      requestMessageSend(user.token, channel1.channelId, 'message');
+      const message = requestMessageSend(user.token, channel1.channelId, 'message');
       requestAdminRemove(authUser.token, user.authUserId, 200);
+      const channelMessages = requestChannelMessages(authUser.token, channel1.channelId, 0);
+      expect(channelMessages).toStrictEqual(
+        expect.objectContaining({
+          messages: [
+            {
+              messageId: message.messageId,
+              uId: user.authUserId,
+              message: 'Removed User',
+              timeSent: expect.any(Number)
+
+            },
+          ],
+          start: 0,
+          end: -1
+        })
+      );
+      const userProfile = requestUserProfile(authUser.token, user.authUserId);
+      expect(userProfile).toStrictEqual(
+        expect.objectContaining({
+          user: {
+            uId: user.authUserId,
+            email: '',
+            nameFirst: 'Removed',
+            nameLast: 'user',
+            handleStr: ''
+          }
+        })
+      );
     });
-    test('Removing multiple users', () => {
-      const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
-      const user2 = requestAuthRegister('email3@email.com', 'password3', 'nameFirst3', 'nameLast3');
-      const dm = requestDmCreate(authUser.token, [user2.authUserId, user.authUserId]);
-      const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
-      requestChannelJoin(user.token, channel1.channelId);
-      requestChannelJoin(user2.token, channel1.channelId);
-      requestMessageSend(user.token, channel1.channelId, 'message');
-      requestMessageSend(user2.token, channel1.channelId, 'message1');
-      requestMessageSenddm(user.token, dm.dmId, 'message2');
-      requestMessageSenddm(user2.token, dm.dmId, 'message3');
-      requestAdminRemove(authUser.token, user.authUserId, 200);
-      requestAdminRemove(authUser.token, user2.authUserId, 200);
-    });
+  });
+  test('Removing multiple users', () => {
+    const user = requestAuthRegister('email2@email.com', 'password2', 'nameFirst2', 'nameLast2');
+    const user2 = requestAuthRegister('email3@email.com', 'password3', 'nameFirst3', 'nameLast3');
+    const dm = requestDmCreate(authUser.token, [user2.authUserId, user.authUserId]);
+    const channel1 = requestChannelCreate(authUser.token, 'channel1', true);
+    requestChannelJoin(user.token, channel1.channelId);
+    requestChannelJoin(user2.token, channel1.channelId);
+    const message1 = requestMessageSend(user.token, channel1.channelId, 'message');
+    const message2 = requestMessageSend(user2.token, channel1.channelId, 'message1');
+    const dmMessage1 = requestMessageSenddm(user.token, dm.dmId, 'message2');
+    const dmMessage2 = requestMessageSenddm(user2.token, dm.dmId, 'message3');
+    requestAdminRemove(authUser.token, user.authUserId, 200);
+    requestAdminRemove(authUser.token, user2.authUserId, 200);
+    const channelMessages = requestChannelMessages(authUser.token, channel1.channelId, 0);
+    expect(channelMessages).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: message2.messageId,
+            uId: user2.authUserId,
+            message: 'Removed User',
+            timeSent: expect.any(Number)
+
+          },
+          {
+            messageId: message1.messageId,
+            uId: user.authUserId,
+            message: 'Removed User',
+            timeSent: expect.any(Number)
+          }
+        ],
+        start: 0,
+        end: -1
+      })
+    );
+    const dmMessages = requestDmMessages(authUser.token, channel1.channelId, 0);
+    expect(dmMessages).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: dmMessage2.messageId,
+            uId: user2.authUserId,
+            message: 'Removed User',
+            timeSent: expect.any(Number)
+
+          },
+          {
+            messageId: dmMessage1.messageId,
+            uId: user.authUserId,
+            message: 'Removed User',
+            timeSent: expect.any(Number)
+          }
+        ],
+        start: 0,
+        end: -1
+      })
+    );
+    const userProfile = requestUserProfile(authUser.token, user.authUserId);
+    expect(userProfile).toStrictEqual(
+      expect.objectContaining({
+        user: {
+          uId: user.authUserId,
+          email: '',
+          nameFirst: 'Removed',
+          nameLast: 'user',
+          handleStr: ''
+        }
+      })
+    );
+    const userProfile2 = requestUserProfile(authUser.token, user2.authUserId);
+    expect(userProfile2).toStrictEqual(
+      expect.objectContaining({
+        user: {
+          uId: user2.authUserId,
+          email: '',
+          nameFirst: 'Removed',
+          nameLast: 'user',
+          handleStr: ''
+        }
+      })
+    );
   });
 });
 
