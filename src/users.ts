@@ -183,11 +183,6 @@ function usersStatsV1(token: string) : (returnWorkspaceStats) {
     }
   }
   let utilizationRate = top / bottom;
-  if (bottom === 0) {
-    utilizationRate = 0;
-  } else if (utilizationRate > 1) {
-    utilizationRate = 1;
-  }
   const temp = {
     channelsExist: data.channelsExist,
     dmsExist: data.dmsExist,
@@ -227,6 +222,11 @@ function userStatsV1(token: string) : (returnUserStats) {
   const top = data.users[uId].totalChannelsJoined + data.users[uId].totalDmsJoined + data.users[uId].totalMessagesSent;
   const bottom = data.totalMessagesExist + data.totalDmsExist + data.totalChannelsExist;
   let involvementRate = top / bottom;
+  if (bottom === 0) {
+    involvementRate = 0;
+  } else if (involvementRate > 1) {
+    involvementRate = 1;
+  }
   if (isNaN(involvementRate)) involvementRate = 0;
   const temp = {
     channelsJoined: data.users[uId].channelsJoined,

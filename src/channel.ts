@@ -279,7 +279,6 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   };
   data.users[user.uId].channelsJoined.push(temp);
   setData(data);
-
   return {};
 }
 
