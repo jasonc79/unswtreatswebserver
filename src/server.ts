@@ -291,7 +291,7 @@ app.delete('/message/remove/v2', (req, res, next) => {
   }
 });
 
-app.put('/message/pin/v1', (req, res, next) => {
+app.post('/message/pin/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
     const { messageId } = req.body;
@@ -311,7 +311,7 @@ app.post('/message/sendlater/v1', (req, res, next) => {
   }
 });
 
-app.put('/message/unpin/v1', (req, res, next) => {
+app.post('/message/unpin/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
     const { messageId } = req.body;
