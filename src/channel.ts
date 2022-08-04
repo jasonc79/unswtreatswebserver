@@ -1,4 +1,4 @@
-import { error, UserInfo, Message, userReturn, OWNER, empty, getData, setData } from './dataStore';
+import { error, UserInfo, Message, userReturn, OWNER, empty, getData, setData, channelsJoined } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { updateChannel } from './helper';
 import { userProfileV3 } from './users';
@@ -109,7 +109,7 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
   };
   data.users[user.uId].channelsJoined.push(temp);
   setData(data);
-  
+
   return {};
 }
 /**
@@ -161,7 +161,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
   }
   channel.allMembers.push(user);
   updateChannel(channelId, channel);
-  
+
   const data = getData();
   const currTime = Math.floor((new Date()).getTime() / 1000);
   const temp: channelsJoined = {
@@ -170,7 +170,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
   };
   data.users[user.uId].channelsJoined.push(temp);
   setData(data);
-  
+
   return {};
 }
 

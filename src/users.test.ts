@@ -1,4 +1,4 @@
-import { requestChannelCreate, requestChannelJoin, requestUserSetName, requestMessageSend, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile, requestUserStats, requestUsersStats } from './helperTests';
+import { requestMessageSenddm, requestChannelCreate, requestDmRemove, requestChannelJoin, requestUserSetName, requestMessageSend, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile, requestUserStats, requestUsersStats, requestDmCreate } from './helperTests';
 import { authUserReturn, requestAuthRegister, requestClear } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -193,7 +193,7 @@ describe('Testing usersStats', () => {
     requestChannelJoin(authUser2.token, channel.channelId);
     requestChannelJoin(authUser3.token, channel.channelId);
     const stats = requestUsersStats(authUser.token);
-    expect(stats.utilizationRate).toStrictEqual('1');
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
   });
   test('Pass situation equal 1/2', () => {
     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
@@ -201,7 +201,7 @@ describe('Testing usersStats', () => {
     const channel = requestChannelCreate(authUser.token, 'name', true);
     requestChannelJoin(authUser2.token, channel.channelId);
     const stats = requestUsersStats(authUser.token);
-    expect(stats.utilizationRate).toStrictEqual('1/2');
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
   });
 });
 
@@ -220,18 +220,69 @@ describe('Testing userStats', () => {
     requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
     requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
     const stats = requestUserStats(authUser.token, 200);
-    expect(stats.involvementRate).toStrictEqual(1);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
   });
-//   test('more than 0 less than 1', () => {
-//     const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
-//     requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
-//     const channel = requestChannelCreate(authUser.token, 'name', true, 200);
-//     requestChannelCreate(authUser.token, 'name1', true, 200);
-//     requestChannelCreate(authUser2.token, 'name2', true, 200);
-//     requestChannelCreate(authUser2.token, 'name3', true, 200);
-//     requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
-//     requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
-//     const stats = requestUserStats(authUser.token, 200);
-//     expect(stats.involvementRate).any(Number);
-//   });
+  test('more than 0 less than 1', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+    
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
+  });
+  test('more than 0 less than 1', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+    
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    const stats = requestUserStats(authUser2.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
+  });
+  test('more than 0 less than 1', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+    
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    const stats = requestUsersStats(authUser.token, 200);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
+  });
 });

@@ -1,4 +1,4 @@
-import { error, getData, setData, Message, Channel, Dm, MessageId, messagesExist } from './dataStore';
+import { error, getData, setData, Message, Channel, Dm, MessageId, messagesExist, messagesSent } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -19,6 +19,7 @@ import {
   isMemberDm,
   isOwnerDm,
   isGlobalOwner,
+  returnValidUser,
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -60,12 +61,21 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
     }
   }
 
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   ///
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
-    timeStamp: Math.floor((new Date()).getTime() / 1000),
+    timeStamp: timeStamp,
   };
   data.messagesExist.push(temp);
+
+  ///
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.users[user.uId].messagesSent.push(temp1);
   ///
 
   setData(data);
@@ -97,13 +107,21 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
     }
   }
 
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   ///
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
-    timeStamp: Math.floor((new Date()).getTime() / 1000),
+    timeStamp: timeStamp,
   };
   data.messagesExist.push(temp);
+
   ///
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.users[user.uId].messagesSent.push(temp1);
 
   setData(data);
   return { messageId: newMessage.messageId };
@@ -205,6 +223,7 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 
   const data = getData();
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
 
   if (checkValidDmMessage(messageId)) {
     if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
@@ -223,6 +242,13 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           dm.messages = messageList;
         }
       }
+      ///
+      const temp: messagesExist = {
+        numMessagesExist: data.totalMessagesExist += -1,
+        timeStamp: timeStamp,
+      };
+      data.messagesExist.push(temp);
+
       setData(data);
       return {};
     } else {
@@ -246,6 +272,13 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           channel.messages = messageList;
         }
       }
+      ///
+      const temp: messagesExist = {
+        numMessagesExist: data.totalMessagesExist += -1,
+        timeStamp: timeStamp,
+      };
+      data.messagesExist.push(temp);
+
       setData(data);
       return {};
     } else {
@@ -314,6 +347,14 @@ function sendChannelMessage(token: string, channelId: number, message: string, m
       channel.messages.push(newMessage);
     }
   }
+  ///
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+
   setData(data);
 }
 
@@ -333,6 +374,14 @@ function sendDmMessage(token: string, dmId: number, message: string, msgId: numb
       dm.messages.push(newMessage);
     }
   }
+
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+
   setData(data);
 }
 
@@ -372,6 +421,16 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
     }
     newMessageId = (messageSenddmV1(token, dmId, concatMessage) as MessageId).messageId;
   }
+
+  const data = getData();
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+  setData(data);
+
   return { sharedMessageId: newMessageId };
 }
 

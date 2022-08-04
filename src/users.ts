@@ -170,6 +170,8 @@ function usersStatsV1(token: string) : (returnWorkspaceStats) {
       top++;
     }
   }
+  console.log(top);
+  console.log(bottom);
   const utilizationRate = top / bottom;
   const temp = {
     channelsExist: data.channelsExist,

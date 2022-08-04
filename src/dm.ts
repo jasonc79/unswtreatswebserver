@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId } from './dataStore';
+import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId, messagesExist, dmsExist, dmsJoined } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
@@ -58,6 +58,23 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
     messages: [],
   };
   data.dms.push(newDm);
+
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+  console.log(DmMembers);
+  for (const member of newDm.members) {
+    const temp: dmsJoined = {
+      numDmsJoined: data.users[member.uId].totalDmsJoined += 1,
+      timeStamp: currTime,
+    };
+    data.users[member.uId].dmsJoined.push(temp);
+  }
+
+  const temp1: dmsExist = {
+    numDmsExist: data.totalDmsExist += 1,
+    timeStamp: currTime,
+  };
+  data.dmsExist.push(temp1);
+
   setData(data);
   return { dmId: dmId };
 };
@@ -170,6 +187,31 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
 
   const data = getData();
   const dmDetails = returnValidDm(dmId);
+
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+
+  for (const member of dmDetails.members) {
+    // if (member.uId === )???
+    const temp: dmsJoined = {
+      numDmsJoined: data.users[member.uId].totalDmsJoined += -1,
+      timeStamp: currTime,
+    };
+    data.users[member.uId].dmsJoined.push(temp);
+  }
+
+  const temp1: dmsExist = {
+    numDmsExist: data.totalDmsExist += -1,
+    timeStamp: currTime,
+  };
+  data.dmsExist.push(temp1);
+
+  const dmMessages = (dmDetails.messages.length) * (-1);
+  const temp2: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += dmMessages,
+    timeStamp: currTime,
+  };
+  data.messagesExist.push(temp2);
+
   data.dms = data.dms.filter((item) => {
     return item !== dmDetails;
   });
@@ -227,11 +269,11 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   }
 
   const currTime = Math.floor((new Date()).getTime() / 1000);
-  const temp: channelsJoined = {
-    numChannelsJoined: data.users[user.uId].totalDmsJoined += -1,
+  const temp: dmsJoined = {
+    numDmsJoined: data.users[user.user.uId].totalDmsJoined += -1,
     timeStamp: currTime,
   };
-  data.users[user.uId].channelsJoined.push(temp);
+  data.users[user.user.uId].dmsJoined.push(temp);
 
   setData(data);
   return {};

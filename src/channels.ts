@@ -44,8 +44,7 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     ownerMembers: [user],
     isPublic: isPublic,
   };
-  // addMetric('channelsExist', 1);
-  // addMetric('channelsJoined', 1, user.uId);
+
   const temp: channelsJoined = {
     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
     timeStamp: currTime,
@@ -57,7 +56,8 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     timeStamp: currTime,
   };
   data.channelsExist.push(temp1);
-  
+
+  data.channels.push(newChannel);
   setData(data);
 
   return { channelId: channelId };
