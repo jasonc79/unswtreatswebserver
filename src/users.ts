@@ -1,4 +1,4 @@
-import { error, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist, } from './dataStore';
+import { error, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser, getIdfromToken } from './helper';
 import { checkValidEmail } from './auth';
 import HTTPError from 'http-errors';

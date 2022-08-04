@@ -123,7 +123,6 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
   return { messageId: newMessage.messageId };
 }
 
-
 function messageSenddmV1(token: string, dmId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');

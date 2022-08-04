@@ -358,7 +358,6 @@ function channelMessagesV3(token: string, channelId: number, start: number): (me
 //   return {};
 // }
 
-
 function channelLeaveV2(token: string, channelId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -369,7 +368,7 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   }
   const user = returnValidUser(token);
   if (isActive(channelId)) {
-    const standUp = returnActiveStandup(channelId)
+    const standUp = returnActiveStandup(channelId);
     if (standUp.uId === user.uId) {
       throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
     }
@@ -390,7 +389,6 @@ function channelLeaveV2(token: string, channelId: number): (object) {
 
   return {};
 }
-
 
 /**
  * channelAddOwnerV1
