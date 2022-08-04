@@ -11,6 +11,8 @@ import {
   returnValidDm,
   returnValidMessagefromChannel,
   returnValidMessagefromDm,
+  returnChannelListFromUId,
+  returnDmListFromUId,
   getIdfromToken,
   getChannelfromMessage,
   getDmfromMessage,
@@ -276,6 +278,37 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
   return { sharedMessageId: newMessageId };
 }
 
+function searchV1(token: string, queryStr: string) {
+  const queryStrLength = queryStr.length;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  const messageList = [];
+  if (queryStrLength < 1) {
+    throw HTTPError(400, 'Length of queryStr is less than 1 character long');
+  } if (queryStrLength > 1000) {
+    throw HTTPError(400, 'Length of queryStr is more than 1000 characters long');
+  }
+  const uId = getIdfromToken(token);
+  const channelList = returnChannelListFromUId(uId);
+  const dmList = returnDmListFromUId(uId);
+  for (const channel of channelList) {
+    for (const message of channel.messages) {
+      if (message.message.includes(queryStr)) {
+        messageList.push(message);
+      }
+    }
+  }
+  for (const dm of dmList) {
+    for (const message of dm.messages) {
+      if (message.message.includes(queryStr)) {
+        messageList.push(message);
+      }
+    }
+  }
+  return messageList;
+}
+
 // helper function
 const genEditMessage = (dataProp: Channel[] | Dm[]) => {
   return (id: number, message: string) : Channel[] | Dm[] => {
@@ -321,4 +354,4 @@ function concatMessageString(ogMessage: string, optionalMessage: string): string
   return newMessage;
 }
 
-export { messageSendV1, messageSenddmV1, messageShareV1, messageEditV1, messageRemoveV1 };
+export { messageSendV1, messageSenddmV1, messageShareV1, messageEditV1, messageRemoveV1, searchV1 };

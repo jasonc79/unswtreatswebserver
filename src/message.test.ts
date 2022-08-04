@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageShare } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageShare, requestSearch } from './helperTests';
 import { removeFile } from './helperTests';
 
 let authUser: authUserReturn;
@@ -8,6 +8,20 @@ const email = 'hayden@gmail.com';
 const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
+const tooShortQueryStr = '';
+const tooLongQueryStr = `qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
+qqqqqqqqqq`;
 
 // ===========================================================================//
 // HELPER FUNCTIONS
@@ -861,5 +875,31 @@ describe('Testing messageShare', () => {
         })
       );
     });
+  });
+});
+describe('Testing searchV1', () => {
+  test('Invalid Token', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch('invalidToken', 'mess', 403);
+  });
+  test('QueryStr too short', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch(user.token, tooShortQueryStr, 400);
+  });
+  test('QueryStr too long', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch(user.token, tooLongQueryStr, 400);
+  });
+  test('Success case', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch(user.token, 'mess', 200);
   });
 });
