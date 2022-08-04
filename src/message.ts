@@ -335,11 +335,12 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
 function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   const newMessage = {
     messageId: msgId,
     uId: getIdfromToken(token),
     message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
+    timeSent: timeStamp,
     isPinned: false,
   };
   for (const channel of data.channels) {
@@ -347,13 +348,21 @@ function sendChannelMessage(token: string, channelId: number, message: string, m
       channel.messages.push(newMessage);
     }
   }
+
   ///
-  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
+
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
   data.messagesExist.push(temp);
+
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.users[user.uId].messagesSent.push(temp1);
 
   setData(data);
 }
@@ -361,11 +370,12 @@ function sendChannelMessage(token: string, channelId: number, message: string, m
 function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   const newMessage = {
     messageId: msgId,
     uId: getIdfromToken(token),
     message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
+    timeSent: timeStamp,
     isPinned: false,
   };
 
@@ -375,12 +385,20 @@ function sendDmMessage(token: string, dmId: number, message: string, msgId: numb
     }
   }
 
-  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  ///
+  const user = returnValidUser(token);
+
   const temp: messagesExist = {
     numMessagesExist: data.totalMessagesExist += 1,
     timeStamp: timeStamp,
   };
   data.messagesExist.push(temp);
+
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.users[user.uId].messagesSent.push(temp1);
 
   setData(data);
 }
@@ -421,15 +439,6 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
     }
     newMessageId = (messageSenddmV1(token, dmId, concatMessage) as MessageId).messageId;
   }
-
-  const data = getData();
-  const timeStamp = Math.floor((new Date()).getTime() / 1000);
-  const temp: messagesExist = {
-    numMessagesExist: data.totalMessagesExist += 1,
-    timeStamp: timeStamp,
-  };
-  data.messagesExist.push(temp);
-  setData(data);
 
   return { sharedMessageId: newMessageId };
 }

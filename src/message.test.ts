@@ -9,13 +9,13 @@ const email = 'hayden@gmail.com';
 const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
-const handleStr = 'firstnamelastname';
+// const handleStr = 'firstnamelastname';
 
 const email2 = 'email2@gmail.com';
 const password2 = 'password2';
 const nameFirst2 = 'firstname2';
 const nameLast2 = 'lastname2';
-const handleStr2 = 'firstname2lastname2';
+// const handleStr2 = 'firstname2lastname2';
 
 // ===========================================================================//
 // HELPER FUNCTIONS
