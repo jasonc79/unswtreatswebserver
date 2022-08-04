@@ -356,12 +356,29 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
   return { sharedMessageId: newMessageId };
 }
 
+/**
+ * searchV1
+ * Given a query string, return a collection of messages in all of the
+ * channels/DMs that the user has joined that contain the query
+ * (case-insensitive). There is no expected order for these messages.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} queryStr is the queryStr that is used to search through each message
+ *
+ * Returns Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if length of queryStr is less than 1 or over 1000 characters
+ * @returns { messages } if pass with no errors
+ */
+
 function searchV1(token: string, queryStr: string) {
   const queryStrLength = queryStr.length;
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
-  const messageList = [];
+  const messages = [];
   if (queryStrLength < 1) {
     throw HTTPError(400, 'Length of queryStr is less than 1 character long');
   } if (queryStrLength > 1000) {
@@ -373,18 +390,18 @@ function searchV1(token: string, queryStr: string) {
   for (const channel of channelList) {
     for (const message of channel.messages) {
       if (message.message.includes(queryStr)) {
-        messageList.push(message);
+        messages.push(message);
       }
     }
   }
   for (const dm of dmList) {
     for (const message of dm.messages) {
       if (message.message.includes(queryStr)) {
-        messageList.push(message);
+        messages.push(message);
       }
     }
   }
-  return messageList;
+  return { messages };
 }
 
 // helper function

@@ -13,7 +13,7 @@ import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, message
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
-import { adminPermissionChangeV1 } from './admin';
+import { adminPermissionChangeV1, adminRemoveV1 } from './admin';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -407,10 +407,9 @@ app.post('/standup/send/v1', (req, res, next) => {
   }
 });
 
-/*
 // ================================================================ //
 // Admin functions
-/*
+
 app.delete('/admin/user/remove/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
@@ -419,7 +418,7 @@ app.delete('/admin/user/remove/v1', (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}); */
+});
 
 app.post('/admin/userpermission/change/v1', (req, res, next) => {
   try {

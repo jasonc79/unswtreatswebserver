@@ -208,10 +208,10 @@ export function requestSearch(token: string, queryStr: string, err?: number) {
 }
 
 // Admin functions
-/*
+
 export function requestAdminRemove(token: string, uId: number, err?: number) {
-  return requestHelper('DELETE', '/admin/user/remove/v1', {token: token}, { uId }, err);
-} */
+  return requestHelper('DELETE', '/admin/user/remove/v1', { token: token }, { uId }, err);
+}
 export function requestUserPermissionChange(token: string, uId: number, permissionId: number, err?: number) {
   return requestHelper('POST', '/admin/userpermission/change/v1', { token: token }, { uId, permissionId }, err);
 }

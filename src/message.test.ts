@@ -1076,10 +1076,48 @@ describe('Testing searchV1', () => {
     requestMessageSend(user.token, channel.channelId, 'message');
     requestSearch(user.token, tooLongQueryStr, 400);
   });
-  test('Success case', () => {
+  test('Success case 1', () => {
     const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
     const channel = requestChannelCreate(user.token, 'name', true);
-    requestMessageSend(user.token, channel.channelId, 'message');
-    requestSearch(user.token, 'mess', 200);
+    const message = requestMessageSend(user.token, channel.channelId, 'message');
+    const messageList = requestSearch(user.token, 'mess', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: message.messageId,
+            uId: user.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number)
+          },
+        ],
+      })
+    );
+  });
+  test('Success case 2', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    const dm = requestDmCreate(authUser.token, [user.authUserId]);
+    const channelMessage = requestMessageSend(user.token, channel.channelId, 'message');
+    const dmMessage = requestMessageSenddm(user.token, dm.dmId, 'message1');
+    const messageList = requestSearch(user.token, 'mess', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: channelMessage.messageId,
+            uId: user.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number)
+          },
+          {
+            messageId: dmMessage.messageId,
+            uId: user.authUserId,
+            message: 'message1',
+            timeSent: expect.any(Number)
+          },
+        ],
+      })
+    );
   });
 });
