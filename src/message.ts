@@ -514,7 +514,7 @@ function messageUnpinV1(token: string, messageId: number): (object) {
     message = channel.messages.find(message => message.messageId === messageId);
     if (message !== undefined) {
       if (!isOwner(token, channel.channelId) && !isGlobalOwner(token)) {
-        throw HTTPError(400, 'messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel');
+        throw HTTPError(403, 'messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel');
       }
     }
   }
@@ -522,7 +522,7 @@ function messageUnpinV1(token: string, messageId: number): (object) {
     message = dm.messages.find(message => message.messageId === messageId);
     if (message !== undefined) {
       if (!isOwnerDm(token, dm.dmId) && !isGlobalOwner(token)) {
-        throw HTTPError(400, 'messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM');
+        throw HTTPError(403, 'messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM');
       }
     }
   }

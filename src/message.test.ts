@@ -9,6 +9,13 @@ const email = 'hayden@gmail.com';
 const password = 'hayden123';
 const nameFirst = 'Hayden';
 const nameLast = 'Smith';
+const handleStr = 'firstnamelastname';
+
+const email2 = 'email2@gmail.com';
+const password2 = 'password2';
+const nameFirst2 = 'firstname2';
+const nameLast2 = 'lastname2';
+const handleStr2 = 'firstname2lastname2';
 
 // ===========================================================================//
 // HELPER FUNCTIONS
@@ -1073,6 +1080,17 @@ describe('Testing messagepin', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
       requestMessagePin('bad', message.messageId, 403);
     });
+    test('messageId is not a valid message', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false, 200);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId + 99, 400);
+    });
+    test('authorised user does not have owner permissions', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false, 200);
+      const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser2.token, message.messageId, 403);
+    });
     test('message is already pinned', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false, 200);
       const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
@@ -1147,6 +1165,19 @@ describe('Testing messageunpin', () => {
       const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
       requestMessagePin(authUser.token, message.messageId, 200);
       requestMessageUnpin('bad', message.messageId, 403);
+    });
+    test('messageId is not a valid message', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser.token, message.messageId + 99, 400);
+    });
+    test('authorised user does not have owner permissions', () => {
+      const channel = requestChannelCreate(authUser.token, 'name', false);
+      const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+      const message = requestMessageSend(authUser.token, channel.channelId, 'message', 200);
+      requestMessagePin(authUser.token, message.messageId, 200);
+      requestMessageUnpin(authUser2.token, message.messageId, 403);
     });
     test('message is already unpinned', () => {
       const channel = requestChannelCreate(authUser.token, 'name', false);
