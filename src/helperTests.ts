@@ -192,6 +192,14 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
   return requestHelper('DELETE', '/message/remove/v2', { token: token }, { messageId }, err);
 }
 
+export function requestMessageSendlater(token: string, channelId: number, message: string, timeSent: number, err?: number) {
+  return requestHelper('POST', '/message/sendlater/v1', { token: token }, { channelId, message, timeSent }, err);
+}
+
+export function requestMessageSendlaterdm(token: string, dmId: number, message: string, timeSent: number, err?: number) {
+  return requestHelper('POST', '/message/sendlaterdm/v1', { token: token }, { dmId, message, timeSent }, err);
+}
+
 export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
   return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
 }
@@ -206,6 +214,21 @@ export function requestAdminRemove(token: string, uId: number, err?: number) {
 } */
 export function requestUserPermissionChange(token: string, uId: number, permissionId: number, err?: number) {
   return requestHelper('POST', '/admin/userpermission/change/v1', { token: token }, { uId, permissionId }, err);
+}
+
+//= ===========================================================================//
+// Standup functions
+//= ===========================================================================//
+export function requestStandupStart(token: string, channelId: number, length: number, err?: number) {
+  return requestHelper('POST', '/standup/start/v1', { token: token }, { channelId, length }, err);
+}
+
+export function requestStandupActive(token: string, channelId: number, err?: number) {
+  return requestHelper('GET', '/standup/active/v1', { token: token }, { channelId }, err);
+}
+
+export function requestStandupSend(token: string, channelId: number, message: string, err?: number) {
+  return requestHelper('POST', '/standup/send/v1', { token: token }, { channelId, message }, err);
 }
 
 // Other functions

@@ -423,6 +423,16 @@ export function isGlobalOwnerFromId(uId: number) : boolean {
   return false;
 }
 
+export function isActive(channelId: number) : boolean {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //= ==========================================================================//
 // UPDATES THE DATASTORE                                                     //
 //= ==========================================================================//
