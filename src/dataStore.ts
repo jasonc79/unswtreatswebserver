@@ -93,6 +93,13 @@ interface Standup {
   isActive: boolean
 }
 
+// NOTIFICATIONS
+interface notifications {
+  channelId: number,
+  dmId: number,
+  notificationMessage: string
+}
+
 // RESET CODES
 interface Codes {
   code: string,

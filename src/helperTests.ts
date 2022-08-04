@@ -15,6 +15,10 @@ export type authUserReturn = {
   token: string,
   authUserId: number
 }
+export type channelReturn = {
+  channelId: number,
+  name: string
+}
 type headers = {
   token?: string
 }
@@ -217,6 +221,14 @@ export function requestStandupActive(token: string, channelId: number, err?: num
 
 export function requestStandupSend(token: string, channelId: number, message: string, err?: number) {
   return requestHelper('POST', '/standup/send/v1', { token: token }, { channelId, message }, err);
+}
+
+//= ===========================================================================//
+// Notifications functions
+//= ===========================================================================//
+
+export function requestNotifications(token: string, err?: number) {
+  return requestHelper('GET', '/notifications/get/v1', { token: token }, {}, err);
 }
 
 // Other functions
