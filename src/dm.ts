@@ -19,6 +19,63 @@ import HTTPError from 'http-errors';
  *    when there are duplicate 'uId's in uIds
  * @returns { dmId } on no error
  */
+// const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   }
+
+//   const authUserId = returnValidUser(token);
+//   const authUser = userProfileV3(token, authUserId.uId) as userReturn;
+
+//   // Any uId in uIds does not refer to a valid user
+//   for (const u of uIds) {
+//     if (!checkValidUser(u)) {
+//       throw HTTPError(400, 'uId does not refer to a valid user');
+//     }
+//   }
+//   // There are duplicate uIds in uIds
+//   const uniqueIds = Array.from(new Set(uIds));
+//   if (uIds.length !== uniqueIds.length) {
+//     throw HTTPError(400, 'Duplicate uIds');
+//   }
+
+//   const data = getData();
+//   const dmId = data.dms.length;
+//   const DmMembers = [];
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   const temp1: dmsExist = {
+//     numDmsExist: data.totalDmsExist += 1,
+//     timeStamp: currTime,
+//   };
+//   DmMembers.push(authUser.user);
+//   for (const uId of uIds) {
+//     const DmMember = userProfileV3(token, uId) as userReturn;
+//     DmMembers.push(DmMember.user);
+//   }
+//   const dmName: string = generateDmName(DmMembers);
+//   const newDm : Dm = {
+//     dmId: dmId,
+//     name: dmName,
+//     members: DmMembers,
+//     owners: [authUser.user],
+//     messages: [],
+//   };
+
+//   for (const member of newDm.members) {
+//     const temp: dmsJoined = {
+//       numDmsJoined: data.users[member.uId].totalDmsJoined += 1,
+//       timeStamp: currTime,
+//     };
+//     data.users[member.uId].dmsJoined.push(temp);
+//   }
+
+//   data.dms.push(newDm);
+//   data.dmsExist.push(temp1);
+
+//   setData(data);
+//   return { dmId: dmId };
+// };
+
 const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -167,6 +224,116 @@ const dmListV2 = (token: string): dmReturn | error => {
  *    when dmId is valid and the authorised user is no longer in the DM
  * @returns { } on no error
  */
+// const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error => {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   }
+
+//   if (!checkValidDm(dmId)) {
+//     throw HTTPError(400, 'dmId is invalid');
+//   }
+
+//   if (!isOwnerDm(token, dmId)) {
+//     throw HTTPError(403, 'Authorised user is not the original DM creator');
+//   }
+
+//   if (!isMemberDm(token, dmId)) {
+//     throw HTTPError(403, 'Authorised user is no longer in the DM');
+//   }
+
+//   const data = getData();
+//   const dmDetails = returnValidDm(dmId);
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   const dmMessages = (dmDetails.messages.length) * (-1);
+//   const temp1: dmsExist = {
+//     numDmsExist: data.totalDmsExist += -1,
+//     timeStamp: currTime,
+//   };
+//   const temp2: messagesExist = {
+//     numMessagesExist: data.totalMessagesExist += dmMessages,
+//     timeStamp: currTime,
+//   };
+//   for (const member of dmDetails.members) {
+//     const temp: dmsJoined = {
+//       numDmsJoined: data.users[member.uId].totalDmsJoined += -1,
+//       timeStamp: currTime,
+//     };
+//     data.users[member.uId].dmsJoined.push(temp);
+//   }
+
+//   data.dms = data.dms.filter((item) => {
+//     return item.dmId !== dmDetails.dmId;
+//   });
+
+//   data.dmsExist.push(temp1);
+//   data.messagesExist.push(temp2);
+
+//   setData(data);
+//   return {};
+// };
+
+/**
+ * dmLeaveV2
+ *
+ * Given a DM ID, the user is removed as a member of this DM
+ * The creator is allowed to leave and the DM will still exist if this happens.
+ *
+ * Arguments:
+ * @param {string} token is a unique identifier for the authorised user's current session
+ * @param {number} dmId is a unique identifier for a DM
+ *
+ * Return Values:
+ * @returns { error: 'error' }
+ *    when dmId does not refer to a valid DM
+ *    when dmId is valid and the authorised user is not the original DM creator
+ *    when dmId is valid and the authorised user is no longer in the DM
+ * @returns { } on no error
+ */
+// const dmLeaveV2 = (token: string, dmId: number) : error | object => {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   }
+
+//   if (!checkValidDm(dmId)) {
+//     throw HTTPError(400, 'dmId is not valid');
+//   }
+
+//   if (!isMemberDm(token, dmId)) {
+//     throw HTTPError(403, 'Authorised user is not a member of the DM');
+//   }
+
+//   const data = getData();
+//   const user = userProfileV3(token, getIdfromToken(token)) as userReturn;
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   const temp: dmsJoined = {
+//     numDmsJoined: data.users[user.user.uId].totalDmsJoined += -1,
+//     timeStamp: currTime,
+//   };
+
+//   let leaveDm: Dm;
+//   for (const dm of data.dms) {
+//     if (dm.dmId === dmId) {
+//       leaveDm = dm;
+//     }
+//   }
+
+//   leaveDm.members = leaveDm.members.filter((item) => {
+//     return item.uId !== user.user.uId;
+//   });
+//   if (isOwnerDm(token, dmId)) {
+//     leaveDm.owners = leaveDm.owners.filter((item) => {
+//       return item.uId !== user.user.uId;
+//     });
+//   }
+
+//   data.users[user.user.uId].dmsJoined.push(temp);
+
+//   setData(data);
+//   return {};
+// };
+
+/// /// HELPER FUNCTIONS ///////
+
 const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -212,29 +379,12 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
   data.messagesExist.push(temp2);
 
   data.dms = data.dms.filter((item) => {
-    return item !== dmDetails;
+    return item.dmId !== dmDetails.dmId;
   });
   setData(data);
   return {};
 };
 
-/**
- * dmLeaveV2
- *
- * Given a DM ID, the user is removed as a member of this DM
- * The creator is allowed to leave and the DM will still exist if this happens.
- *
- * Arguments:
- * @param {string} token is a unique identifier for the authorised user's current session
- * @param {number} dmId is a unique identifier for a DM
- *
- * Return Values:
- * @returns { error: 'error' }
- *    when dmId does not refer to a valid DM
- *    when dmId is valid and the authorised user is not the original DM creator
- *    when dmId is valid and the authorised user is no longer in the DM
- * @returns { } on no error
- */
 const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');

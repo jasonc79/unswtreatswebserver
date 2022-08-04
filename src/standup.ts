@@ -28,11 +28,13 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   const data = getData();
   const finish = Math.floor((new Date()).getTime() / 1000) + length;
   const seconds = finish - Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
   const newStandup: Standup = {
     channelId: channelId,
     messages: [],
     timeFinish: finish,
-    isActive: true
+    isActive: true,
+    uId: user.uId
   };
   data.standups.push(newStandup);
   setData(data);

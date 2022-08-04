@@ -1,5 +1,5 @@
 import { error, UserInfo, Message, userReturn, OWNER, empty, getData, setData, channelsJoined } from './dataStore';
-import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
+import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken, returnActiveStandup, isActive } from './helper';
 import { updateChannel } from './helper';
 import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
@@ -79,6 +79,39 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
  *    if the cahnnelId is invalid
  * @returns {} if there is no error
  */
+// function channelJoinV1(token: string, channelId: number): (error | empty) {
+//   // Check if channelId and token is valid
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   } else if (!checkValidChannel(channelId)) {
+//     throw HTTPError(400, 'Invalid channelId');
+//   }
+//   const user = returnValidUser(token);
+//   const channel = returnValidChannel(channelId);
+//   const userIsMember = isMember(token, channel.channelId);
+//   const data = getData();
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   const temp: channelsJoined = {
+//     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+//     timeStamp: currTime,
+//   };
+
+//   if (userIsMember) {
+//     throw HTTPError(400, 'The authorised user is already a member of the channel');
+//   }
+//   if (channel.isPublic === false && user.permissionId !== OWNER && !userIsMember) {
+//     throw HTTPError(403, 'The authorised user is not a global owner and has no access to a private channel');
+//   }
+
+//   // Add user to the selected channel, update channel list in data, append authUser to allMembers array.
+//   channel.allMembers.push(user);
+//   updateChannel(channelId, channel);
+//   data.users[user.uId].channelsJoined.push(temp);
+//   setData(data);
+
+//   return {};
+// }
+
 function channelJoinV1(token: string, channelId: number): (error | empty) {
   // Check if channelId and token is valid
   if (!checkValidToken(token)) {
@@ -112,6 +145,7 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
 
   return {};
 }
+
 /**
  * channelInviteV3
  * Invites a user with ID uId to join a channel with ID channelId.
@@ -130,6 +164,48 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
  *    if user is already part of channel
  * @returns {} if there is no error
  */
+
+// function channelInviteV3(token: string, channelId: number, uId: number): (object) {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   }
+//   // Checking if channelID and uId are valid
+//   const channel = returnValidChannel(channelId);
+//   const user = returnValidId(uId);
+//   if (channel === undefined) {
+//     throw HTTPError(400, 'Invalid channelId');
+//   } else if (user === undefined) {
+//     throw HTTPError(400, 'Invalid userId');
+//   }
+//   // Checking if uId and authUserID are members
+//   const authUserId = getIdfromToken(token);
+//   let uIdMember = false;
+//   let authUserIdMember = false;
+//   for (const member of channel.allMembers) {
+//     if (member.uId === uId) {
+//       uIdMember = true;
+//     } else if (member.uId === authUserId) {
+//       authUserIdMember = true;
+//     }
+//   }
+//   if (uIdMember === true) {
+//     throw HTTPError(400, 'User is already a member of the channel');
+//   } else if (authUserIdMember === false) {
+//     throw HTTPError(403, 'Authorised user is not a member of the channel');
+//   }
+//   const data = getData();
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   const temp: channelsJoined = {
+//     numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+//     timeStamp: currTime,
+//   };
+//   channel.allMembers.push(user);
+//   updateChannel(channelId, channel);
+//   data.users[user.uId].channelsJoined.push(temp);
+//   setData(data);
+
+//   return {};
+// }
 
 function channelInviteV3(token: string, channelId: number, uId: number): (object) {
   if (!checkValidToken(token)) {
@@ -250,6 +326,39 @@ function channelMessagesV3(token: string, channelId: number, start: number): (me
  * @returns { object } on no error
  */
 
+// function channelLeaveV2(token: string, channelId: number): (object) {
+//   if (!checkValidToken(token)) {
+//     throw HTTPError(403, 'Invalid token');
+//   } else if (!checkValidChannel(channelId)) {
+//     throw HTTPError(400, 'ChannelId does not refer to a valid channel');
+//   } else if (!isMember(token, channelId)) {
+//     throw HTTPError(403, 'ChannelId is valid and the authorised user is not a member of the channel');
+//   }
+//   const user = returnValidUser(token);
+//   const currChannel = returnValidChannel(channelId);
+//   const data = getData();
+//   const currTime = Math.floor((new Date()).getTime() / 1000);
+//   for (const standup of data.standups) {
+//     if (standup.isActive === true) {
+//       if (standup.uId === user.uId) {
+//         throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
+//       }
+//     }
+//   }
+//   const temp: channelsJoined = {
+//     numChannelsJoined: data.users[user.uId].totalChannelsJoined += -1,
+//     timeStamp: currTime,
+//   };
+//   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
+//   currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
+//   updateChannel(channelId, currChannel);
+//   data.users[user.uId].channelsJoined.push(temp);
+//   setData(data);
+
+//   return {};
+// }
+
+
 function channelLeaveV2(token: string, channelId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -259,6 +368,12 @@ function channelLeaveV2(token: string, channelId: number): (object) {
     throw HTTPError(403, 'ChannelId is valid and the authorised user is not a member of the channel');
   }
   const user = returnValidUser(token);
+  if (isActive(channelId)) {
+    const standUp = returnActiveStandup(channelId)
+    if (standUp.uId === user.uId) {
+      throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
+    }
+  }
   const currChannel = returnValidChannel(channelId);
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
   currChannel.allMembers = currChannel.allMembers.filter((temp) => temp.uId !== user.uId);
@@ -275,6 +390,7 @@ function channelLeaveV2(token: string, channelId: number): (object) {
 
   return {};
 }
+
 
 /**
  * channelAddOwnerV1

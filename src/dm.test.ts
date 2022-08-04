@@ -168,6 +168,14 @@ describe('Testing dm/remove/v2', () => {
     const dm = -1;
     requestDmRemove(authUser.token, dm, 400);
   });
+  test('dmId has already been removed', () => {
+    const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+    const uIds = [];
+    uIds.push(uId1.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestDmRemove(authUser.token, dm.dmId);
+    requestDmRemove(authUser.token, dm.dmId, 400);
+  });
 
   test('dmId is valid and the authorised user is not the original DM creator', () => {
     const authUser1 = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');

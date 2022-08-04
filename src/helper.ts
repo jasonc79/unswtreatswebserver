@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message, Standup } from './dataStore';
 import { ELEMENT } from './auth';
 import crypto from 'crypto';
 
@@ -194,6 +194,14 @@ export function returnValidMessagefromDm(messageId: number) : Message {
   }
 }
 
+export function returnActiveStandup(channelId: number) : Standup {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return standup;
+    }
+  }
+}
 //= ==========================================================================//
 // GET OR RETURN OBJECTS USING IDS                                                                   //
 //= ==========================================================================//
@@ -351,78 +359,3 @@ export function updateChannel(channelId: number, channel: Channel) {
 }
 
 /// if not remove 1 by one make uId an array(uId[])
-
-/// helper function to change metric values
-export function addMetric(metricType: string, metricValue: number, uId?: number) {
-  const data = getData();
-  const currTime = Math.floor((new Date()).getTime() / 1000);
-  /// Check for metricType
-  if (metricType === 'channelsJoined') {
-    /// If metricType is channelsJoined
-    // const currValue = data.users[uId].channelsJoined.length - 1;
-    /// Add metricValue to totalChannelsJoined
-    const temp: channelsJoined = {
-      numChannelsJoined: data.users[uId].totalChannelsJoined += metricValue,
-      timeStamp: currTime,
-    };
-    console.log(temp);
-    data.users[uId].totalChannelsJoined += metricValue;
-    console.log(data.users[uId].totalChannelsJoined);
-    data.users[uId].channelsJoined.push(temp);
-    console.log(data.users[uId].channelsJoined);
-  } else if (metricType === 'dmsJoined') {
-    /// If metricType is dmsJoined
-    // const currValue = data.users[uId].dmsJoined.length - 1;
-    /// Add metricValue to totalDmsJoined
-    const temp: dmsJoined = {
-      numDmsJoined: data.users[uId].totalDmsJoined += metricValue,
-      timeStamp: currTime,
-    };
-    data.users[uId].totalDmsJoined += metricValue;
-    data.users[uId].dmsJoined.push(temp);
-  } else if (metricType === 'messagesSent') {
-    /// If metricType is messagesSent
-    // const currValue = data.users[uId].messagesSent.length - 1;
-    /// Add metricValue to totalMessagesSent
-    const temp: messagesSent = {
-      numMessagesSent: data.users[uId].totalMessagesSent += metricValue,
-      timeStamp: currTime,
-    };
-    data.users[uId].totalMessagesSent += metricValue;
-    data.users[uId].messagesSent.push(temp);
-  } else if (metricType === 'channelsExist') {
-    /// If metricType is channelsExist
-    // const currValue = data.channelsExist.length - 1;
-    /// Add metricValue to totalChannelsExist
-    const temp: channelsExist = {
-      numChannelsExist: data.totalChannelsExist += metricValue,
-      timeStamp: currTime,
-    };
-    console.log(temp);
-    data.totalChannelsExist += metricValue;
-    console.log(data.totalChannelsExist);
-    data.channelsExist.push(temp);
-    console.log(data.channelsExist);
-  } else if (metricType === 'dmsExist') {
-    /// If metricType is dmsExist
-    // const currValue = data.dmsExist.length - 1;
-    /// Add metricValue to totalDmsExist
-    const temp: dmsExist = {
-      numDmsExist: data.totalDmsExist += metricValue,
-      timeStamp: currTime,
-    };
-    data.totalDmsExist += metricValue;
-    data.dmsExist.push(temp);
-  } else if (metricType === 'messagesExist') {
-    /// If metricType is messagesExist
-    // const currValue = data.messagesExist.length - 1;
-    /// Add metricValue to totalMessagesExist
-    const temp: messagesExist = {
-      numMessagesExist: data.totalMessagesExist += metricValue,
-      timeStamp: currTime,
-    };
-    data.totalMessagesExist += metricValue;
-    data.messagesExist.push(temp);
-  }
-  setData(data);
-}

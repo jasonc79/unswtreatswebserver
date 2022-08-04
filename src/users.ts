@@ -1,4 +1,4 @@
-import { error, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
+import { error, userReturn, getData, allUserReturn, UserInfo, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist, } from './dataStore';
 import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValidUser, getIdfromToken } from './helper';
 import { checkValidEmail } from './auth';
 import HTTPError from 'http-errors';
@@ -158,6 +158,18 @@ interface workspaceStats {
 
 type returnWorkspaceStats = { workspaceStats: workspaceStats};
 
+/**
+ * usersStatsV1
+ * Fetch the required statistics about the workspace's use of UNSW Treats.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ * @returns {returnWorkspaceStats} if there is no error
+ */
 function usersStatsV1(token: string) : (returnWorkspaceStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -170,16 +182,18 @@ function usersStatsV1(token: string) : (returnWorkspaceStats) {
       top++;
     }
   }
-  console.log(top);
-  console.log(bottom);
-  const utilizationRate = top / bottom;
+  let utilizationRate = top / bottom;
+  if (bottom === 0) {
+    utilizationRate = 0;
+  } else if (utilizationRate > 1) {
+    utilizationRate = 1;
+  }
   const temp = {
     channelsExist: data.channelsExist,
     dmsExist: data.dmsExist,
     messagesExist: data.messagesExist,
     utilizationRate: utilizationRate
   };
-  console.log(temp);
   return { workspaceStats: temp };
 }
 
@@ -192,6 +206,18 @@ interface userStats {
 
 type returnUserStats = { userStats: userStats};
 
+/**
+ * userStatsV1
+ * Fetch the required statistics about this user's use of UNSW Treats.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ * @returns {returnUserStats} if there is no error
+ */
 function userStatsV1(token: string) : (returnUserStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -201,8 +227,6 @@ function userStatsV1(token: string) : (returnUserStats) {
   const top = data.users[uId].totalChannelsJoined + data.users[uId].totalDmsJoined + data.users[uId].totalMessagesSent;
   const bottom = data.totalMessagesExist + data.totalDmsExist + data.totalChannelsExist;
   let involvementRate = top / bottom;
-  console.log(top);
-  console.log(bottom);
   if (isNaN(involvementRate)) involvementRate = 0;
   const temp = {
     channelsJoined: data.users[uId].channelsJoined,
@@ -210,7 +234,6 @@ function userStatsV1(token: string) : (returnUserStats) {
     messagesSent: data.users[uId].messagesSent,
     involvementRate: involvementRate
   };
-  console.log(temp);
   return { userStats: temp };
 }
 export { userProfileV3, userSetNameV2, userSetEmailV2, userSetHandleV2, usersAllV2, usersStatsV1, userStatsV1 };

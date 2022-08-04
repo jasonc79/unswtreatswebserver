@@ -127,7 +127,8 @@ interface Standup {
   channelId: number,
   messages: standupMsg[],
   timeFinish: number,
-  isActive: boolean
+  isActive: boolean,
+  uId: number
 }
 
 // RESET CODES
@@ -149,7 +150,6 @@ type Data = {
   totalMessagesExist: number,
   totalDmsExist: number,
   totalChannelsExist: number,
-
   standups: Standup[]
   resetCodes: Codes[]
 }
