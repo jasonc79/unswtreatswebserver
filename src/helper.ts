@@ -119,6 +119,7 @@ export function checkDmMessageSender(token: string, messageId: number) : boolean
   }
   return false;
 }
+
 //= ==========================================================================//
 // RETURN FUNCTIONS - RETURNS AN OBJECT                                      //
 //= ==========================================================================//

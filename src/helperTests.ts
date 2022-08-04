@@ -176,8 +176,8 @@ export function requestUserHandle(token: string, handleStr: string, err?: number
   return requestHelper('PUT', '/user/profile/sethandle/v2', { token: token }, { handleStr }, err);
 }
 
-export function requestUserUploadPhoto(token: string, imgUrl, xStart, yStart, xEnd, yEnd) {
-  return requestHelper('POST', 'user/profile/uploadphoto/v1', { token: token}, { imgUrl, xStart, yStart, xEnd, yEnd }, err);
+export function requestUserUploadPhoto(token: string, imgUrl: string, xStart: number, yStart: number, xEnd: number, yEnd: number, err?: number) {
+  return requestHelper('POST', '/user/profile/uploadphoto/v1', { token: token}, { imgUrl, xStart, yStart, xEnd, yEnd }, err);
 }
 
 // Message functions
