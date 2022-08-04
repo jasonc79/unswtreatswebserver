@@ -35,19 +35,12 @@ function uploadPhotoV1(token: string, imgUrl: string, xStart: number, yStart: nu
     }
     
     // Cropping the image
-    // Jimp.read('lenna.png', (err, lenna) => {
-    //     if (err) throw err;
-    //     lenna
-    //       .resize(256, 256) // resize
-    //       .quality(60) // set JPEG quality
-    //       .greyscale() // set greyscale
-    //       .write('lena-small-bw.jpg'); // save
-    //   });
-    // image.crop( x, y, w, h );         // crop to the given region
     const imageName = `profilepics/${ token }`;
     Jimp.read(image, (err, imageName ) => {
         if (err) throw err; 
         imageName.crop(xStart, yStart, xEnd, yEnd); 
+        imageName.write(`profilepics/cropped-${ token }.jpg`);
+        // Remove old file? 
     })
     return {}; 
 }; 

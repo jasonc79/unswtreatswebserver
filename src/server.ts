@@ -242,6 +242,8 @@ app.post('/user/profile/uploadphoto/v1', (req, res, next) => {
     next (err); 
   }
 }); 
+// to access profile pics folder
+// app.use('/static', express.static('profilepics'));
 
 // ================================================================ //
 // Message functions
