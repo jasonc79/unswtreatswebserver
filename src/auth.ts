@@ -1,4 +1,4 @@
-import { getData, setData, error, authUserId, token, Codes } from './dataStore';
+import { getData, setData, error, authUserId, token, Codes, User, empty } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser, returnValidId, getHashOf } from './helper';
 import validator from 'validator';
 import HTTPError from 'http-errors';
@@ -45,7 +45,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
   const token = generateToken();
 
   // Generate uId using the size of array users and default permission 2
-  const user = {
+  const user: User = {
     uId: data.users.length,
     email: email,
     nameFirst: nameFirst,
@@ -54,6 +54,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     password: getHashOf(password + SECRET),
     token: [token],
     permissionId: 2,
+    notifications: []
   };
   // Global owner
   if (user.uId === 0) {
@@ -128,7 +129,6 @@ const authLogoutV1 = (token: token) : object | error => {
   return {};
 };
 
-type empty = object;
 const authPasswordRequest = (email: string) : empty => {
   const data = getData();
   const user = checkEmailExists(email);

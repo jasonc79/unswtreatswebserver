@@ -1,6 +1,7 @@
 import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
+import {notifyUserInvite} from './notifications'
 import HTTPError from 'http-errors';
 
 /**
@@ -59,6 +60,10 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   };
   data.dms.push(newDm);
   setData(data);
+  for (const uId of uIds) {
+    notifyUserInvite(token, uId, -1, dmId);
+  }
+
   return { dmId: dmId };
 };
 

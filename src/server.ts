@@ -13,6 +13,7 @@ import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, message
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
+import { notificationsV1 } from './notifications';
 
 // Set up web app, use JSON
 const app = express();
@@ -381,7 +382,6 @@ app.post('/standup/start/v1', (req, res, next) => {
 app.get('/standup/active/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    // const token = req.query.token as string;
     const channelId = parseInt(req.query.channelId as string);
     return res.json(standupActiveV1(token, channelId));
   } catch (err) {
@@ -399,6 +399,14 @@ app.post('/standup/send/v1', (req, res, next) => {
   }
 });
 
+app.get('/notifications/get/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    return res.json(notificationsV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
 /*
 // ================================================================ //
 // Server function

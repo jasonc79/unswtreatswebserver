@@ -17,6 +17,7 @@ interface User {
   token: token[],
   password: string,
   permissionId: number,
+  notifications: Notification[]
 }
 
 interface UserInfo {
@@ -90,11 +91,11 @@ interface Standup {
   channelId: number,
   messages: standupMsg[],
   timeFinish: number,
-  isActive: boolean
+  isActive: boolean,
 }
 
 // NOTIFICATIONS
-interface notifications {
+interface Notification {
   channelId: number,
   dmId: number,
   notificationMessage: string
@@ -157,7 +158,7 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn };
+export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn, Notification };
 export { timeReturn, activeReturn, Standup, standupMsg };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };

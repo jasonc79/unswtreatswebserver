@@ -16,6 +16,7 @@ const nameLast = 'Smith';
 const handleStr = 'haydensmith';
 const handleStr2 = 'haydensmith0';
 const channelName = 'Channel';
+const dmName = "haydensmith, haydensmith0";
 
 // ===========================================================================//
 // HELPER FUNCTIONS
@@ -35,12 +36,15 @@ beforeEach(() => {
     requestClear();
   });
 
-  function createDm(): {dmId: number, dmName: string, userToken: string, uId: number} {
+  /**
+   * 
+   * @returns dmId, dmName, userToken, uId
+   */
+  function createDm(): {dmId: number, userToken: string, uId: number} {
     const uIds = [user.authUserId];
     const dm = requestDmCreate(authUser.token, uIds);
     return {
       dmId: dm.dmId,
-      dmName: dm.name,
       userToken: user.token,
       uId: user.authUserId 
     }
@@ -89,7 +93,7 @@ beforeEach(() => {
 describe('Testing notifications', () => {
   describe('Error cases', () => {
     test('Invalid token', () => {
-      requestNotifications(authUser.token, 403);
+      requestNotifications(authUser.token + 1, 403);
     });
   });
   describe('Receives notifications', () => {
@@ -139,18 +143,18 @@ describe('Testing notifications', () => {
     describe('Upon being invited to a channel/dm', () => {
       test('User is notified when added to a channel', () => {
         requestChannelInvite(authUser.token, channel.channelId, user.authUserId);
-        expect(requestNotifications(authUser.token)).toStrictEqual({
+        expect(requestNotifications(user.token)).toStrictEqual({
           notifications: [
             {
               channelId: channel.channelId,
               dmId: -1,
-              notificationMessage: `${handleStr} added you to ${channel.name}`
+              notificationMessage: `${handleStr} added you to ${channelName}`
             }]
         });
       });
       test('User is notified when added to a dm', () => {
-        const {dmId, dmName, userToken, uId} = createDm();
-        expect(requestNotifications(authUser.token)).toStrictEqual({
+        const {dmId, userToken, uId} = createDm();
+        expect(requestNotifications(user.token)).toStrictEqual({
           notifications: [
             {
               channelId: -1,
@@ -184,7 +188,11 @@ describe('Testing notifications', () => {
       expect(requestNotifications(user.token)).toStrictEqual({notifications:[]});
     });
     test('User is not a member of the dm they are tagged in', () => {
-
+      const tagMsg = 'good @haydensmith1';
+      const user2 = requestAuthRegister('user2@email.com', password, nameFirst, nameLast);
+      const {dmId, userToken, uId} = createDm();
+      requestMessageSenddm(authUser.token, dmId, tagMsg);
+      expect(requestNotifications(user2.token)).toStrictEqual({notifications:[]});
     });
     test('No notifications for reactions when user is removed from a channel', () => {
 
@@ -204,12 +212,12 @@ describe('Testing notifications', () => {
           {
             channelId: channel.channelId,
             dmId: -1,
-            notificationMessage: `${handleStr} tagged you in ${channel.name}: ${expectedMsg}`
+            notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
           },
           {
             channelId: channel.channelId,
             dmId: -1,
-            notificationMessage: `${handleStr} added you to ${channel.channelId}`
+            notificationMessage: `${handleStr} added you to ${channelName}`
           }
         ]
       });
@@ -219,8 +227,8 @@ describe('Testing notifications', () => {
       requestChannelInvite(authUser.token, channel.channelId, user.authUserId);
       let name = 'channel';
       for (let i = 0; i < 19; i++) {
-        name = name + i.toString();
-        let newChannel = requestChannelCreate(authUser.token, name, true);
+        let newName = name + i.toString();
+        let newChannel = requestChannelCreate(authUser.token, newName, true);
         requestChannelInvite(authUser.token, newChannel.channelId, user.authUserId);
       }
       const {notifications} = requestNotifications(user.token);
@@ -231,8 +239,8 @@ describe('Testing notifications', () => {
       let name = 'channel';
       let lastChannelId: number;
       for (let i = 0; i < 20; i++) {
-        name = name + i.toString();
-        let newChannel = requestChannelCreate(authUser.token, name, true);
+        let newName = name + i.toString();
+        let newChannel = requestChannelCreate(authUser.token, newName, true);
         if (i === 0) {
           lastChannelId = newChannel.channelId;
         }
