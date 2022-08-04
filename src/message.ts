@@ -274,6 +274,8 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
   
   const user = returnValidUser(token);
   const data = getData();
+
+  // Finding current message
   let currMessage: Message;
   if (checkMessageSource(messageId) === 0) {
     for (const dm of data.dms) {
@@ -336,9 +338,10 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
     throw HTTPError(400, 'Message does not contain react from authorised user'); 
   }
 
-  const data = getData(); 
-  const userId = returnValidUser(token); 
+  const user = returnValidUser(token); 
   const data = getData();
+
+  // Finding current message
   let currMessage: Message;
   if (checkMessageSource(messageId) === 0) {
     for (const dm of data.dms) {
@@ -357,18 +360,26 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
       }
     }
   }
-  // Usual unreact
-  for (const react of currMessage.reacts) {
-    if (reactId === react.reactId) {
-      for (const uId of react.uIds) {
-        if (uId === userId.uId) {
-          // remove uId 
+
+  if (currMessage.reacts.length > 1) {
+    for (const react of currMessage.reacts) {
+      if (reactId === react.reactId) {
+        // Usual unreact
+        if (react.uIds.length > 1) {
+          react.uIds = react.uIds.filter((item) => {
+            return item !== user.uId; 
+          });
+          react.isThisUserReacted = false;
+        // Last unreact of that reactId
+        } else {
+          currMessage.reacts = currMessage.reacts.filter((item) => {
+            return item.reactId !== react.reactId; 
+          })
         }
       }
     }
   }
 
-  // Last react
   return {}; 
 }
 

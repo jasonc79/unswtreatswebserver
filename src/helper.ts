@@ -164,7 +164,6 @@ export function checkAlreadyReacted(messageId: number, reactId: number): number 
       }
     }
   }
-  
   return 0; 
   // 0 : No current reacts in that reactId
   // 1 : Already reacts with that reactId but not from the authorised user

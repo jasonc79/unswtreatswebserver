@@ -770,7 +770,7 @@ describe('Testing message/react/v1', () => {
     });
   })
 });
-/*
+
 describe('Testing message/unreact/v1', () => {
   describe('Testing in channel messages', () => { 
     beforeEach(() => {
@@ -820,7 +820,7 @@ describe('Testing message/unreact/v1', () => {
 
     test('reactId is not valid', () => {
       const message = requestMessageSenddm(authUser.token, dm.dmId, 'message'); 
-      requestMessageReact(authUser.token, message.messageId, 1, 400);     
+      requestMessageReact(authUser.token, message.messageId, -1, 400);     
       requestMessageUnreact(authUser.token, message.messageId, -1, 400);     
     });
 
@@ -830,11 +830,11 @@ describe('Testing message/unreact/v1', () => {
     });
 
     test('Valid inputs', () => {
-      const message = requestMessageSend(authUser.token, dm.dmId, 'message');
+      const message = requestMessageSenddm(authUser.token, dm.dmId, 'message');
       requestMessageReact(authUser.token, message.messageId, 1);
       const unreact = requestMessageUnreact(authUser.token, message.messageId, 1); 
       expect(unreact).toStrictEqual({}); 
     });
   })
 });
-*/
+
