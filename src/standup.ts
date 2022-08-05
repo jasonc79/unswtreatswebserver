@@ -18,14 +18,15 @@ import { messageSendV1 } from './message';
  * @param {number} channelId the channelId of the channel to start a standup
  * @param {number} length duration of the standup in seconds
  *
- * Return Values:
- * @returns { error }
- *    if invalid token
- *    if Channel ID does not refer to a valid channel
- *    if Length cannot be a negative number
- *    if There is already an active standup in this channel
- *    if The authorised user is not a member of the channel
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Channel ID does not refer to a valid channel
+ *    - Length cannot be a negative number
+ *    - There is already an active standup in this channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns { timeFinish: finish } when no error
  */
 
@@ -73,12 +74,13 @@ function standupStartV1(token: string, channelId: number, length: number) : time
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId the channelId of the channel to start a standup
  *
- * Return Values:
- * @returns { error }
- *    if invalid token
- *    if Channel ID does not refer to a valid channel
- *    if The authorised user is not a member of the channel
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Channel ID does not refer to a valid channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns { activeReturn } when no error
  */
 
@@ -120,13 +122,15 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
  * @param {number} channelId the channelId of the channel to start a standup
  * @param {string} message the message to be sent to standup
  *
- * Return Values:
- * @returns { error }
- *    if invalid token
- *    if Channel ID does not refer to a valid channel
- *    if The length of the message is over 1000 characters
- *    if An active standup is not currently running in the channel
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Channel ID does not refer to a valid channel
+ *    - The length of the message is over 1000 characters
+ *    - An active standup is not currently running in the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns {} when no error
  */
 

@@ -14,10 +14,13 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
  *
- * @returns { error }
- *    channelId is invalid
- *    token is invalid
- *    function caller isnt part of channel
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorisd user is not a member of the channel
+ * Returns:
  * @returns { channelDetails } if there is no error
  */
 
@@ -73,10 +76,14 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel beign accessed
  *
+ * Error throwing:
+ *  @throws { HTTPError(400) }
+ *    - On channelId does not refer to a valid channel
+ *    - On the authorised user is already a member of the channel
+ * @throws { HTTPError(403) }
+ *    - On invalid token
+ *    - On channelId refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
  * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if the cahnnelId is invalid
  * @returns {} if there is no error
  */
 
@@ -121,13 +128,15 @@ function channelJoinV1(token: string, channelId: number): (error | empty) {
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} uId the id of the user who wants to join the channel
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if the chnnelId is invalid
- *    if uId not valid
- *    if user is not part of channel
- *    if user is already part of channel
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - Invalid userId
+ *    - User is already a member of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorisd user is not a member of the channel
+ * Returns:
  * @returns {} if there is no error
  */
 
@@ -184,12 +193,15 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} start where messages will start printing from
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if the chnnelId is invalid
- *    start is greater than number of messages
- *    token is not part of channel
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - start is greater than the total number of messages in the channel
+ *    - User is already a member of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorisd user is not a member of the channel
+ * Returns:
  * @returns { messagesUnder50 } if there is no error and if less than 50 messages
  * @returns { messagesOver50 } if there is no error and there is 50 messages
  */
@@ -242,12 +254,14 @@ function channelMessagesV3(token: string, channelId: number, start: number): (me
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
  *
- * Return values
- * @returns { error }
- *    token invalid
- *    channelId is invalid
- *    user is not part of channel
- *    user is starter of an active startup
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - the authorised user is the starter of an active standup in the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - ChannelId is valid and the authorised user is not a member of the channel
+ * Returns:
  * @returns { object } on no error
  */
 
@@ -265,7 +279,7 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   if (isActive(channelId)) {
     const standUp = returnActiveStandup(channelId);
     if (standUp.uId === user.uId) {
-      throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
+      throw HTTPError(400, 'the authorised user is the starter of an active standup in the channel');
     }
   }
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
@@ -291,15 +305,16 @@ function channelLeaveV2(token: string, channelId: number): (object) {
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} uId the user to become owner
  *
- * Return values
- * @returns { error }
- *    channelId invalid
- *    uId is invalid
- *    uId is already owner
- *    uId is not member
- *    token is not owner
- *    token is invalid
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - channelId does not refer to a valid channel
+ *    - uId does not refer to a valid user
+ *    - uId refers to a user who is already an owner of the channel
+ *    - uId refers to a user who is not a member of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - channelId is valid and the authorised user does not have owner permissions in the channel
+ * Returns:
  * @returns { object } when no error
  */
 
@@ -338,15 +353,16 @@ function channelAddOwnerV2(token: string, channelId: number, uId: number): (obje
  * @param {number} channelId is the id of the channel being accessed
  * @param {number} uId the user to remove owner
  *
- * Return values
- * @returns { error }
- *    channelId invalid
- *    uId is invalid
- *    uId is not owner
- *    uId is only owner
- *    token is not owner
- *    token is invalid
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - channelId does not refer to a valid channel
+ *    - uId does not refer to a valid user
+ *    - uId refers to a user who is not an owner of the channel
+ *    - uId refers to a user who is currently the only owner of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - channelId is valid and the authorised user does not have owner permissions in the channel
+ * Returns:
  * @returns { object } when no error
  */
 

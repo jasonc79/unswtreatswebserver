@@ -34,12 +34,15 @@ import HTTPError from 'http-errors';
  * @param {number} channelId is the id of the channel beign accessed
  * @param {string} message is the message the user wants to send
  *
- * Return Values:
- * @returns { error }
- *    if the token is invalid
- *    if the channelId is invalid
- *    if length of message is less than 1 or over 1000 characters
- *    if channelId is valid and the authorised user is not a member of the channel
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - Channel ID does not refer to a valid channel
+ *    - Length of message must be 1-1000 inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns { messageId: messageId } if a message is sent without any errors
  */
 
@@ -89,12 +92,14 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
  * @param {number} dmId is the id of the dm beign accessed
  * @param {string} message is the message the user wants to send
  *
- * Return Values:
- * @returns { error }
- *    if the token is invalid
- *    if the dmId is invalid
- *    if length of message is less than 1 or over 1000 characters
- *    if dmId is valid and the authorised user is not a member of the DM
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Dm ID does not refer to a valid dm
+ *    - Length of message must be 1-1000 inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the dm
+ * Returns:
  * @returns { messageId: messageId } if a message is sent without any errors
  */
 
@@ -145,14 +150,21 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
  * @param {number} messageId is the id of the message beign accessed
  * @param {string} message is the new message the user wants to change to
  *
- * Returns Values:
- * @returns { error }
- *    if message is invalid
- *    if the sender is not the current user
- *    if the token is invalid
- *    if the current user doesn't have permission to edit messages
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Length of message must be less than 1000 inclusive
+ *    - Message ID does not refer to a valid message
+ *    - The authorised user is not a member of the dm
+ *    - The authorised user is not a member of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the dm
+ *    - User is not an owner of the dm
+ *    - User is not an owner of the channel
+ * Returns:
  * @returns {} if pass with no errors
  */
+
 function messageEditV1(token: string, messageId: number, message: string) : object | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -202,11 +214,17 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
  * @param {string} token tells the server who is currently accessing it
  * @param {number} messageId is the id of the message beign accessed
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if the message is invalid
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Message ID does not refer to a valid message
+ *    - The authorised user is not a member of the dm
+ *    - The authorised user is not a member of the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the dm
+ *    - User is not an owner of the dm
+ *    - User is not an owner of the channel
+ * Returns:
  * @returns {} if message is removed with no errors
  */
 
@@ -303,13 +321,15 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
  * @param {string} message is the message the user wants to send
  * @param {number} timeSent is the time that the message should be sent
  *
- * Return Values:
- * @returns { error }
- *    if the token is invalid
- *    if the channelId is invalid
- *    if length of message is less than 1 or over 1000 characters
- *    if timeSent is a time in the past
- *    if user is not a member of the channel they are trying to post to
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Channel ID does not refer to a valid channel
+ *    - timeSent is a time in the past
+ *    - Length of message must be 1-1000 inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns { messageId: msgId } if a message is set to be sent without any errors
  */
 
@@ -347,13 +367,15 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
  * @param {string} message is the message the user wants to send
  * @param {number} timeSent is the time that the message should be sent
  *
- * Return Values:
- * @returns { error }
- *    if the token is invalid
- *    if the dmId is invalid
- *    if length of message is less than 1 or over 1000 characters
- *    if timeSent is a time in the past
- *    if user is not a member of the dm they are trying to post to
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Dm ID does not refer to a valid dm
+ *    - timeSent is a time in the past
+ *    - Length of message must be 1-1000 inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - The authorised user is not a member of the channel
+ * Returns:
  * @returns { messageId: msgId } if a message is set to be sent without any errors
  */
 
@@ -391,13 +413,17 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
  * @param {string} ogMessageId is the original messageId the user wants to share
  * @param {string} message is the additional message the user wants to send
  *
- * Return Values:
- * @returns { error }
- *    if the token is invalid
- *    if both channelId and dmId are invalid
- *    if length of message is less than 1 or over 1000 characters
- *    if ogMessageId does not refer to a valid message
- *    if user has not joined the channel/DM they are trying to share the message to
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Channel ID does not refer to a valid channel
+ *    - Neither dmId or channelId is -1
+ *    - Length of message must be less than 1000 inclusive
+ *    - ogMessageId does not refer to valid channel or channel that the authorised user has joined
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorised user is not a member of the channel they are sharing a message to
+ *    - Authorised user is not a member of the dm they are sharing a message to
+ * Returns:
  * @returns { sharedMessageId: newMessageId } if a message is shared without any errors
  */
 
@@ -449,15 +475,18 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
  * @param {string} token tells the server who is currently accessing it
  * @param {number} messageId is the id of the message beign accessed
  *
- * Returns Values:
- * @returns { error }
- *    if token is invalid
- *    if the message is invalid
- *    if the message is already pinned
- *    if message exists but user is not part of channel/dm
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - messageId is not a valid message within a channel or DM that the authorised user has joined
+ *    - the message is already pinned
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel
+ *    - messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM
+ * Returns:
  * @returns {} if message is pinned with no errors
  */
+
 function messagePinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -499,15 +528,18 @@ function messagePinV1(token: string, messageId: number): (object) {
  * @param {string} token tells the server who is currently accessing it
  * @param {number} messageId is the id of the message beign accessed
  *
- * Returns Values:
- * @returns { error }
- *    if token is invalid
- *    if the message is invalid
- *    if the message is already not pinned
- *    if message exists but user is not part of channel/dm
- *
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - messageId is not a valid message within a channel or DM that the authorised user has joined
+ *    - the message is not already pinned
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel
+ *    - messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM
+ * Returns:
  * @returns {} if message is removed pinned with no errors
  */
+
 function messageUnpinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -551,10 +583,13 @@ function messageUnpinV1(token: string, messageId: number): (object) {
  * @param {string} token tells the server who is currently accessing it
  * @param {string} queryStr is the queryStr that is used to search through each message
  *
- * Returns Values:
- * @returns { error }
- *    if the token is invalid
- *    if length of queryStr is less than 1 or over 1000 characters
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Length of queryStr is less than 1 character long
+ *    - Length of queryStr is more than 1000 characters long
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { messages } if pass with no errors
  */
 

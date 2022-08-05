@@ -18,11 +18,15 @@ import HTTPError from 'http-errors';
  * @param {string} token tells the server who is currently accessing it
  * @param {number} uId is the id of the user
  *
- * Returns Values:
- * @returns { error }
- *    if uId does not refer to a valid user
- *    if uId refers to a user who is the only global owner
- *    if the authorised user is not a global owner
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - uId does not refer to a valid user
+ *    - uId refers to a user who is the only global owner
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - the authorised user is not a global owner
+ * Returns:
  * @returns {} if pass with no errors
  */
 
@@ -61,15 +65,20 @@ function adminRemoveV1(token: string, uId: number) {
  * @param {number} uId is the id of the user
  * @param {number} permissionId is the permission of the user
  *
- * Returns Values:
- * @returns { error }
- *    if the uId does not refer to a valid user
- *    if uId refers to a user who is the only global owner and they are being demoted to a user
- *    if permissionId is invalid
- *    if the user already has the permissions level of permissionId
- *    if the authorised user is not a global owner
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ *    - uId does not refer to a valid user
+ *    - uId refers to a user who is the only global owner and they are being demoted to a user
+ *    - permissionId is invalid
+ *    - the user already has the permissions level of permissionId
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - the authorised user is not a global owner
+ * Returns:
  * @returns {} if pass with no errors
  */
+
 function adminPermissionChangeV1(token: string, uId: number, permissionId: number) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');

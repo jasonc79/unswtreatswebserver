@@ -18,13 +18,12 @@ export const ELEMENT = 'Water';
  * @param nameFirst The user's first name, with non-alphanumeric characters
  * @param nameLast The user's last name, with non-alphanumeric characters
  *
- * Return Values:
- * @returns { error }
- *    invalid email
- *    email already used
- *    pass length is invalid
- *    firstname length invalid
- *    lastname length invalid
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Length of name is not between 1 and 50 characters inclusive
+ *    - Password length is less than 6 characters
+ *    - Email is not valid, or is already being used
+ * Returns:
  * @returns { authUserId } when no error
  */
 
@@ -110,10 +109,10 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
  * @param email The email inputted by the user
  * @param password The password inputted by the user
  *
- * Return Values:
- * @returns { error }
- *    email invalid
- *    password incorrect
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Email does not belong to a user
+ *    - Password is not correct
  * @returns { authUserId } on no error
  */
 
@@ -144,9 +143,10 @@ const authLoginV1 = (email: string, password: string) : authUserId | error => {
  * Arguments:
  * @param token tells the server who is currently accessing it
  *
- * Return values:
- * @returns { error }
- *    invalid token
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { object } when no error
  */
 
@@ -205,10 +205,11 @@ const authPasswordRequest = (email: string) : empty => {
  * @param {string} resetCode the secret code needed to change password
  * @param {string} newPassword the new password
  *
- * Return values:
- * @returns { error }
- *    if resetCode is not a valid reset code
- *    if password entered is less than 6 characters long
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Reset code is not a valid reset code
+ *    - Length of new password is not less than 6 characters
+ * Returns:
  * @returns { empty } when no error
  */
 

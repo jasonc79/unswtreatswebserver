@@ -11,10 +11,12 @@ import HTTPError from 'http-errors';
  * @param {string} token tells the server who is currently accessing it
  * @param {number} uId the id of the user that's details are being searched for
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if uId does not refer to a valid user
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - uId does not refer to a valid user
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { user } if there is no error
  */
 
@@ -47,11 +49,13 @@ function userProfileV3(token: string, uId: number) : error | userReturn {
  * @param {string} nameFirst The first name of the user
  * @param {string} nameLast The last name of the user
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if length of nameFirst is not between 1 and 50 characters inclusive
- *    if length of nameLast is not between 1 and 50 characters inclusive
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - length of nameFirst is not between 1 and 50 characters inclusive
+ *    - length of nameLast is not between 1 and 50 characters inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns {} if there is no error
  */
 
@@ -82,11 +86,12 @@ function userSetNameV2(token: string, nameFirst: string, nameLast: string) : obj
  * @param {string} token tells the server who is currently accessing it
  * @param {string} email the email of the user
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if invalid user email
- *    if the email is already used by another user
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - email entered is not a valid email
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns {} if there is no error
  */
 
@@ -112,13 +117,14 @@ function userSetEmailV2(token: string, email: string) {
  * @param {string} token tells the server who is currently accessing it
  * @param {string} handleStr the handle string of the user
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if invalid user handlestr
- *    if on handle without non-alphanumeric characters
- *    if when handle length is less than 3 or greater than 20 characters
- *    iv the handle is already used by another user
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - length of handleStr is not between 3 and 20 characters inclusive
+ *    - handleStr contains characters that are not alphanumeric
+ *    - the handle is already used by another user
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns {} if there is no error
  */
 
@@ -150,9 +156,10 @@ function userSetHandleV2(token: string, handleStr: string) {
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { users: userDetails } if there is no error
  */
 
@@ -185,9 +192,10 @@ type returnWorkspaceStats = { workspaceStats: workspaceStats};
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns {returnWorkspaceStats} if there is no error
  */
 
@@ -229,9 +237,10 @@ type returnUserStats = { userStats: userStats};
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns {returnUserStats} if there is no error
  */
 

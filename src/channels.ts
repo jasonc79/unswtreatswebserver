@@ -18,10 +18,12 @@ type channelsList = { channels: channelReturn[] };
  * @param name contains the string which is set to be the channel name
  * @param isPublic value determining if the channel will be private or public
  *
- * Return values
- * @returns { error }
- *    invalid token
- *    invald name length
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Length of name must be 1-20 inclusive
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { channelId } when no error
  */
 
@@ -71,9 +73,10 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
  * Arguments
  * @param token tells the server who is currently accessing it
  *
- * Return values
- * @returns { error }
- *    invalid token
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { channelsList } when no error
  */
 
@@ -107,9 +110,10 @@ function channelsListV1(token: string) : channelsList | error {
  * Arguments
  * @param token tells the server who is currently accessing it
  *
- * Return values
- * @returns { error }
- *    invalid token
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { channelsList } when no errors
  */
 

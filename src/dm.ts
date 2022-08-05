@@ -13,10 +13,13 @@ import HTTPError from 'http-errors';
  * @param {string} token is a unique identifier for the authorised user's current session
  * @param {number[]} uIds is an array of user's uIds, not including the creator of the DM
  *
- * Return Values:
- * @returns { error: 'error' }
- *    when any uId in uIds does not refer to a valid user
- *    when there are duplicate 'uId's in uIds
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - uId does not refer to a valid user
+ *    - Duplicate uIds
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { dmId } on no error
  */
 
@@ -88,12 +91,16 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
  * @param {string} token is a unique identifier for the authorised user's current session
  * @param {number} dmId is a unique identifier for a DM
  *
- * Return Values:
- * @returns { error: 'error' }
- *    when dmId does not refer to a valid DM
- *    when dmId is valid and the authorised user is not a member of the DM
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - dmId is invalid
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorised user is not a member of the DM
+ * Returns:
  * @returns { name, members } on no error
  */
+
 type dmDetails = { name: string, members: UserInfo[] };
 const dmDetailsV2 = (token: string, dmId: number): dmDetails | error => {
   if (!checkValidToken(token)) {
@@ -125,7 +132,10 @@ const dmDetailsV2 = (token: string, dmId: number): dmDetails | error => {
  * Arguments:
  * @param {string} token is a unique identifier for the authorised user's current session
  *
- * Return Values:
+ * Error throwing:
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ * Returns:
  * @returns { } on no error
  */
 const dmListV2 = (token: string): dmReturn | error => {
@@ -160,11 +170,14 @@ const dmListV2 = (token: string): dmReturn | error => {
  * @param {string} token is a unique identifier for the authorised user's current session
  * @param {number} dmId is a unique identifier for a DM
  *
- * Return Values:
- * @returns { error: 'error' }
- *    when dmId does not refer to a valid DM
- *    when dmId is valid and the authorised user is not the original DM creator
- *    when dmId is valid and the authorised user is no longer in the DM
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - dmId is invalid
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorised user is not the original DM creator
+ *    - Authorised user is no longer in the DM
+ * Returns:
  * @returns { } on no error
  */
 
@@ -225,11 +238,13 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
  * @param {string} token is a unique identifier for the authorised user's current session
  * @param {number} dmId is a unique identifier for a DM
  *
- * Return Values:
- * @returns { error: 'error' }
- *    when dmId does not refer to a valid DM
- *    when dmId is valid and the authorised user is not the original DM creator
- *    when dmId is valid and the authorised user is no longer in the DM
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - dmId is invalid
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorised user is not a member of the DM
+ * Returns:
  * @returns { } on no error
  */
 
@@ -285,12 +300,14 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
  * @param {number} dmId is the id of the dm being accessed
  * @param {number} start where messages will start printing from
  *
- * Return Values:
- * @returns { error }
- *    if token is invalid
- *    if the dmId is invalid
- *    start is greater than number of messages
- *    token is not part of dm
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - dmlId does not refer to a valid DM
+ *    - start is greater than the total number of messages in the channel
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - dmId is valid and the authorised user is not a member of the DM
+ * Returns:
  * @returns { messagesUnder50 } if there is no error and if less than 50 messages
  * @returns { messagesOver50 } if there is no error and there is 50 messages
  */
