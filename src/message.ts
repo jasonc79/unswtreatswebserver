@@ -336,7 +336,7 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
   const msgId = Math.floor(Math.random() * Date.now());
   const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
   setTimeout(() => { sendChannelMessage(token, channelId, message, msgId); }, seconds * 1000);
-  // console.log('msgId =', msgId);
+
   return { messageId: msgId };
 }
 
@@ -362,34 +362,24 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
  */
 
 function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : MessageId | error {
-  console.log('it fails here2');
   if (!checkValidToken(token)) {
-    console.log('it fails here1');
     throw HTTPError(403, 'Token is invalid');
   }
   if (!checkValidDm(dmId)) {
-    console.log('it fails here');
     throw HTTPError(400, 'Dm ID does not refer to a valid dm');
   }
   if (timeSent < Math.floor((new Date()).getTime() / 1000)) {
-    console.log('wrong time');
     throw HTTPError(400, 'timeSent is a time in the past');
   }
   if (!isMemberDm(token, dmId)) {
-    console.log('it should fail here3');
     throw HTTPError(403, 'The authorised user is not a member of the channel');
   }
-  console.log('it fails here4');
   if (message.length < 1 || message.length > 1000) {
-    console.log('it fails here6');
     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
-  console.log('it fails here5');
   const msgId = Math.floor(Math.random() * Date.now());
   const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
-  console.log('it fails here');
   setTimeout(() => { sendDmMessage(token, dmId, message, msgId); }, seconds * 1000);
-  console.log('it fails here7');
   return { messageId: msgId };
 }
 
