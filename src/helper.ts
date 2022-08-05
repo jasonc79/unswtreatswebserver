@@ -307,6 +307,20 @@ export function isOwnerFromId(uId: number, channelId: number) : boolean {
   return false;
 }
 
+
+export function isDmMemberFromId(uId: number, dmId: number) : boolean {
+  const dm = returnValidDm(dmId);
+  for (const user of dm.members) {
+    if (uId === user.uId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
+
 export function isGlobalOwner(token: string) : boolean {
   const user = returnValidUser(token);
   if (user.permissionId === 1) {

@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 // USER TYPES AND INTERFACES
+type id = number;
 type uId = { uId: number };
 type token = string;
 type authUserId = {
@@ -17,7 +18,8 @@ interface User {
   token: token[],
   password: string,
   permissionId: number,
-  notifications: Notification[]
+  notifications: Notification[],
+  messagesTagged: id[];
 }
 
 interface UserInfo {
@@ -36,7 +38,7 @@ interface Message {
   messageId: number,
   uId: number,
   message: string,
-  timeSent: number
+  timeSent: number,
 }
 type MessageId = { messageId: number };
 

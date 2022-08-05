@@ -54,7 +54,8 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     password: getHashOf(password + SECRET),
     token: [token],
     permissionId: 2,
-    notifications: []
+    notifications: [],
+    messagesTagged: []
   };
   // Global owner
   if (user.uId === 0) {

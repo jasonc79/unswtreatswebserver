@@ -62,7 +62,6 @@ beforeEach(() => {
    * @returns {messageId: number}
    */
   function testTagChannel(token: string, tagMsg: string, expectedMsg: string, method: string, id?: number) : {messageId: number} {
-    requestChannelJoin(token, channel.channelId);
     if (method === 'send') {
       const {messageId} = requestMessageSend(authUser.token, channel.channelId, tagMsg);
       id = messageId;
@@ -78,7 +77,7 @@ beforeEach(() => {
           channelId: channel.channelId,
           dmId: -1,
           notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
-        }
+        },
       ]
     });
     return {
@@ -101,6 +100,13 @@ describe('Testing notifications', () => {
       test('User is notified when tagged once in a channel', () => {
         const tagMsg = '@haydensmith0, here';
         const expectedMsg = tagMsg;
+        requestChannelJoin(user.token, channel.channelId);
+        testTagChannel(user.token, tagMsg, expectedMsg,'send');
+      });
+      test('User is notified once when tagged twice in a message', () => {
+        const tagMsg = '@haydensmith0@haydensmith0';
+        const expectedMsg = '@haydensmith0@hayden'
+        requestChannelJoin(user.token, channel.channelId);
         testTagChannel(user.token, tagMsg, expectedMsg,'send');
       });
       test('User is notified when tagged once in a dm', () => {
@@ -114,43 +120,105 @@ describe('Testing notifications', () => {
               channelId: -1,
               dmId: dmId,
               notificationMessage: `${handleStr} tagged you in ${dmName}: ${expectedMsg}`
+            },
+            {
+              channelId: -1,
+              dmId: dmId,
+              notificationMessage: `${handleStr} added you to ${dmName}`
             }
           ]
         });
       });
-      test('User is notified once when tagged twice in a channel', () => {
+      
+      test('User is notified twice when tagged twice in two different messages in a channel', () => {
         const tagMsg = '@haydensmith0, here';
         const expectedMsg = tagMsg;
-        testTagChannel(user.token, tagMsg, expectedMsg, 'send');
-        testTagChannel(user.token, tagMsg, expectedMsg, 'send');
+        requestChannelJoin(user.token, channel.channelId);
+        requestMessageSend(authUser.token, channel.channelId, tagMsg);
+        requestMessageSend(authUser.token, channel.channelId, tagMsg);
+        expect(requestNotifications(user.token)).toStrictEqual({
+          notifications: [
+            {
+              channelId: channel.channelId,
+              dmId: -1,
+              notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
+            },
+            {
+              channelId: channel.channelId,
+              dmId: -1,
+              notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
+            },
+          ]
+        });
       });
-      test('User is notified once when message in channel is edited', () => {
+      test('User is notified once when message in channel is edited to tag them', () => {
         const tagMsg = 'edit@haydensmith0';
         const expectedMsg = tagMsg;
+        requestChannelJoin(user.token, channel.channelId);
         const {messageId} = requestMessageSend(authUser.token, channel.channelId, 'anything');
-        testTagChannel(user.token, tagMsg, expectedMsg, 'edit', messageId);
+        expect(requestMessageEdit(authUser.token, messageId, tagMsg)).toStrictEqual({});
+        expect(requestNotifications(user.token)).toStrictEqual({
+          notifications: [
+            {
+              channelId: channel.channelId,
+              dmId: -1,
+              notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
+            },
+          ]
+        });
+      });
+      test('User is notified once when message in channel is edited twice', () => {
+        const tagMsg = 'edit@haydensmith0';
+        const expectedMsg = tagMsg;
+        requestChannelJoin(user.token, channel.channelId);
+        const {messageId} = requestMessageSend(authUser.token, channel.channelId, 'anything');
+        requestMessageEdit(authUser.token, messageId, tagMsg);
+        requestMessageEdit(authUser.token, messageId, '@haydensmith0');
+        expect(requestNotifications(user.token)).toStrictEqual({
+          notifications: [
+            {
+              channelId: channel.channelId,
+              dmId: -1,
+              notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
+            },
+          ]
+        });
       });
       test('User is notified once when the optional message in message/share tags them', () => {
         const tagMsg = 'good @haydensmith0';
-        const expectedMsg = tagMsg;
+        const expectedMsg = 'good @haydensmith0' + '\n=';
+        requestChannelJoin(user.token, channel.channelId);
         const {messageId} = requestMessageSend(authUser.token, channel.channelId, 'anything');
         testTagChannel(user.token, tagMsg, expectedMsg, 'share', messageId);
       });
       test('Multiple people are notified when tagged', () => {
         const user2 = requestAuthRegister('user2@email.com', password, 'c', 'c');
-        const tagMsg = '@haydensmith0@cc good';
+        const tagMsg = '@haydensmith0@cc g';
         const expectedMsg = tagMsg;
+        requestChannelJoin(user.token, channel.channelId);
+        requestChannelJoin(user2.token, channel.channelId);
+        const {messageId} = requestMessageSend(authUser.token, channel.channelId, 'anything');
         testTagChannel(user.token, tagMsg, expectedMsg, 'send');
-        testTagChannel(user2.token, tagMsg, expectedMsg, 'send');
+        expect(requestNotifications(user2.token)).toStrictEqual({
+          notifications: [
+            {
+              channelId: channel.channelId,
+              dmId: -1,
+              notificationMessage: `${handleStr} tagged you in ${channelName}: ${expectedMsg}`
+            },
+          ]
+        });
       });
       test('User is notified when tagging themselves', () => {
         const tagMsg = '@haydensmith, here';
         const expectedMsg = tagMsg;
+        requestChannelJoin(user.token, channel.channelId);
         testTagChannel(authUser.token, tagMsg, expectedMsg, 'send');
       });
       test('First 20 characters of the message', () => {
         const tagMsg = 'gooood @haydensmith0, well done';
         const expectedMsg = 'gooood @haydensmith0';
+        requestChannelJoin(user.token, channel.channelId);
         testTagChannel(user.token, tagMsg, expectedMsg, 'send');
 
       });
