@@ -1,5 +1,12 @@
 import fs from 'fs';
 
+// NOTIFICATIONS
+interface Notification {
+  channelId: number,
+  dmId: number,
+  notificationMessage: string
+}
+
 // USER TYPES AND INTERFACES
 type id = number;
 type uId = { uId: number };
@@ -34,11 +41,18 @@ type userReturn = { user: UserInfo };
 type allUserReturn = { users: UserInfo[] };
 
 // MESSAGE TYPES AND INTERFACES
+interface React {
+  reactId: number,
+  uIds: number[],
+  isThisUserReacted: boolean
+}
+
 interface Message {
   messageId: number,
   uId: number,
   message: string,
   timeSent: number,
+  reacts?: React[]
 }
 type MessageId = { messageId: number };
 
@@ -96,12 +110,7 @@ interface Standup {
   isActive: boolean,
 }
 
-// NOTIFICATIONS
-interface Notification {
-  channelId: number,
-  dmId: number,
-  notificationMessage: string
-}
+type channelReturn = { channels: ChannelInfo[] };
 
 // RESET CODES
 interface Codes {
@@ -160,7 +169,8 @@ function loadData() {
 }
 
 export { getData, setData };
-export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn, Notification };
+export { channelId, ChannelInfo, channelReturn, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn, Notification };
 export { timeReturn, activeReturn, Standup, standupMsg };
+export { React };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };

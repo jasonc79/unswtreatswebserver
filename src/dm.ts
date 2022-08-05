@@ -1,7 +1,7 @@
 import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
-import {notifyUserInvite} from './notifications'
+import { notifyUserInvite } from './notifications';
 import HTTPError from 'http-errors';
 
 /**

@@ -134,21 +134,21 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
     }
   }
 
-    if (checkValidDmMessage(messageId)) {
-      if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
-        editMessage(token, messageId, message, 'dms');
-        notifyTag(token, message, messageId, -1, dm.dmId);
-      } else {
-        throw HTTPError(403, 'User is not an owner of the dm');
-      }
-    } else if (checkValidChannelMessage(messageId)) {
-      if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
-        editMessage(token, messageId, message, 'channels');
-        notifyTag(token, message, messageId, channel.channelId, -1);
-      } else {
-        throw HTTPError(403, 'User is not an owner of the channel');
-      }
+  if (checkValidDmMessage(messageId)) {
+    if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
+      editMessage(token, messageId, message, 'dms');
+      notifyTag(token, message, messageId, -1, dm.dmId);
+    } else {
+      throw HTTPError(403, 'User is not an owner of the dm');
     }
+  } else if (checkValidChannelMessage(messageId)) {
+    if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
+      editMessage(token, messageId, message, 'channels');
+      notifyTag(token, message, messageId, channel.channelId, -1);
+    } else {
+      throw HTTPError(403, 'User is not an owner of the channel');
+    }
+  }
   return {};
 }
 

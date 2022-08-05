@@ -1,5 +1,5 @@
 import { error, UserInfo, Message, userReturn, OWNER, empty } from './dataStore';
-import { notifyUserInvite, notifyTag } from './notifications';
+import { notifyUserInvite } from './notifications';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken } from './helper';
 import { updateChannel } from './helper';
 import { userProfileV3 } from './users';

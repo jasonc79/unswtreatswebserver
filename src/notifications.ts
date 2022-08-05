@@ -1,14 +1,8 @@
-import { getData, User, Notification, userReturn } from './dataStore';
-import { updateUser, checkValidToken, returnValidUser, returnValidChannel, returnValidDm, returnValidId, getIdfromToken, isMember, isMemberDm } from './helper';
-import {isMemberFromId, isDmMemberFromId} from './helper';
-import { userProfileV3 } from './users';
+import { getData, User, Notification } from './dataStore';
+import { updateUser, checkValidToken, returnValidUser, returnValidChannel, returnValidDm, returnValidId } from './helper';
+import { isMemberFromId, isDmMemberFromId } from './helper';
 import HTTPError from 'http-errors';
 
-
-//=
-  import {getHashOf} from './helper';
-  import {ELEMENT} from './auth';
-// 
 /** NotificationsV1
  *
  * @param {string}  token
@@ -28,7 +22,7 @@ export function notificationsV1(token: string) {
       notificationsArray.shift();
     }
   }
-  
+
   notificationsArray = notificationsArray.reverse();
   return { notifications: notificationsArray };
 }
@@ -36,42 +30,39 @@ export function notificationsV1(token: string) {
 /** Notify tag
  *  Given a message, identifies which users it tags and notifies the respective
  * users
- * @param {string} token 
- * @param {string} message 
- * @param {number} channelId 
- * @param {number} dmId 
+ * @param {string} token
+ * @param {string} message
+ * @param {number} channelId
+ * @param {number} dmId
  */
-export function notifyTag(token: string, message: string, messageId: number, channelId: number, dmId:number ) {
+export function notifyTag(token: string, message: string, messageId: number, channelId: number, dmId:number) {
   const authUser = returnValidUser(token);
-  const {user} = userProfileV3(token, authUser.uId) as userReturn;
-  
-  let handleArray: string[] = extractHandle(message);
+  const handleArray: string[] = extractHandle(message);
   for (const handle of handleArray) {
-      let userFromHandle = getUserfromHandle(handle);
-      if (userFromHandle !== undefined) {
-        if (!isTagged(userFromHandle, messageId)) {
-          if (dmId === -1) {
-            userFromHandle = tagUserChannel(token, authUser, userFromHandle, message, messageId, channelId)
-          } else if (channelId === -1) {
-            userFromHandle = tagUserDm(token, authUser, userFromHandle, message, messageId, dmId);
-          }
-          updateUser(userFromHandle.uId, userFromHandle);
+    let userFromHandle = getUserfromHandle(handle);
+    if (userFromHandle !== undefined) {
+      if (!isTagged(userFromHandle, messageId)) {
+        if (dmId === -1) {
+          userFromHandle = tagUserChannel(token, authUser, userFromHandle, message, messageId, channelId);
+        } else if (channelId === -1) {
+          userFromHandle = tagUserDm(token, authUser, userFromHandle, message, messageId, dmId);
         }
-      
+        updateUser(userFromHandle.uId, userFromHandle);
       }
+    }
   }
 }
 
-function getUserfromHandle(handleStr: string): User | undefined{
-    let data = getData();
-    let user = data.users.find((user: User) => user.handleStr === handleStr);
-    return user;
+function getUserfromHandle(handleStr: string): User | undefined {
+  const data = getData();
+  const user = data.users.find((user: User) => user.handleStr === handleStr);
+  return user;
 }
 
 function tagUserChannel(token: string, authUser: User, user: User, message: string, messageId: number, channelId: number): User {
   if (isMemberFromId(user.uId, channelId)) {
     const channel = returnValidChannel(channelId);
-    const notificationMessage = `${authUser.handleStr} tagged you in ${channel.name}: ${message.slice(0,20)}`;
+    const notificationMessage = `${authUser.handleStr} tagged you in ${channel.name}: ${message.slice(0, 20)}`;
     const newNotification = createNotification(channelId, -1, notificationMessage);
     user.notifications.push(newNotification);
     user.messagesTagged.push(messageId);
@@ -82,7 +73,7 @@ function tagUserChannel(token: string, authUser: User, user: User, message: stri
 function tagUserDm(token: string, authUser: User, user: User, message: string, messageId: number, dmId:number): User {
   if (isDmMemberFromId(user.uId, dmId)) {
     const dm = returnValidDm(dmId);
-    const notificationMessage = `${authUser.handleStr} tagged you in ${dm.name}: ${message.slice(0,20)}`;
+    const notificationMessage = `${authUser.handleStr} tagged you in ${dm.name}: ${message.slice(0, 20)}`;
     const newNotification = createNotification(-1, dmId, notificationMessage);
     user.notifications.push(newNotification);
     user.messagesTagged.push(messageId);
@@ -93,10 +84,10 @@ function isTagged(user: User, messageId: number) {
   return user.messagesTagged.includes(messageId);
 }
 
-/**notifyUserInvite
+/** notifyUserInvite
  * Notify the user when they are added to a channel or dm
- * @param {string} token 
- * @param {number} uId 
+ * @param {string} token
+ * @param {number} uId
  * @param {number} channelId    -1 or channelId
  * @param {number} dmId         -1 or dmId
  */
@@ -109,19 +100,42 @@ export function notifyUserInvite(token: string, uId: number, channelId: number, 
     const channel = returnValidChannel(channelId);
     const notificationMessage = `${authUser.handleStr} added you to ${channel.name}`;
     notification = createNotification(channel.channelId, -1, notificationMessage);
-  } else if (channelId === -1 ) {
+  } else if (channelId === -1) {
   // Create a notification for dm invite
     const dm = returnValidDm(dmId);
     const notificationMessage = `${authUser.handleStr} added you to ${dm.name}`;
     notification = createNotification(-1, dmId, notificationMessage);
   }
- 
+
   user.notifications.push(notification);
   updateUser(uId, user);
 }
-
-export function notifyReact() {
-
+/** notifyReact
+ * @param {number} authUserId   // The person receiving the react
+ * @param {number} uId
+ * @param {number} id           // The channel or dm id
+ * @param {boolean} isChannel   // true for channel, false for dm
+ */
+export function notifyReact(authUserId: number, uId: number, id: number, isChannel: boolean) {
+  const authUser = returnValidId(authUserId);
+  const user = returnValidId(uId);
+  let notification: Notification;
+  // Create a notification for a react in a channel
+  if (isChannel) {
+    const channel = returnValidChannel(id);
+    if (isMemberFromId(authUserId, id)) {
+      const notificationMessage = `${user.handleStr} reacted to your message in ${channel.name}`;
+      notification = createNotification(id, -1, notificationMessage);
+      authUser.notifications.push(notification);
+    }
+  } else if (isDmMemberFromId(authUserId, id)) {
+  // Create a notification for a react in a dm
+    const dm = returnValidDm(id);
+    const notificationMessage = `${user.handleStr} reacted to your message in ${dm.name}`;
+    notification = createNotification(-1, id, notificationMessage);
+    authUser.notifications.push(notification);
+  }
+  updateUser(authUserId, authUser);
 }
 
 function createNotification(channelId: number, dmId: number, notificationMessage: string) : Notification {
@@ -134,20 +148,18 @@ function createNotification(channelId: number, dmId: number, notificationMessage
 }
 
 function extractHandle(message: string) : string[] {
-    let newArray: string[] = message.split(/[^a-zA-Z0-9@]/);
-    newArray = newArray.filter((string) => string.includes('@'));
-    let handleArray: string[] = [];
-    newArray.forEach((string) => {
-      if(string.includes('@')) {
-        let index = string.indexOf('@');
-        string = string.substring(index + 1);
-      }
-      let newString = string.split('@');
-      for (let s of newString) {
-        handleArray.push(s);
-      }
-    });
-    return handleArray;
-  }
-  
-  
+  let newArray: string[] = message.split(/[^a-zA-Z0-9@]/);
+  newArray = newArray.filter((string) => string.includes('@'));
+  const handleArray: string[] = [];
+  newArray.forEach((string) => {
+    if (string.includes('@')) {
+      const index = string.indexOf('@');
+      string = string.substring(index + 1);
+    }
+    const newString = string.split('@');
+    for (const s of newString) {
+      handleArray.push(s);
+    }
+  });
+  return handleArray;
+}

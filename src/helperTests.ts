@@ -19,6 +19,12 @@ export type channelReturn = {
   channelId: number,
   name: string
 }
+
+export type dmReturn = {
+  dmId: number,
+  name: string,
+}
+
 type headers = {
   token?: string
 }
@@ -221,6 +227,17 @@ export function requestStandupActive(token: string, channelId: number, err?: num
 
 export function requestStandupSend(token: string, channelId: number, message: string, err?: number) {
   return requestHelper('POST', '/standup/send/v1', { token: token }, { channelId, message }, err);
+}
+
+//= ===========================================================================//
+// React functions
+//= ===========================================================================//
+export function requestMessageReact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/react/v1', { token: token }, { messageId, reactId }, err);
+}
+
+export function requestMessageUnreact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/unreact/v1', { token: token }, { messageId, reactId }, err);
 }
 
 //= ===========================================================================//
