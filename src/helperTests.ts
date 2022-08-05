@@ -202,11 +202,11 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
 }
 
 export function requestMessagePin(token: string, messageId: number, err?: number) {
-  return requestHelper('PUT', '/message/pin/v1', { token: token }, { messageId }, err);
+  return requestHelper('POST', '/message/pin/v1', { token: token }, { messageId }, err);
 }
 
 export function requestMessageUnpin(token: string, messageId: number, err?: number) {
-  return requestHelper('PUT', '/message/unpin/v1', { token: token }, { messageId }, err);
+  return requestHelper('POST', '/message/unpin/v1', { token: token }, { messageId }, err);
 }
 
 export function requestMessageSendlater(token: string, channelId: number, message: string, timeSent: number, err?: number) {
