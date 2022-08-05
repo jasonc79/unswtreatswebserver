@@ -161,6 +161,19 @@ const authLogoutV1 = (token: token) : object | error => {
   return {};
 };
 
+/**
+ * authPasswordRequest
+ * Given an email address, if the email address belongs to a 
+ * registered user, send them an email containing a secret password reset code.
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} email the email being accessed
+ *
+ * Return values:
+ * @returns { empty } when no error
+ */
+
 type empty = object;
 const authPasswordRequest = (email: string) : empty => {
   const data = getData();
@@ -182,6 +195,22 @@ const authPasswordRequest = (email: string) : empty => {
 
   return {};
 };
+
+/**
+ * authPasswordReset
+ * Given a reset code for a user, set that user's new password to the password provided.
+ * 
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} resetCode the secret code needed to change password
+ * @param {string} newPassword the new password
+ *
+ * Return values:
+ * @returns { error }
+ *    if resetCode is not a valid reset code
+ *    if password entered is less than 6 characters long
+ * @returns { empty } when no error
+ */
 
 const authPasswordReset = (resetCode: string, newPassword: string): empty => {
   if (newPassword.length < 6) {

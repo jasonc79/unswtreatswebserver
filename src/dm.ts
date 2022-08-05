@@ -19,62 +19,6 @@ import HTTPError from 'http-errors';
  *    when there are duplicate 'uId's in uIds
  * @returns { dmId } on no error
  */
-// const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
-//   if (!checkValidToken(token)) {
-//     throw HTTPError(403, 'Invalid token');
-//   }
-
-//   const authUserId = returnValidUser(token);
-//   const authUser = userProfileV3(token, authUserId.uId) as userReturn;
-
-//   // Any uId in uIds does not refer to a valid user
-//   for (const u of uIds) {
-//     if (!checkValidUser(u)) {
-//       throw HTTPError(400, 'uId does not refer to a valid user');
-//     }
-//   }
-//   // There are duplicate uIds in uIds
-//   const uniqueIds = Array.from(new Set(uIds));
-//   if (uIds.length !== uniqueIds.length) {
-//     throw HTTPError(400, 'Duplicate uIds');
-//   }
-
-//   const data = getData();
-//   const dmId = data.dms.length;
-//   const DmMembers = [];
-//   const currTime = Math.floor((new Date()).getTime() / 1000);
-//   const temp1: dmsExist = {
-//     numDmsExist: data.totalDmsExist += 1,
-//     timeStamp: currTime,
-//   };
-//   DmMembers.push(authUser.user);
-//   for (const uId of uIds) {
-//     const DmMember = userProfileV3(token, uId) as userReturn;
-//     DmMembers.push(DmMember.user);
-//   }
-//   const dmName: string = generateDmName(DmMembers);
-//   const newDm : Dm = {
-//     dmId: dmId,
-//     name: dmName,
-//     members: DmMembers,
-//     owners: [authUser.user],
-//     messages: [],
-//   };
-
-//   for (const member of newDm.members) {
-//     const temp: dmsJoined = {
-//       numDmsJoined: data.users[member.uId].totalDmsJoined += 1,
-//       timeStamp: currTime,
-//     };
-//     data.users[member.uId].dmsJoined.push(temp);
-//   }
-
-//   data.dms.push(newDm);
-//   data.dmsExist.push(temp1);
-
-//   setData(data);
-//   return { dmId: dmId };
-// };
 
 const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
@@ -331,23 +275,6 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   return {};
 };
 
-/// /// HELPER FUNCTIONS ///////
-const generateDmName = (DmMembers: UserInfo[]): string => {
-  const DmHandles = [];
-  for (const member of DmMembers) {
-    DmHandles.push(member.handleStr);
-  }
-  const sortedHandles = DmHandles.sort();
-
-  let dmName = '';
-  for (const handle of sortedHandles) {
-    dmName += handle;
-    dmName += ', ';
-  }
-  const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
-  return dmNameFinal;
-};
-
 /**
  * dmMessagesV1
  * Given a DM with ID dmId that the authorised user is a member of,
@@ -406,4 +333,22 @@ function dmMessagesV2(token: string, dmId: number, start: number): (messagesUnde
     end: final,
   };
 }
+
+/// /// HELPER FUNCTIONS ///////
+const generateDmName = (DmMembers: UserInfo[]): string => {
+  const DmHandles = [];
+  for (const member of DmMembers) {
+    DmHandles.push(member.handleStr);
+  }
+  const sortedHandles = DmHandles.sort();
+
+  let dmName = '';
+  for (const handle of sortedHandles) {
+    dmName += handle;
+    dmName += ', ';
+  }
+  const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
+  return dmNameFinal;
+};
+
 export { dmCreateV2, dmLeaveV2, dmMessagesV2, dmDetailsV2, dmListV2, dmRemoveV2 };
