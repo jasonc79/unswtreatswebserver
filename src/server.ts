@@ -306,16 +306,6 @@ app.post('/message/sendlater/v1', (req, res, next) => {
 app.post('/message/sendlaterdm/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    const { messageId, reactId } = req.body;
-    return res.json(messageReactV1(token, messageId, reactId));
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.post('/message/sendlaterdm/v1', (req, res, next) => {
-  try {
-    const token = req.headers.token as string;
     const { dmId, message, timeSent } = req.body;
     return res.json(messageSendlaterdmV1(token, dmId, message, timeSent));
   } catch (err) {

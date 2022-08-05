@@ -857,6 +857,9 @@ describe('Testing messageSendlaterV1', () => {
 
 describe('Testing messageSendlaterdmV1', () => {
   describe('error', () => {
+    afterEach(() => {
+      return pause(1);
+    });
     test('invalid token', () => {
       const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
       const uIds = [];
