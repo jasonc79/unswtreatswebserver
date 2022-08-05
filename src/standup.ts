@@ -178,9 +178,6 @@ function packMessage(token: string, id: number) {
   setData(data);
   if (isMessage) {
     messageSendV1(token, id, packedMessage);
-    if (data.users.length === 2) {
-      //console.log(packedMessage, data.users[0].notifications, data.users[1].notifications);
-      }
   }
 }
 
