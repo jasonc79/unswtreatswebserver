@@ -24,6 +24,7 @@ import {
   returnValidUser,
 } from './helper';
 import HTTPError from 'http-errors';
+import { notifyTag } from './notifications';
 
 /**
  * messageSendV1
@@ -77,6 +78,7 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
   data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
   setData(data);
+  notifyTag(token, message, newMessage.messageId, channelId, -1);
   return { messageId: newMessage.messageId };
 }
 
@@ -132,6 +134,7 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
   data.messagesExist.push(temp);
   data.users[user.uId].messagesSent.push(temp1);
   setData(data);
+  notifyTag(token, message, newMessage.messageId, -1, dmId);
   return { messageId: newMessage.messageId };
 }
 
@@ -180,18 +183,19 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
   if (checkValidDmMessage(messageId)) {
     if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
       editMessage(token, messageId, message, 'dms');
-      return {};
+      notifyTag(token, message, messageId, -1, dm.dmId);
     } else {
       throw HTTPError(403, 'User is not an owner of the dm');
     }
   } else if (checkValidChannelMessage(messageId)) {
     if (checkChannelMessageSender(token, messageId) || isOwner(token, channel.channelId)) {
       editMessage(token, messageId, message, 'channels');
-      return {};
+      notifyTag(token, message, messageId, channel.channelId, -1);
     } else {
       throw HTTPError(403, 'User is not an owner of the channel');
     }
   }
+  return {};
 }
 
 /**
@@ -332,7 +336,7 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
   const msgId = Math.floor(Math.random() * Date.now());
   const seconds = timeSent - Math.floor((new Date()).getTime() / 1000);
   setTimeout(() => { sendChannelMessage(token, channelId, message, msgId); }, seconds * 1000);
-  // console.log('msgId =', msgId);
+
   return { messageId: msgId };
 }
 

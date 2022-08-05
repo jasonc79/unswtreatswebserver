@@ -1,4 +1,5 @@
-import { getData, setData, error, authUserId, token, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist, Codes } from './dataStore';
+import { Codes, User, empty } from './dataStore';
+import { getData, setData, error, authUserId, token, channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist } from './dataStore';
 import { checkValidToken, updateUser, returnValidUser, returnValidId, getHashOf } from './helper';
 import validator from 'validator';
 import HTTPError from 'http-errors';
@@ -57,7 +58,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     timeStamp: currTime,
   };
   // Generate uId using the size of array users and default permission 2
-  const user = {
+  const user: User = {
     uId: data.users.length,
     email: email,
     nameFirst: nameFirst,
@@ -66,6 +67,8 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     password: getHashOf(password + SECRET),
     token: [token],
     permissionId: 2,
+    notifications: [],
+    messagesTagged: [],
     channelsJoined: [temp1],
     dmsJoined: [temp2],
     messagesSent: [temp3],
@@ -160,7 +163,6 @@ const authLogoutV1 = (token: token) : object | error => {
   updateUser(user.uId, user);
   return {};
 };
-
 /**
  * authPasswordRequest
  * Given an email address, if the email address belongs to a
@@ -173,8 +175,6 @@ const authLogoutV1 = (token: token) : object | error => {
  * Return values:
  * @returns { empty } when no error
  */
-
-type empty = object;
 const authPasswordRequest = (email: string) : empty => {
   const data = getData();
   const user = checkEmailExists(email);

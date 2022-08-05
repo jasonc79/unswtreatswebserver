@@ -14,6 +14,8 @@ import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
 import { adminPermissionChangeV1, adminRemoveV1 } from './admin';
+import { notificationsV1 } from './notifications';
+import { messageReactV1, messageUnreactV1 } from './react';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -301,6 +303,46 @@ app.post('/message/sendlater/v1', (req, res, next) => {
   }
 });
 
+app.post('/message/sendlaterdm/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { dmId, message, timeSent } = req.body;
+    return res.json(messageSendlaterdmV1(token, dmId, message, timeSent));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/share/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { ogMessageId, message, channelId, dmId } = req.body;
+    return res.json(messageShareV1(token, ogMessageId, message, channelId, dmId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/react/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId, reactId } = req.body;
+    return res.json(messageReactV1(token, messageId, reactId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/unreact/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId, reactId } = req.body;
+    return res.json(messageUnreactV1(token, messageId, reactId));
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post('/message/pin/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
@@ -321,34 +363,6 @@ app.post('/message/unpin/v1', (req, res, next) => {
   }
 });
 
-app.post('/message/sendlaterdm/v1', (req, res, next) => {
-  try {
-    const token = req.headers.token as string;
-    const { dmId, message, timeSent } = req.body;
-    return res.json(messageSendlaterdmV1(token, dmId, message, timeSent));
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.post('/message/share/v1', (req, res, next) => {
-  try {
-    const token = req.headers.token as string;
-    const { ogMessageId, message, channelId, dmId } = req.body;
-    return res.json(messageShareV1(token, ogMessageId, message, channelId, dmId));
-  } catch (err) {
-    next(err);
-  }
-});
-app.get('/search/v1', (req, res, next) => {
-  try {
-    const token = req.headers.token as string;
-    const queryStr = req.query.queryStr as string;
-    return res.json(searchV1(token, queryStr));
-  } catch (err) {
-    next(err);
-  }
-});
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v2', (req, res, next) => {
@@ -426,7 +440,6 @@ app.post('/standup/start/v1', (req, res, next) => {
 app.get('/standup/active/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
-    // const token = req.query.token as string;
     const channelId = parseInt(req.query.channelId as string);
     return res.json(standupActiveV1(token, channelId));
   } catch (err) {
@@ -473,6 +486,25 @@ app.post('/admin/userpermission/change/v1', (req, res, next) => {
 app.delete('/clear/v1', (req, res, next) => {
   try {
     return res.json(clearV1());
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/search/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const queryStr = req.query.queryStr as string;
+    return res.json(searchV1(token, queryStr));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/notifications/get/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    return res.json(notificationsV1(token));
   } catch (err) {
     next(err);
   }

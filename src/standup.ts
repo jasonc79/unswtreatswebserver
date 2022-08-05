@@ -142,7 +142,6 @@ function standupSendV1(token: string, channelId: number, message: string) {
   } else if (!isMember(token, channelId)) {
     throw HTTPError(403, 'The authorised user is not a member of the channel');
   }
-  // TO DO:  Ignore notifications
   const user = returnValidUser(token);
   const newMsg = {
     handle: user.handleStr,

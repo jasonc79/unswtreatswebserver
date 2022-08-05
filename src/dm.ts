@@ -1,6 +1,7 @@
-import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId, messagesExist, dmsExist, dmsJoined } from './dataStore';
+import { getData, setData, error, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId, messagesExist, dmsExist, dmsJoined } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
+import { notifyUserInvite } from './notifications';
 import HTTPError from 'http-errors';
 
 /**
@@ -41,7 +42,7 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   }
 
   const data = getData();
-  const dmId = data.dms.length;
+  const dmId = Math.floor((new Date()).getTime() / 1000);
   const currTime = Math.floor((new Date()).getTime() / 1000);
   const DmMembers = [];
   DmMembers.push(authUser.user);
@@ -75,6 +76,10 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   data.dmsExist.push(temp1);
 
   setData(data);
+  for (const uId of uIds) {
+    notifyUserInvite(token, uId, -1, dmId);
+  }
+
   return { dmId: dmId };
 };
 
@@ -128,9 +133,9 @@ const dmDetailsV2 = (token: string, dmId: number): dmDetails | error => {
  * Return Values:
  * @returns { } on no error
  */
-const dmListV2 = (token: string): dmReturn | error => {
+const dmListV2 = (token: string): dmReturn => {
   if (!checkValidToken(token)) {
-    return errorMsg;
+    throw HTTPError(403, 'Token is invalid');
   }
 
   const data = getData();
@@ -177,12 +182,12 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
     throw HTTPError(400, 'dmId is invalid');
   }
 
-  if (!isOwnerDm(token, dmId)) {
-    throw HTTPError(403, 'Authorised user is not the original DM creator');
-  }
-
   if (!isMemberDm(token, dmId)) {
     throw HTTPError(403, 'Authorised user is no longer in the DM');
+  }
+
+  if (!isOwnerDm(token, dmId)) {
+    throw HTTPError(403, 'Authorised user is not the original DM creator');
   }
 
   const data = getData();

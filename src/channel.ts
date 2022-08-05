@@ -1,3 +1,4 @@
+import { notifyUserInvite } from './notifications';
 import { error, UserInfo, Message, userReturn, OWNER, empty, getData, setData, channelsJoined } from './dataStore';
 import { checkValidChannel, returnValidChannel, checkValidToken, isGlobalOwner, returnValidUser, isMemberFromId, isOwnerFromId, isMember, isOwner, returnValidId, checkValidUser, getIdfromToken, returnActiveStandup, isActive } from './helper';
 import { updateChannel } from './helper';
@@ -161,6 +162,7 @@ function channelInviteV3(token: string, channelId: number, uId: number): (object
     throw HTTPError(403, 'Authorised user is not a member of the channel');
   }
   channel.allMembers.push(user);
+  notifyUserInvite(token, uId, channelId, -1);
   updateChannel(channelId, channel);
 
   const data = getData();
