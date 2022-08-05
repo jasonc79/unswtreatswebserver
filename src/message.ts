@@ -298,7 +298,6 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
   }
 
   const checkReacts = checkAlreadyReacted(token, messageId, reactId);
-  console.log(checkReacts);
   if (checkReacts === 2) {
     throw HTTPError(400, 'Message already contains react from authorised user');
   }
@@ -347,7 +346,6 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
       currMessage.reacts.push(newReact);
     }
   }
-  console.log(currMessage.reacts);
   setData(data);
   return {};
 }
