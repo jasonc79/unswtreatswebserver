@@ -4,9 +4,9 @@ import { isMemberFromId, isDmMemberFromId } from './helper';
 import HTTPError from 'http-errors';
 
 /** NotificationsV1
- *
+ * Return the user's most recent 20 notifications, ordered from most recent to least recent.
  * @param {string}  token
- *
+ * @returns {notifications}
  */
 export function notificationsV1(token: string) {
   if (!checkValidToken(token)) {

@@ -143,7 +143,7 @@ describe('Testing channelLeaveV2', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     requestStandupStart(authUser.token, channel.channelId, 1, 200);
     requestStandupActive(authUser.token, channel.channelId, 200);
-    requestChannelLeave(authUser.token, channel.channelId, 403);
+    requestChannelLeave(authUser.token, channel.channelId, 400);
   });
   /*
   Add test for standup

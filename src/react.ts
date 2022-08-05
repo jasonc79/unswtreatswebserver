@@ -4,6 +4,14 @@ import { notifyReact } from './notifications';
 import { checkValidChannelMessage, checkValidDmMessage } from './helper';
 import HTTPError from 'http-errors';
 
+/** MessageReactV1
+ * Given a message within a channel or DM the authorised user is part of, add a "react" to that particular message.
+ * @param {string} token
+ * @param {number} messageId
+ * @param {number reactId
+ * @returns
+ *
+ */
 function messageReactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -80,6 +88,13 @@ function messageReactV1 (token: string, messageId: number, reactId: number): err
   return {};
 }
 
+/** MessageUnreactV1
+ *
+ * @param {string} token
+ * @param {number} messageId
+ * @param {number} reactId
+ * @returns
+ */
 function messageUnreactV1 (token: string, messageId: number, reactId: number): error | Record<string, never> {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
