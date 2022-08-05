@@ -8,12 +8,13 @@ import errorHandler from 'middleware-http-errors';
 import { authRegisterV1, authLoginV1, authLogoutV1, authPasswordRequest, authPasswordReset } from './auth';
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
-import { userProfileV3, usersAllV2, userSetNameV2, userSetEmailV2, userSetHandleV2 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messageReactV1, messageUnreactV1 } from './message';
 import { clearV1 } from './other';
-import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
-import { uploadPhotoV1 } from './userprofile'; 
+import { uploadPhotoV1 } from './userprofile';
+import { userProfileV3, usersAllV2, userSetNameV2, userSetEmailV2, userSetHandleV2, userStatsV1, usersStatsV1 } from './users';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1, searchV1, messageReactV1, messageUnreactV1 } from './message';
+import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
+import { adminPermissionChangeV1, adminRemoveV1 } from './admin';
 
 // Set up web app, use JSON
 const app = express();
@@ -235,16 +236,33 @@ app.get('/users/all/v2', (req, res, next) => {
 
 app.post('/user/profile/uploadphoto/v1', (req, res, next) => {
   try {
-    const token = req.headers.token as string; 
+    const token = req.headers.token as string;
     const { imgUrl, xStart, yStart, xEnd, yEnd } = req.body;
     return res.json(uploadPhotoV1(token, imgUrl, xStart, yStart, xEnd, yEnd));
   } catch (err) {
-    next (err); 
+    next(err);
   }
-}); 
+});
 // to access profile pics folder
 // app.use('/static', express.static('profilepics'));
 
+app.get('/user/stats/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    return res.json(userStatsV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/users/stats/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    return res.json(usersStatsV1(token));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // Message functions
 app.post('/message/send/v2', (req, res, next) => {
@@ -297,6 +315,26 @@ app.post('/message/sendlater/v1', (req, res, next) => {
   }
 });
 
+app.post('/message/pin/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId } = req.body;
+    return res.json(messagePinV1(token, parseInt(messageId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/unpin/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId } = req.body;
+    return res.json(messageUnpinV1(token, parseInt(messageId)));
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post('/message/sendlaterdm/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
@@ -315,7 +353,7 @@ app.post('/message/share/v1', (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}); 
+});
 
 app.post('/message/react/v1', (req, res, next) => {
   try {
@@ -336,7 +374,15 @@ app.post('/message/unreact/v1', (req, res, next) => {
     next(err);
   }
 });
-
+app.get('/search/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const queryStr = req.query.queryStr as string;
+    return res.json(searchV1(token, queryStr));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v2', (req, res, next) => {
@@ -432,17 +478,28 @@ app.post('/standup/send/v1', (req, res, next) => {
   }
 });
 
-/*
 // ================================================================ //
-// Server function
-app.get('/search/v1', (req, res, next) => {
+// Admin functions
+
+app.delete('/admin/user/remove/v1', (req, res, next) => {
   try {
-    const queryStr = req.headers.queryStr as string;
-    return res.json(searchV1(queryStr));
+    const token = req.headers.token as string;
+    const uId = parseInt(req.query.uId as string);
+    return res.json(adminRemoveV1(token, uId));
   } catch (err) {
     next(err);
   }
-}); */
+});
+
+app.post('/admin/userpermission/change/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { uId, permissionId } = req.body;
+    return res.json(adminPermissionChangeV1(token, uId, permissionId));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ================================================================ //
 // Other functions
@@ -474,3 +531,5 @@ const server = app.listen(PORT, HOST, () => {
 process.on('SIGINT', () => {
   server.close(() => console.log('Shutting down server gracefully.'));
 });
+
+export { PORT, HOST };

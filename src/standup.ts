@@ -9,6 +9,26 @@ import {
 import HTTPError from 'http-errors';
 import { messageSendV1 } from './message';
 
+/**
+ * standupStartV1
+ * For a given channel, start a standup period lasting length seconds.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId the channelId of the channel to start a standup
+ * @param {number} length duration of the standup in seconds
+ *
+ * Return Values:
+ * @returns { error }
+ *    if invalid token
+ *    if Channel ID does not refer to a valid channel
+ *    if Length cannot be a negative number
+ *    if There is already an active standup in this channel
+ *    if The authorised user is not a member of the channel
+ *
+ * @returns { timeFinish: finish } when no error
+ */
+
 function standupStartV1(token: string, channelId: number, length: number) : timeReturn {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -28,11 +48,13 @@ function standupStartV1(token: string, channelId: number, length: number) : time
   const data = getData();
   const finish = Math.floor((new Date()).getTime() / 1000) + length;
   const seconds = finish - Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
   const newStandup: Standup = {
     channelId: channelId,
     messages: [],
     timeFinish: finish,
-    isActive: true
+    isActive: true,
+    uId: user.uId
   };
   data.standups.push(newStandup);
   setData(data);
@@ -42,6 +64,23 @@ function standupStartV1(token: string, channelId: number, length: number) : time
 
   return { timeFinish: finish };
 }
+
+/**
+ * standupActiveV1
+ * For a given channel, return whether a standup is active in it, and what time the standup finishes.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId the channelId of the channel to start a standup
+ *
+ * Return Values:
+ * @returns { error }
+ *    if invalid token
+ *    if Channel ID does not refer to a valid channel
+ *    if The authorised user is not a member of the channel
+ *
+ * @returns { activeReturn } when no error
+ */
 
 function standupActiveV1(token: string, channelId: number) : activeReturn {
   if (!checkValidToken(token)) {
@@ -70,6 +109,26 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
     timeFinish: null
   };
 }
+
+/**
+ * standupSendV1
+ * For a given channel, if a standup is currently active in the channel, send a message to
+ * get buffered in the standup queue.
+ *
+ * Arguments
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId the channelId of the channel to start a standup
+ * @param {string} message the message to be sent to standup
+ *
+ * Return Values:
+ * @returns { error }
+ *    if invalid token
+ *    if Channel ID does not refer to a valid channel
+ *    if The length of the message is over 1000 characters
+ *    if An active standup is not currently running in the channel
+ *
+ * @returns {} when no error
+ */
 
 function standupSendV1(token: string, channelId: number, message: string) {
   if (!checkValidToken(token)) {

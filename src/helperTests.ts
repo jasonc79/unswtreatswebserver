@@ -13,7 +13,8 @@ const FORBIDDEN = 403;
 // Return types
 export type authUserReturn = {
   token: string,
-  authUserId: number
+  authUserId: number,
+  profileImgUrl: string,
 }
 
 export type createDmReturn = {
@@ -188,7 +189,15 @@ export function requestUserHandle(token: string, handleStr: string, err?: number
 }
 
 export function requestUserUploadPhoto(token: string, imgUrl: string, xStart: number, yStart: number, xEnd: number, yEnd: number, err?: number) {
-  return requestHelper('POST', '/user/profile/uploadphoto/v1', { token: token}, { imgUrl, xStart, yStart, xEnd, yEnd }, err);
+  return requestHelper('POST', '/user/profile/uploadphoto/v1', { token: token }, { imgUrl, xStart, yStart, xEnd, yEnd }, err);
+}
+
+export function requestUserStats(token: string, err?: number) {
+  return requestHelper('GET', '/user/stats/v1', { token: token }, {}, err);
+}
+
+export function requestUsersStats(token: string, err?: number) {
+  return requestHelper('GET', '/users/stats/v1', { token: token }, {}, err);
 }
 
 // Message functions
@@ -208,6 +217,14 @@ export function requestMessageRemove(token: string, messageId: number, err?: num
   return requestHelper('DELETE', '/message/remove/v2', { token: token }, { messageId }, err);
 }
 
+export function requestMessagePin(token: string, messageId: number, err?: number) {
+  return requestHelper('POST', '/message/pin/v1', { token: token }, { messageId }, err);
+}
+
+export function requestMessageUnpin(token: string, messageId: number, err?: number) {
+  return requestHelper('POST', '/message/unpin/v1', { token: token }, { messageId }, err);
+}
+
 export function requestMessageSendlater(token: string, channelId: number, message: string, timeSent: number, err?: number) {
   return requestHelper('POST', '/message/sendlater/v1', { token: token }, { channelId, message, timeSent }, err);
 }
@@ -218,6 +235,18 @@ export function requestMessageSendlaterdm(token: string, dmId: number, message: 
 
 export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
   return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
+}
+export function requestSearch(token: string, queryStr: string, err?: number) {
+  return requestHelper('GET', '/search/v1', { token: token }, { queryStr }, err);
+}
+
+// Admin functions
+
+export function requestAdminRemove(token: string, uId: number, err?: number) {
+  return requestHelper('DELETE', '/admin/user/remove/v1', { token: token }, { uId }, err);
+}
+export function requestUserPermissionChange(token: string, uId: number, permissionId: number, err?: number) {
+  return requestHelper('POST', '/admin/userpermission/change/v1', { token: token }, { uId, permissionId }, err);
 }
 
 export function requestMessageReact(token: string, messageId: number, reactId: number, err?: number) {

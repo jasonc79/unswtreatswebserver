@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message, Standup } from './dataStore';
 import { ELEMENT } from './auth';
 import crypto from 'crypto';
 
@@ -246,7 +246,115 @@ export function returnValidMessagefromDm(messageId: number) : Message {
     }
   }
 }
+// Return a list of channels with same uId
+export function returnChannelListFromUId(uId: number) : Channel[] {
+  const data: Data = getData();
+  const channelList: Channel[] = [];
+  for (const channel of data.channels) {
+    for (const user of channel.allMembers) {
+      if (user.uId === uId) {
+        channelList.push(channel);
+        break;
+      }
+    }
+  }
+  return channelList;
+}
+// Returns a list of dms with same uId
+export function returnDmListFromUId(uId: number) : Dm[] {
+  const data: Data = getData();
+  const dmList: Dm[] = [];
+  for (const dm of data.dms) {
+    for (const user of dm.members) {
+      if (user.uId === uId) {
+        dmList.push(dm);
+        break;
+      }
+    }
+  }
+  return dmList;
+}
 
+export function removeUser(uId: number) {
+  const data: Data = getData();
+  for (const user of data.users) {
+    // Remove user, but still retrivable with user/profile
+    if (user.uId === uId) {
+      user.nameFirst = 'Removed';
+      user.nameLast = 'user';
+      user.email = '';
+      user.handleStr = '';
+      user.profileImgUrl = '';
+    }
+  }
+  // Remove user from all channel
+  for (const user of data.channels) {
+    let memberList = [];
+    for (const members of user.allMembers) {
+      if (members.uId !== uId) {
+        memberList.push(members);
+      }
+    }
+    user.allMembers = memberList;
+    memberList = [];
+    for (const members of user.ownerMembers) {
+      if (members.uId !== uId) {
+        memberList.push(members);
+      }
+    }
+    user.ownerMembers = memberList;
+  }
+  // Remove user from all dm
+  for (const dm of data.dms) {
+    let memberList = [];
+    for (const members of dm.members) {
+      if (members.uId !== uId) {
+        memberList.push(members);
+      }
+    }
+    dm.members = memberList;
+    memberList = [];
+    for (const members of dm.owners) {
+      if (members.uId !== uId) {
+        memberList.push(members);
+      }
+    }
+    dm.members = memberList;
+  }
+  // Remove user messages
+  for (const user of data.channels) {
+    for (const message of user.messages) {
+      if (message.uId === uId) {
+        message.message = 'Removed User';
+      }
+    }
+  }
+  for (const user of data.dms) {
+    for (const message of user.messages) {
+      if (message.uId === uId) {
+        message.message = 'Removed User';
+      }
+    }
+  }
+  setData(data);
+}
+export function returnUserPermission(uId: number) {
+  const data: Data = getData();
+  for (const user of data.users) {
+    if (user.uId === uId) {
+      return user.permissionId;
+    }
+  }
+}
+
+export function returnActiveStandup(channelId: number) : Standup {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return standup;
+    }
+  }
+}
 //= ==========================================================================//
 // GET OR RETURN OBJECTS USING IDS                                                                   //
 //= ==========================================================================//
@@ -362,6 +470,13 @@ export function isOwnerFromId(uId: number, channelId: number) : boolean {
 
 export function isGlobalOwner(token: string) : boolean {
   const user = returnValidUser(token);
+  if (user.permissionId === 1) {
+    return true;
+  }
+  return false;
+}
+export function isGlobalOwnerFromId(uId: number) : boolean {
+  const user = returnValidId(uId);
   if (user.permissionId === 1) {
     return true;
   }

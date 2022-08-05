@@ -1,4 +1,5 @@
-import { error, getData, setData, Message, Channel, Dm, MessageId, React } from './dataStore';
+
+import { error, getData, setData, Message, Channel, Dm, MessageId, React, messagesExist, messagesSent } from './dataStore';
 import {
   checkValidChannel,
   checkValidToken,
@@ -12,7 +13,8 @@ import {
   returnValidDm,
   returnValidMessagefromChannel,
   returnValidMessagefromDm,
-  returnValidUser,
+  returnChannelListFromUId,
+  returnDmListFromUId,
   getIdfromToken,
   getChannelfromMessage,
   getDmfromMessage,
@@ -22,6 +24,8 @@ import {
   isOwnerDm,
   checkReactId,
   checkMessageSource,
+  isGlobalOwner,
+  returnValidUser,
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -38,8 +42,11 @@ import HTTPError from 'http-errors';
  * @returns { error }
  *    if the token is invalid
  *    if the channelId is invalid
+ *    if length of message is less than 1 or over 1000 characters
+ *    if channelId is valid and the authorised user is not a member of the channel
  * @returns { messageId: messageId } if a message is sent without any errors
  */
+
 function messageSendV1(token: string, channelId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -56,16 +63,44 @@ function messageSendV1(token: string, channelId: number, message: string) : Mess
   const data = getData();
   const cuurentChannel = returnValidChannel(channelId);
   const newMessage = createMessage(token, message);
-
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   for (const channel of data.channels) {
     if (channel.channelId === cuurentChannel.channelId) {
       channel.messages.push(newMessage);
     }
   }
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+  data.users[user.uId].messagesSent.push(temp1);
   setData(data);
-
   return { messageId: newMessage.messageId };
 }
+
+/**
+ * messageSenddmV1
+ * Send a message from authorisedUser to the DM specified by dmId.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} dmId is the id of the dm beign accessed
+ * @param {string} message is the message the user wants to send
+ *
+ * Return Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if the dmId is invalid
+ *    if length of message is less than 1 or over 1000 characters
+ *    if dmId is valid and the authorised user is not a member of the DM
+ * @returns { messageId: messageId } if a message is sent without any errors
+ */
 
 function messageSenddmV1(token: string, dmId: number, message: string) : MessageId | error {
   if (!checkValidToken(token)) {
@@ -80,16 +115,26 @@ function messageSenddmV1(token: string, dmId: number, message: string) : Message
   if (message.length < 1 || message.length > 1000) {
     throw HTTPError(400, 'Length of message must be 1-1000 inclusive');
   }
-
   const data = getData();
   const cuurentDm = returnValidDm(dmId);
   const newMessage = createMessage(token, message);
-
+  const user = returnValidUser(token);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
   for (const dm of data.dms) {
     if (dm.dmId === cuurentDm.dmId) {
       dm.messages.push(newMessage);
     }
   }
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+  data.users[user.uId].messagesSent.push(temp1);
   setData(data);
   return { messageId: newMessage.messageId };
 }
@@ -168,6 +213,7 @@ function messageEditV1(token: string, messageId: number, message: string) : obje
  *
  * @returns {} if message is removed with no errors
  */
+
 function messageRemoveV1(token: string, messageId: number) : object | error {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -190,6 +236,7 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
   }
 
   const data = getData();
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
 
   if (checkValidDmMessage(messageId)) {
     if (checkDmMessageSender(token, messageId) || isOwnerDm(token, dm.dmId)) {
@@ -208,6 +255,11 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           dm.messages = messageList;
         }
       }
+      const temp: messagesExist = {
+        numMessagesExist: data.totalMessagesExist += -1,
+        timeStamp: timeStamp,
+      };
+      data.messagesExist.push(temp);
       setData(data);
       return {};
     } else {
@@ -231,6 +283,11 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
           channel.messages = messageList;
         }
       }
+      const temp: messagesExist = {
+        numMessagesExist: data.totalMessagesExist += -1,
+        timeStamp: timeStamp,
+      };
+      data.messagesExist.push(temp);
       setData(data);
       return {};
     } else {
@@ -238,6 +295,27 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
     }
   }
 }
+
+/**
+ * messageSendlaterV1
+ * Send a message from the authorised user to the channel specified by channelId
+ * automatically at a specified time in the future
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel beign accessed
+ * @param {string} message is the message the user wants to send
+ * @param {number} timeSent is the time that the message should be sent
+ *
+ * Return Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if the channelId is invalid
+ *    if length of message is less than 1 or over 1000 characters
+ *    if timeSent is a time in the past
+ *    if user is not a member of the channel they are trying to post to
+ * @returns { messageId: msgId } if a message is set to be sent without any errors
+ */
 
 function messageSendlaterV1(token: string, channelId: number, message: string, timeSent: number) : MessageId | error {
   if (!checkValidToken(token)) {
@@ -261,6 +339,27 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
   // console.log('msgId =', msgId);
   return { messageId: msgId };
 }
+
+/**
+ * messageSendlaterdmV1
+ * Send a message from the authorised user to the dm specified by dmId
+ * automatically at a specified time in the future
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} dmId is the id of the dm beign accessed
+ * @param {string} message is the message the user wants to send
+ * @param {number} timeSent is the time that the message should be sent
+ *
+ * Return Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if the dmId is invalid
+ *    if length of message is less than 1 or over 1000 characters
+ *    if timeSent is a time in the past
+ *    if user is not a member of the dm they are trying to post to
+ * @returns { messageId: msgId } if a message is set to be sent without any errors
+ */
 
 function messageSendlaterdmV1(token: string, dmId: number, message: string, timeSent: number) : MessageId | error {
   if (!checkValidToken(token)) {
@@ -412,41 +511,27 @@ function messageUnreactV1 (token: string, messageId: number, reactId: number): e
   return {};
 }
 
-// helper function
-function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
-  const data = getData();
-  const cuurentChannel = returnValidChannel(channelId);
-  const newMessage = {
-    messageId: msgId,
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-  };
-  for (const channel of data.channels) {
-    if (channel.channelId === cuurentChannel.channelId) {
-      channel.messages.push(newMessage);
-    }
-  }
-  setData(data);
-}
-
-function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
-  const data = getData();
-  const cuurentDm = returnValidDm(dmId);
-  const newMessage = {
-    messageId: msgId,
-    uId: getIdfromToken(token),
-    message: message,
-    timeSent: Math.floor((new Date()).getTime() / 1000),
-  };
-
-  for (const dm of data.dms) {
-    if (dm.dmId === cuurentDm.dmId) {
-      dm.messages.push(newMessage);
-    }
-  }
-  setData(data);
-}
+/**
+ * messageShareV1
+ * A new message containing the contents of both the original message and the optional
+ * message should be sent to the channel/DM identified by the channelId/dmId.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} channelId is the id of the channel beign accessed
+ * @param {number} dmId is the id of the dm beign accessed
+ * @param {string} ogMessageId is the original messageId the user wants to share
+ * @param {string} message is the additional message the user wants to send
+ *
+ * Return Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if both channelId and dmId are invalid
+ *    if length of message is less than 1 or over 1000 characters
+ *    if ogMessageId does not refer to a valid message
+ *    if user has not joined the channel/DM they are trying to share the message to
+ * @returns { sharedMessageId: newMessageId } if a message is shared without any errors
+ */
 
 function messageShareV1(token: string, ogMessageId: number, message: string, channelId: number, dmId: number) {
   if (!checkValidToken(token)) {
@@ -484,10 +569,160 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
     }
     newMessageId = (messageSenddmV1(token, dmId, concatMessage) as MessageId).messageId;
   }
+
   return { sharedMessageId: newMessageId };
 }
 
-// helper function
+/**
+ * messagePinV1
+ * Given a message within a channel or DM, mark it as "pinned".
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} messageId is the id of the message beign accessed
+ *
+ * Returns Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the message is invalid
+ *    if the message is already pinned
+ *    if message exists but user is not part of channel/dm
+ *
+ * @returns {} if message is pinned with no errors
+ */
+function messagePinV1(token: string, messageId: number): (object) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  const data = getData();
+  let message;
+  for (const channel of data.channels) {
+    message = channel.messages.find(message => message.messageId === messageId);
+    if (message !== undefined) {
+      if (!isOwner(token, channel.channelId) && !isGlobalOwner(token)) {
+        throw HTTPError(403, 'messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel');
+      }
+    }
+  }
+  for (const dm of data.dms) {
+    message = dm.messages.find(message => message.messageId === messageId);
+    if (message !== undefined) {
+      if (!isOwnerDm(token, dm.dmId) && !isGlobalOwner(token)) {
+        throw HTTPError(403, 'messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM');
+      }
+    }
+  }
+  if (message === undefined) {
+    throw HTTPError(400, 'messageId is not a valid message within a channel or DM that the authorised user has joined');
+  }
+  if (message.isPinned === true) {
+    throw HTTPError(400, 'the message is already pinned');
+  }
+  message.isPinned = true;
+  setData(data);
+  return {};
+}
+
+/**
+ * messageUnpinV1
+ * Given a message within a channel or DM, remove its mark as "pinned".
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} messageId is the id of the message beign accessed
+ *
+ * Returns Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if the message is invalid
+ *    if the message is already not pinned
+ *    if message exists but user is not part of channel/dm
+ *
+ * @returns {} if message is removed pinned with no errors
+ */
+function messageUnpinV1(token: string, messageId: number): (object) {
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  const data = getData();
+  let message;
+  for (const channel of data.channels) {
+    message = channel.messages.find(message => message.messageId === messageId);
+    if (message !== undefined) {
+      if (!isOwner(token, channel.channelId) && !isGlobalOwner(token)) {
+        throw HTTPError(403, 'messageId refers to a valid message in a joined channel and the authorised user does not have owner permissions in the channel');
+      }
+    }
+  }
+  for (const dm of data.dms) {
+    message = dm.messages.find(message => message.messageId === messageId);
+    if (message !== undefined) {
+      if (!isOwnerDm(token, dm.dmId) && !isGlobalOwner(token)) {
+        throw HTTPError(403, 'messageId refers to a valid message in a joined DM and the authorised user does not have owner permissions in the DM');
+      }
+    }
+  }
+  if (message === undefined) {
+    throw HTTPError(400, 'messageId is not a valid message within a channel or DM that the authorised user has joined');
+  }
+  if (message.isPinned === false) {
+    throw HTTPError(400, 'the message is not already pinned');
+  }
+  message.isPinned = false;
+  setData(data);
+  return {};
+}
+
+/**
+ * searchV1
+ * Given a query string, return a collection of messages in all of the
+ * channels/DMs that the user has joined that contain the query
+ * (case-insensitive). There is no expected order for these messages.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} queryStr is the queryStr that is used to search through each message
+ *
+ * Returns Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if length of queryStr is less than 1 or over 1000 characters
+ * @returns { messages } if pass with no errors
+ */
+
+function searchV1(token: string, queryStr: string) {
+  queryStr = queryStr.toLowerCase();
+  const queryStrLength = queryStr.length;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  const messages = [];
+  if (queryStrLength < 1) {
+    throw HTTPError(400, 'Length of queryStr is less than 1 character long');
+  } if (queryStrLength > 1000) {
+    throw HTTPError(400, 'Length of queryStr is more than 1000 characters long');
+  }
+  const uId = getIdfromToken(token);
+  const channelList = returnChannelListFromUId(uId);
+  const dmList = returnDmListFromUId(uId);
+  for (const channel of channelList) {
+    for (const message of channel.messages) {
+      if (message.message.toLowerCase().includes(queryStr)) {
+        messages.push(message);
+      }
+    }
+  }
+  for (const dm of dmList) {
+    for (const message of dm.messages) {
+      if (message.message.toLowerCase().includes(queryStr)) {
+        messages.push(message);
+      }
+    }
+  }
+  return { messages };
+}
+
+// helper functions
 const genEditMessage = (dataProp: Channel[] | Dm[]) => {
   return (id: number, message: string) : Channel[] | Dm[] => {
     for (const item of dataProp) {
@@ -523,6 +758,7 @@ function createMessage(token: string, messageStr: string): Message {
     uId: getIdfromToken(token),
     message: messageStr,
     timeSent: Math.floor((new Date()).getTime() / 1000),
+    isPinned: false,
   };
   return message;
 }
@@ -532,5 +768,64 @@ function concatMessageString(ogMessage: string, optionalMessage: string): string
   return newMessage;
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messageReactV1, messageUnreactV1 };
+function sendChannelMessage(token: string, channelId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentChannel = returnValidChannel(channelId);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: timeStamp,
+    isPinned: false,
+  };
+  for (const channel of data.channels) {
+    if (channel.channelId === cuurentChannel.channelId) {
+      channel.messages.push(newMessage);
+    }
+  }
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+  data.users[user.uId].messagesSent.push(temp1);
+  setData(data);
+}
 
+function sendDmMessage(token: string, dmId: number, message: string, msgId: number) {
+  const data = getData();
+  const cuurentDm = returnValidDm(dmId);
+  const timeStamp = Math.floor((new Date()).getTime() / 1000);
+  const user = returnValidUser(token);
+  const newMessage = {
+    messageId: msgId,
+    uId: getIdfromToken(token),
+    message: message,
+    timeSent: timeStamp,
+    isPinned: false,
+  };
+  for (const dm of data.dms) {
+    if (dm.dmId === cuurentDm.dmId) {
+      dm.messages.push(newMessage);
+    }
+  }
+  const temp: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += 1,
+    timeStamp: timeStamp,
+  };
+  const temp1: messagesSent = {
+    numMessagesSent: data.users[user.uId].totalMessagesSent += 1,
+    timeStamp: timeStamp,
+  };
+  data.messagesExist.push(temp);
+  data.users[user.uId].messagesSent.push(temp1);
+  setData(data);
+}
+
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1, searchV1, messageReactV1, messageUnreactV1 };

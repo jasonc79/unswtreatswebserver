@@ -8,6 +8,36 @@ type authUserId = {
   authUserId: number
 };
 
+interface channelsJoined {
+  numChannelsJoined: number,
+  timeStamp: number,
+}
+
+interface dmsJoined {
+  numDmsJoined: number,
+  timeStamp: number,
+}
+
+interface messagesSent {
+  numMessagesSent: number,
+  timeStamp: number,
+}
+
+interface channelsExist {
+  numChannelsExist: number,
+  timeStamp: number,
+}
+
+interface dmsExist {
+  numDmsExist: number,
+  timeStamp: number,
+}
+
+interface messagesExist {
+  numMessagesExist: number,
+  timeStamp: number,
+}
+
 interface User {
   uId: number,
   email: string,
@@ -17,6 +47,13 @@ interface User {
   token: token[],
   password: string,
   permissionId: number,
+  channelsJoined: channelsJoined[],
+  dmsJoined: dmsJoined[],
+  messagesSent: messagesSent[],
+  totalChannelsJoined: number,
+  totalDmsJoined: number,
+  totalMessagesSent: number,
+  profileImgUrl: string,
 }
 
 interface UserInfo {
@@ -25,6 +62,7 @@ interface UserInfo {
   nameFirst: string,
   nameLast: string,
   handleStr: string,
+  profileImgUrl: string,
 }
 
 type userReturn = { user: UserInfo };
@@ -43,6 +81,7 @@ interface Message {
   message: string,
   timeSent: number,
   reacts?: React[]
+  isPinned: boolean,
 }
 type MessageId = { messageId: number };
 
@@ -97,7 +136,8 @@ interface Standup {
   channelId: number,
   messages: standupMsg[],
   timeFinish: number,
-  isActive: boolean
+  isActive: boolean,
+  uId: number
 }
 
 type channelReturn = { channels: ChannelInfo[] };
@@ -115,6 +155,12 @@ type Data = {
   users: User[],
   channels: Channel[],
   dms: Dm[],
+  channelsExist: channelsExist[],
+  dmsExist: dmsExist[],
+  messagesExist: messagesExist[],
+  totalMessagesExist: number,
+  totalDmsExist: number,
+  totalChannelsExist: number,
   standups: Standup[]
   resetCodes: Codes[]
 }
@@ -132,6 +178,12 @@ let data: Data = {
   users: [],
   channels: [],
   dms: [],
+  channelsExist: [],
+  dmsExist: [],
+  messagesExist: [],
+  totalMessagesExist: 0,
+  totalDmsExist: 0,
+  totalChannelsExist: 0,
   standups: [],
   resetCodes: []
 };
@@ -160,6 +212,7 @@ function loadData() {
 
 export { getData, setData };
 export { channelId, ChannelInfo, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn, React, channelReturn };
+export { channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist };
 export { timeReturn, activeReturn, Standup, standupMsg };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
 export { error, errorMsg, empty, OWNER, MEMBER };

@@ -1,5 +1,5 @@
+import { requestMessageSenddm, requestChannelCreate, requestDmRemove, requestChannelJoin, requestUserSetName, requestMessageSend, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile, requestUserStats, requestUsersStats, requestDmCreate, requestStandupStart, requestStandupActive, requestStandupSend } from './helperTests';
 import { authUserReturn, requestAuthRegister, requestClear } from './helperTests';
-import { requestUserSetName, requestUserEmail, requestUserHandle, requestAllUsers, requestUserProfile } from './helperTests';
 import { removeFile } from './helperTests';
 
 const email = 'email@gmail.com';
@@ -48,6 +48,7 @@ describe('Testing userProfileV3', () => {
         nameFirst: nameFirst2,
         nameLast: nameLast2,
         handleStr: handleStr2,
+        profileImgUrl: profile.user.profileImgUrl,
       }
     });
   });
@@ -130,6 +131,7 @@ describe('Testing usersAllV2', () => {
   describe('Valid Token', () => {
     test('one user', () => {
       const users = requestAllUsers(authUser.token, 200);
+      const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
       expect(users).toStrictEqual({
         users: [
           {
@@ -137,15 +139,19 @@ describe('Testing usersAllV2', () => {
             email: email,
             nameFirst: nameFirst,
             nameLast: nameLast,
-            handleStr: handleStr
+            handleStr: handleStr,
+            profileImgUrl: userInfo.user.profileImgUrl,
           }
         ]
       });
     });
 
     test('multiple users', () => {
+      const profile1 = requestUserProfile(authUser.token, authUser.authUserId);
       const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+      const profile2 = requestUserProfile(authUser2.token, authUser.authUserId);
       const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+      const profile3 = requestUserProfile(authUser3.token, authUser.authUserId);
       const users = requestAllUsers(authUser.token, 200);
       expect(users).toStrictEqual({
         users: [
@@ -154,7 +160,8 @@ describe('Testing usersAllV2', () => {
             email: email,
             nameFirst: nameFirst,
             nameLast: nameLast,
-            handleStr: handleStr
+            handleStr: handleStr,
+            profileImgUrl: profile1.user.profileImgUrl,
           },
           {
             uId: authUser2.authUserId,
@@ -162,6 +169,7 @@ describe('Testing usersAllV2', () => {
             nameFirst: nameFirst2,
             nameLast: nameLast2,
             handleStr: handleStr2,
+            profileImgUrl: profile2.user.profileImgUrl,
           },
           {
             uId: authUser3.authUserId,
@@ -169,6 +177,7 @@ describe('Testing usersAllV2', () => {
             nameFirst: nameFirst3,
             nameLast: nameLast3,
             handleStr: handleStr3,
+            profileImgUrl: profile3.user.profileImgUrl,
           }
         ]
       });
@@ -178,5 +187,150 @@ describe('Testing usersAllV2', () => {
   test('Invalid uId', () => {
     const uId = authUser.authUserId + 1;
     requestUserProfile(authUser.token, uId, 400);
+  });
+});
+
+describe('Testing usersStats', () => {
+  test('Invalid token', () => {
+    requestUsersStats('bad', 403);
+  });
+  test('equal 0', () => {
+    const stats = requestUsersStats(authUser.token, 200);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(0);
+  });
+  test('random pass scenario', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+    const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    requestChannelJoin(authUser3.token, channel.channelId);
+    const stats = requestUsersStats(authUser.token);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
+  });
+  test('random pass scenario', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3);
+    const channel = requestChannelCreate(authUser.token, 'name', true);
+    requestChannelJoin(authUser2.token, channel.channelId);
+    const stats = requestUsersStats(authUser.token);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
+  });
+  test('random pass scenario', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    const stats = requestUsersStats(authUser.token, 200);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
+  });
+  test('random pass scenario', async () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    requestStandupStart(authUser.token, channel.channelId, 1, 200);
+    requestStandupActive(authUser.token, channel.channelId, 200);
+    requestStandupSend(authUser.token, channel.channelId, 'message', 200);
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const stats = requestUsersStats(authUser.token, 200);
+    expect(stats.workspaceStats.utilizationRate).toStrictEqual(expect.any(Number));
+  });
+});
+
+describe('Testing userStats', () => {
+  test('Invalid token', () => {
+    requestUserStats('bad', 403);
+  });
+  test('equal 0', () => {
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(0);
+  });
+  test('random pass scenario', () => {
+    requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser.token, 'name2', true, 200);
+    requestChannelCreate(authUser.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
+  });
+  test('random pass scenario', () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    const stats = requestUserStats(authUser.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
+  });
+  test('random pass scenario', async () => {
+    const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+    requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+    const channel = requestChannelCreate(authUser.token, 'name', true, 200);
+    requestChannelCreate(authUser.token, 'name1', true, 200);
+    requestChannelCreate(authUser2.token, 'name2', true, 200);
+    requestChannelCreate(authUser2.token, 'name3', true, 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message4', 200);
+    requestMessageSend(authUser.token, channel.channelId, 'message5', 200);
+
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestMessageSenddm(authUser.token, dm.dmId, 'message1');
+    requestMessageSenddm(authUser.token, dm.dmId, 'message2');
+    requestMessageSenddm(authUser2.token, dm.dmId, 'message3');
+    requestDmRemove(authUser.token, dm.dmId);
+
+    requestStandupStart(authUser.token, channel.channelId, 1, 200);
+    requestStandupActive(authUser.token, channel.channelId, 200);
+    requestStandupSend(authUser.token, channel.channelId, 'message', 200);
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const stats = requestUserStats(authUser2.token, 200);
+    expect(stats.userStats.involvementRate).toStrictEqual(expect.any(Number));
   });
 });
