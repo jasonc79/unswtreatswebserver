@@ -78,6 +78,11 @@ describe('Testing dm/create/v2', () => {
 });
 
 describe('Testing dm/details/v2', () => {
+  test('Invalid token', () => {
+    const uIds = generateUserIds();
+    const dm = requestDmCreate(authUser.token, uIds, 200);
+    requestDmDetails(authUser.token + 1, dm.dmId, 403);
+  });
   test('dmId does not refer to a valid DM', () => {
     const authUser = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
     const dm = -1;
@@ -123,6 +128,12 @@ describe('Testing dm/details/v2', () => {
 });
 
 describe('Testing dm/list/v2', () => {
+  test('Invalid token', () => {
+    const uIds = generateUserIds();
+    requestDmCreate(authUser.token, uIds, 200);
+    requestDmList(authUser.token + 1, 403);
+  });
+
   test('0 dms, empty list', () => {
     const dmList = requestDmList(authUser.token);
     expect(dmList).toStrictEqual({ dms: [] });
@@ -164,9 +175,20 @@ describe('Testing dm/list/v2', () => {
 });
 
 describe('Testing dm/remove/v2', () => {
+  test('Invalid token', () => {
+    const uIds = generateUserIds();
+    const dm = requestDmCreate(authUser.token, uIds, 200);
+    requestDmRemove(authUser.token + 1, dm.dmId, 403);
+  });
   test('dmId does not refer to a valid DM', () => {
     const dm = -1;
     requestDmRemove(authUser.token, dm, 400);
+  });
+  test('user is not in the DM', () => {
+    const uIds = generateUserIds();
+    const uId2 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+    const dm = requestDmCreate(authUser.token, uIds, 200);
+    requestDmRemove(uId2.token, dm.dmId, 403);
   });
   test('dmId has already been removed', () => {
     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
