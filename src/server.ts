@@ -9,11 +9,11 @@ import { authRegisterV1, authLoginV1, authLogoutV1, authPasswordRequest, authPas
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
 import { userProfileV3, usersAllV2, userSetNameV2, userSetEmailV2, userSetHandleV2, userStatsV1, usersStatsV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1 } from './message';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1, searchV1 } from './message';
 import { clearV1 } from './other';
 import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
-
+import { adminPermissionChangeV1, adminRemoveV1 } from './admin';
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -340,7 +340,15 @@ app.post('/message/share/v1', (req, res, next) => {
     next(err);
   }
 });
-
+app.get('/search/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const queryStr = req.query.queryStr as string;
+    return res.json(searchV1(token, queryStr));
+  } catch (err) {
+    next(err);
+  }
+});
 // ================================================================ //
 // dm functions
 app.post('/dm/create/v2', (req, res, next) => {
@@ -436,17 +444,28 @@ app.post('/standup/send/v1', (req, res, next) => {
   }
 });
 
-/*
 // ================================================================ //
-// Server function
-app.get('/search/v1', (req, res, next) => {
+// Admin functions
+
+app.delete('/admin/user/remove/v1', (req, res, next) => {
   try {
-    const queryStr = req.headers.queryStr as string;
-    return res.json(searchV1(queryStr));
+    const token = req.headers.token as string;
+    const uId = parseInt(req.query.uId as string);
+    return res.json(adminRemoveV1(token, uId));
   } catch (err) {
     next(err);
   }
-}); */
+});
+
+app.post('/admin/userpermission/change/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { uId, permissionId } = req.body;
+    return res.json(adminPermissionChangeV1(token, uId, permissionId));
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ================================================================ //
 // Other functions

@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestDmCreate, requestChannelJoin, requestChannelMessages, requestDmMessages, requestClear } from './helperTests';
-import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageSendlater, requestMessageSendlaterdm, requestMessageShare, requestMessagePin, requestMessageUnpin } from './helperTests';
+import { requestMessageSend, requestMessageSenddm, requestMessageEdit, requestMessageRemove, requestMessageSendlater, requestMessageSendlaterdm, requestMessageShare, requestMessagePin, requestMessageUnpin, requestSearch } from './helperTests';
 import { removeFile } from './helperTests';
 import { channelId, MessageId, dmId } from './dataStore';
 
@@ -16,6 +16,9 @@ const password2 = 'password2';
 const nameFirst2 = 'firstname2';
 const nameLast2 = 'lastname2';
 // const handleStr2 = 'firstname2lastname2';
+
+const tooShortQueryStr = '';
+const tooLongQueryStr = 'a'.repeat(1001);
 
 // ===========================================================================//
 // HELPER FUNCTIONS
@@ -1246,5 +1249,91 @@ describe('Testing messageunpin', () => {
       );
       checkTimestamp(messages.messages[0].timeSent, expectedTime);
     });
+  });
+});
+describe('Testing searchV1', () => {
+  test('Invalid Token', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch('invalidToken', 'mess', 403);
+  });
+  test('QueryStr too short', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch(user.token, tooShortQueryStr, 400);
+  });
+  test('QueryStr too long', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    requestMessageSend(user.token, channel.channelId, 'message');
+    requestSearch(user.token, tooLongQueryStr, 400);
+  });
+  test('Success case 1', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    const message = requestMessageSend(user.token, channel.channelId, 'message');
+    const messageList = requestSearch(user.token, 'mess', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: message.messageId,
+            uId: user.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            isPinned: false
+          },
+        ],
+      })
+    );
+  });
+  test('Success case with both channelMessage and dmMessage', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    const dm = requestDmCreate(authUser.token, [user.authUserId]);
+    const channelMessage = requestMessageSend(user.token, channel.channelId, 'message');
+    const dmMessage = requestMessageSenddm(user.token, dm.dmId, 'message1');
+    const messageList = requestSearch(user.token, 'mess', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: channelMessage.messageId,
+            uId: user.authUserId,
+            message: 'message',
+            timeSent: expect.any(Number),
+            isPinned: false
+          },
+          {
+            messageId: dmMessage.messageId,
+            uId: user.authUserId,
+            message: 'message1',
+            timeSent: expect.any(Number),
+            isPinned: false
+          },
+        ],
+      })
+    );
+  });
+  test('Test case-sensitivity', () => {
+    const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+    const channel = requestChannelCreate(user.token, 'name', true);
+    const message = requestMessageSend(user.token, channel.channelId, 'MEssaGe');
+    const messageList = requestSearch(user.token, 'meSs', 200);
+    expect(messageList).toStrictEqual(
+      expect.objectContaining({
+        messages: [
+          {
+            messageId: message.messageId,
+            uId: user.authUserId,
+            message: 'MEssaGe',
+            timeSent: expect.any(Number),
+            isPinned: false
+          },
+        ],
+      })
+    );
   });
 });
