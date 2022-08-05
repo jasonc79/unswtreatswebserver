@@ -1,5 +1,5 @@
 import { authUserReturn, requestAuthRegister, requestChannelCreate, requestChannelMessages } from './helperTests';
-import { requestStandupStart, requestStandupActive, requestStandupSend } from './helperTests';
+import { requestStandupStart, requestStandupActive, requestStandupSend, requestNotifications } from './helperTests';
 import { removeFile, requestClear } from './helperTests';
 
 let authUser: authUserReturn;
@@ -17,8 +17,8 @@ const handleStr = 'haydensmith';
 
 const email2 = 'hayden2@gmail.com';
 const password2 = 'hayden1234';
-const nameFirst2 = 'Hayden2';
-const nameLast2 = 'Smith2';
+const nameFirst2 = 'Hayden';
+const nameLast2 = 'Smith';
 //= ===========================================================================//
 // HELPER FUNCTIONS
 const sleep = (ms:number) => new Promise(r => setTimeout(r, ms));
@@ -169,7 +169,17 @@ describe('Testing standupSendV1', () => {
           start: 0,
           end: -1
         });
-        // TEST CASE NO @ should be parsed as proper tags
+      });
+
+      test('Tagged Message does not trigger a notification', async () => {
+        const user = requestAuthRegister('email@email.com', password, nameFirst, nameLast);
+        const tagMsg = '@haydensmith0';
+        const channel = createActiveStandup();
+        expect(requestStandupSend(authUser.token, channel.channelId, tagMsg, 200)).toStrictEqual({});
+        await new Promise((r) => setTimeout(r, 2000));
+        expect(requestNotifications(user.token)).toStrictEqual({
+          notifications: []
+        });
       });
     });
     afterEach(() => {

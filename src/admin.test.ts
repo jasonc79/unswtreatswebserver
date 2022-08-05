@@ -109,7 +109,7 @@ describe('Testing admin remove', () => {
         end: -1
       })
     );
-    const dmMessages = requestDmMessages(authUser.token, channel1.channelId, 0);
+    const dmMessages = requestDmMessages(authUser.token, dm.dmId, 0);
     expect(dmMessages).toStrictEqual(
       expect.objectContaining({
         messages: [
