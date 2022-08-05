@@ -463,7 +463,7 @@ app.use(errorHandler());
 app.use(morgan('dev'));
 
 // to access profile pics folder
-app.use('/static', express.static('profilepics'));
+app.use('/img', express.static('profilepics'));
 
 // start server
 const server = app.listen(PORT, HOST, () => {

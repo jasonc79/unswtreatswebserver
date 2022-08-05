@@ -11,37 +11,41 @@ function uploadPhotoV1(token: string, imgUrl: string, xStart: number, yStart: nu
         throw HTTPError(403, 'Token is invalid');
     }
 
+    const fileType: string = imgUrl.substring(imgUrl.length - 3); 
+    if (fileType !== 'jpg') {
+        throw HTTPError(400, 'Image uploaded is not a JPG')
+    }
+
     const res = request('GET', imgUrl);
     const body = res.getBody();
-    const image = `profilepics/${ token }.jpg`;
+    const uniqueUrl = Math.floor(Math.random() * Date.now());
+    const image = `profilepics/${ uniqueUrl }.jpg`;
     fs.writeFileSync(image, body, { flag: 'w' });
 
     if (res.statusCode !== 200) {
+        fs.unlinkSync(image); 
         throw HTTPError(400, 'Error when attempting to retrieve image'); 
     }
 
     const dimensions = sizeOf(image); 
     if (xStart < 0 || yStart < 0 || xEnd > dimensions.width || yEnd > dimensions.height) {
+        fs.unlinkSync(image);
         throw HTTPError(400, 'Crop bounds are outside dimensions of the image');
     }
 
     if (xEnd <= xStart || yEnd <= yStart) {
+        fs.unlinkSync(image);
         throw HTTPError(400, 'Invalid crop bounds'); 
-    }
-
-    const fileType: string = imgUrl.substring(imgUrl.length - 3); 
-    if (fileType !== 'jpg') {
-        throw HTTPError(400, 'Image uploaded is not a JPG')
     }
     
     // Cropping the image
-    const imageName = `profilepics/${ token }`;
+    const imageName = `profilepics/${ uniqueUrl }`;
     Jimp.read(image, (err, imageName ) => {
         if (err) throw err; 
         imageName.crop(xStart, yStart, xEnd, yEnd); 
-        imageName.write(`profilepics/cropped-${ token }.jpg`);
-        // Remove old file? 
+        imageName.write(`profilepics/cropped-${ uniqueUrl }.jpg`);
     })
+    fs.unlinkSync(image);
     return {}; 
 }; 
 
