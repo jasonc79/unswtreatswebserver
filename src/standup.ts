@@ -25,7 +25,7 @@ import { messageSendV1 } from './message';
  *    if Length cannot be a negative number
  *    if There is already an active standup in this channel
  *    if The authorised user is not a member of the channel
- *    
+ *
  * @returns { timeFinish: finish } when no error
  */
 
@@ -78,7 +78,7 @@ function standupStartV1(token: string, channelId: number, length: number) : time
  *    if invalid token
  *    if Channel ID does not refer to a valid channel
  *    if The authorised user is not a member of the channel
- *    
+ *
  * @returns { activeReturn } when no error
  */
 
@@ -112,7 +112,7 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
 
 /**
  * standupSendV1
- * For a given channel, if a standup is currently active in the channel, send a message to 
+ * For a given channel, if a standup is currently active in the channel, send a message to
  * get buffered in the standup queue.
  *
  * Arguments
@@ -126,7 +126,7 @@ function standupActiveV1(token: string, channelId: number) : activeReturn {
  *    if Channel ID does not refer to a valid channel
  *    if The length of the message is over 1000 characters
  *    if An active standup is not currently running in the channel
- *    
+ *
  * @returns {} when no error
  */
 

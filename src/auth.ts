@@ -163,9 +163,9 @@ const authLogoutV1 = (token: token) : object | error => {
 
 /**
  * authPasswordRequest
- * Given an email address, if the email address belongs to a 
+ * Given an email address, if the email address belongs to a
  * registered user, send them an email containing a secret password reset code.
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {string} email the email being accessed
@@ -199,7 +199,7 @@ const authPasswordRequest = (email: string) : empty => {
 /**
  * authPasswordReset
  * Given a reset code for a user, set that user's new password to the password provided.
- * 
+ *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {string} resetCode the secret code needed to change password

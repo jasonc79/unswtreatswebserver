@@ -10,7 +10,7 @@ import HTTPError from 'http-errors';
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
  * @param {number} uId the id of the user that's details are being searched for
- * 
+ *
  * Return Values:
  * @returns { error }
  *    if token is invalid
@@ -46,7 +46,7 @@ function userProfileV3(token: string, uId: number) : error | userReturn {
  * @param {string} token tells the server who is currently accessing it
  * @param {string} nameFirst The first name of the user
  * @param {string} nameLast The last name of the user
- * 
+ *
  * Return Values:
  * @returns { error }
  *    if token is invalid

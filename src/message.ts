@@ -292,7 +292,7 @@ function messageRemoveV1(token: string, messageId: number) : object | error {
 
 /**
  * messageSendlaterV1
- * Send a message from the authorised user to the channel specified by channelId 
+ * Send a message from the authorised user to the channel specified by channelId
  * automatically at a specified time in the future
  *
  * Arguments:
@@ -336,7 +336,7 @@ function messageSendlaterV1(token: string, channelId: number, message: string, t
 
 /**
  * messageSendlaterdmV1
- * Send a message from the authorised user to the dm specified by dmId 
+ * Send a message from the authorised user to the dm specified by dmId
  * automatically at a specified time in the future
  *
  * Arguments:
@@ -379,8 +379,8 @@ function messageSendlaterdmV1(token: string, dmId: number, message: string, time
 
 /**
  * messageShareV1
- * A new message containing the contents of both the original message and the optional 
- * message should be sent to the channel/DM identified by the channelId/dmId. 
+ * A new message containing the contents of both the original message and the optional
+ * message should be sent to the channel/DM identified by the channelId/dmId.
  *
  * Arguments:
  * @param {string} token tells the server who is currently accessing it
@@ -456,7 +456,7 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
  *
  * @returns {} if message is pinned with no errors
  */
- function messagePinV1(token: string, messageId: number): (object) {
+function messagePinV1(token: string, messageId: number): (object) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
   }
