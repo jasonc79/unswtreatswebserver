@@ -213,6 +213,18 @@ export function requestMessageSendlaterdm(token: string, dmId: number, message: 
 export function requestMessageShare(token: string, ogMessageId: number, message: string, channelId: number, dmId: number, err?: number) {
   return requestHelper('POST', '/message/share/v1', { token: token }, { ogMessageId, message, channelId, dmId }, err);
 }
+export function requestSearch(token: string, queryStr: string, err?: number) {
+  return requestHelper('GET', '/search/v1', { token: token }, { queryStr }, err);
+}
+
+// Admin functions
+
+export function requestAdminRemove(token: string, uId: number, err?: number) {
+  return requestHelper('DELETE', '/admin/user/remove/v1', { token: token }, { uId }, err);
+}
+export function requestUserPermissionChange(token: string, uId: number, permissionId: number, err?: number) {
+  return requestHelper('POST', '/admin/userpermission/change/v1', { token: token }, { uId, permissionId }, err);
+}
 
 //= ===========================================================================//
 // Standup functions

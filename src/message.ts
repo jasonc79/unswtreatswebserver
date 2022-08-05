@@ -11,6 +11,8 @@ import {
   returnValidDm,
   returnValidMessagefromChannel,
   returnValidMessagefromDm,
+  returnChannelListFromUId,
+  returnDmListFromUId,
   getIdfromToken,
   getChannelfromMessage,
   getDmfromMessage,
@@ -357,6 +359,55 @@ function messageShareV1(token: string, ogMessageId: number, message: string, cha
   return { sharedMessageId: newMessageId };
 }
 
+/**
+ * searchV1
+ * Given a query string, return a collection of messages in all of the
+ * channels/DMs that the user has joined that contain the query
+ * (case-insensitive). There is no expected order for these messages.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} queryStr is the queryStr that is used to search through each message
+ *
+ * Returns Values:
+ * @returns { error }
+ *    if the token is invalid
+ *    if length of queryStr is less than 1 or over 1000 characters
+ * @returns { messages } if pass with no errors
+ */
+
+function searchV1(token: string, queryStr: string) {
+  queryStr = queryStr.toLowerCase();
+  const queryStrLength = queryStr.length;
+  if (!checkValidToken(token)) {
+    throw HTTPError(403, 'Token is invalid');
+  }
+  const messages = [];
+  if (queryStrLength < 1) {
+    throw HTTPError(400, 'Length of queryStr is less than 1 character long');
+  } if (queryStrLength > 1000) {
+    throw HTTPError(400, 'Length of queryStr is more than 1000 characters long');
+  }
+  const uId = getIdfromToken(token);
+  const channelList = returnChannelListFromUId(uId);
+  const dmList = returnDmListFromUId(uId);
+  for (const channel of channelList) {
+    for (const message of channel.messages) {
+      if (message.message.toLowerCase().includes(queryStr)) {
+        messages.push(message);
+      }
+    }
+  }
+  for (const dm of dmList) {
+    for (const message of dm.messages) {
+      if (message.message.toLowerCase().includes(queryStr)) {
+        messages.push(message);
+      }
+    }
+  }
+  return { messages };
+}
+
 // helper function
 const genEditMessage = (dataProp: Channel[] | Dm[]) => {
   return (id: number, message: string) : Channel[] | Dm[] => {
@@ -402,4 +453,4 @@ function concatMessageString(ogMessage: string, optionalMessage: string): string
   return newMessage;
 }
 
-export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1 };
+export { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, searchV1 };
