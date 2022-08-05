@@ -11,6 +11,12 @@ function clearV1(): empty {
   data.users = [];
   data.channels = [];
   data.dms = [];
+  data.channelsExist = [];
+  data.dmsExist = [];
+  data.messagesExist = [];
+  data.totalMessagesExist = 0;
+  data.totalDmsExist = 0;
+  data.totalChannelsExist = 0;
   data.standups = [];
   data.resetCodes = [];
   setData(data);

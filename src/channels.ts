@@ -1,4 +1,4 @@
-import { error, Channel, userReturn, channelId, getData, setData } from './dataStore';
+import { error, Channel, userReturn, channelId, getData, setData, channelsJoined, channelsExist } from './dataStore';
 import { checkValidToken, returnValidUser } from './helper';
 import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
@@ -24,6 +24,7 @@ type channelsList = { channels: channelReturn[] };
  *    invald name length
  * @returns { channelId } when no error
  */
+
 function channelsCreateV1(token: string, name: string, isPublic: boolean) : error | channelId {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Token is invalid');
@@ -34,6 +35,7 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
   const data = getData();
   const user = returnValidUser(token);
   const channelId = data.channels.length;
+  const currTime = Math.floor((new Date()).getTime() / 1000);
 
   const newChannel : Channel = {
     channelId: channelId,
@@ -43,6 +45,19 @@ function channelsCreateV1(token: string, name: string, isPublic: boolean) : erro
     ownerMembers: [user],
     isPublic: isPublic,
   };
+
+  const temp: channelsJoined = {
+    numChannelsJoined: data.users[user.uId].totalChannelsJoined += 1,
+    timeStamp: currTime,
+  };
+  data.users[user.uId].channelsJoined.push(temp);
+
+  const temp1: channelsExist = {
+    numChannelsExist: data.totalChannelsExist += 1,
+    timeStamp: currTime,
+  };
+  data.channelsExist.push(temp1);
+
   data.channels.push(newChannel);
   setData(data);
 

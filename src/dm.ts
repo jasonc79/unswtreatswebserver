@@ -1,4 +1,4 @@
-import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId } from './dataStore';
+import { getData, setData, error, errorMsg, Message, Dm, DmInfo, userReturn, UserInfo, dmReturn, dmId, messagesExist, dmsExist, dmsJoined } from './dataStore';
 import { checkValidToken, checkValidUser, returnValidUser, checkValidDm, returnValidDm, getIdfromToken, isMemberDm, isOwnerDm } from './helper';
 import { userProfileV3 } from './users';
 import { notifyUserInvite } from './notifications';
@@ -20,6 +20,7 @@ import HTTPError from 'http-errors';
  *    when there are duplicate 'uId's in uIds
  * @returns { dmId } on no error
  */
+
 const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -41,8 +42,8 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
   }
 
   const data = getData();
-  const dmId = data.dms.length;
-
+  const dmId = Math.floor((new Date()).getTime() / 1000);
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   const DmMembers = [];
   DmMembers.push(authUser.user);
   for (const uId of uIds) {
@@ -59,6 +60,21 @@ const dmCreateV2 = (token: string, uIds: number[]): dmId | error => {
     messages: [],
   };
   data.dms.push(newDm);
+
+  for (const member of newDm.members) {
+    const temp: dmsJoined = {
+      numDmsJoined: data.users[member.uId].totalDmsJoined += 1,
+      timeStamp: currTime,
+    };
+    data.users[member.uId].dmsJoined.push(temp);
+  }
+
+  const temp1: dmsExist = {
+    numDmsExist: data.totalDmsExist += 1,
+    timeStamp: currTime,
+  };
+  data.dmsExist.push(temp1);
+
   setData(data);
   for (const uId of uIds) {
     notifyUserInvite(token, uId, -1, dmId);
@@ -156,6 +172,7 @@ const dmListV2 = (token: string): dmReturn | error => {
  *    when dmId is valid and the authorised user is no longer in the DM
  * @returns { } on no error
  */
+
 const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -175,8 +192,29 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
 
   const data = getData();
   const dmDetails = returnValidDm(dmId);
+  const dmMessages = (dmDetails.messages.length) * (-1);
+  const currTime = Math.floor((new Date()).getTime() / 1000);
+
+  for (const member of dmDetails.members) {
+    const temp: dmsJoined = {
+      numDmsJoined: data.users[member.uId].totalDmsJoined += -1,
+      timeStamp: currTime,
+    };
+    data.users[member.uId].dmsJoined.push(temp);
+  }
+  const temp1: dmsExist = {
+    numDmsExist: data.totalDmsExist += -1,
+    timeStamp: currTime,
+  };
+  const temp2: messagesExist = {
+    numMessagesExist: data.totalMessagesExist += dmMessages,
+    timeStamp: currTime,
+  };
+
+  data.dmsExist.push(temp1);
+  data.messagesExist.push(temp2);
   data.dms = data.dms.filter((item) => {
-    return item !== dmDetails;
+    return item.dmId !== dmDetails.dmId;
   });
   setData(data);
   return {};
@@ -199,6 +237,7 @@ const dmRemoveV2 = (token: string, dmId: number): Record<string, never> | error 
  *    when dmId is valid and the authorised user is no longer in the DM
  * @returns { } on no error
  */
+
 const dmLeaveV2 = (token: string, dmId: number) : error | object => {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -214,7 +253,7 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
 
   const data = getData();
   const user = userProfileV3(token, getIdfromToken(token)) as userReturn;
-
+  const currTime = Math.floor((new Date()).getTime() / 1000);
   let leaveDm: Dm;
   for (const dm of data.dms) {
     if (dm.dmId === dmId) {
@@ -230,25 +269,15 @@ const dmLeaveV2 = (token: string, dmId: number) : error | object => {
       return item.uId !== user.user.uId;
     });
   }
+
+  const temp: dmsJoined = {
+    numDmsJoined: data.users[user.user.uId].totalDmsJoined += -1,
+    timeStamp: currTime,
+  };
+  data.users[user.user.uId].dmsJoined.push(temp);
+
   setData(data);
   return {};
-};
-
-/// /// HELPER FUNCTIONS ///////
-const generateDmName = (DmMembers: UserInfo[]): string => {
-  const DmHandles = [];
-  for (const member of DmMembers) {
-    DmHandles.push(member.handleStr);
-  }
-  const sortedHandles = DmHandles.sort();
-
-  let dmName = '';
-  for (const handle of sortedHandles) {
-    dmName += handle;
-    dmName += ', ';
-  }
-  const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
-  return dmNameFinal;
 };
 
 /**
@@ -309,4 +338,22 @@ function dmMessagesV2(token: string, dmId: number, start: number): (messagesUnde
     end: final,
   };
 }
+
+/// /// HELPER FUNCTIONS ///////
+const generateDmName = (DmMembers: UserInfo[]): string => {
+  const DmHandles = [];
+  for (const member of DmMembers) {
+    DmHandles.push(member.handleStr);
+  }
+  const sortedHandles = DmHandles.sort();
+
+  let dmName = '';
+  for (const handle of sortedHandles) {
+    dmName += handle;
+    dmName += ', ';
+  }
+  const dmNameFinal = dmName.slice(0, -2); // Remove final comma and space
+  return dmNameFinal;
+};
+
 export { dmCreateV2, dmLeaveV2, dmMessagesV2, dmDetailsV2, dmListV2, dmRemoveV2 };

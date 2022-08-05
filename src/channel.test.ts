@@ -1,4 +1,4 @@
-import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails, requestMessageSend } from './helperTests';
+import { requestChannelCreate, requestChannelMessages, requestChannelInvite, requestChannelAddOwner, requestChannelRemoveOwner, requestChannelJoin, requestChannelLeave, requestChannelDetails, requestMessageSend, requestStandupStart, requestStandupActive } from './helperTests';
 import { authUserReturn, requestAuthRegister, requestUserProfile, requestClear } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -16,6 +16,10 @@ afterEach(() => {
 });
 
 describe('Testing channelMessagesV1', () => {
+  test('Invalid token', () => {
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelMessages('bad', channel.channelId, 0, 403);
+  });
   test('Empty messages', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     const messages = requestChannelMessages(authUser.token, channel.channelId, 0, 200);
@@ -134,6 +138,12 @@ describe('Testing channelLeaveV2', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     requestChannelLeave(authUser2.token, channel.channelId, 403);
+  });
+  test('uId is creater of an active standup', () => {
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestStandupStart(authUser.token, channel.channelId, 1, 200);
+    requestStandupActive(authUser.token, channel.channelId, 200);
+    requestChannelLeave(authUser.token, channel.channelId, 403);
   });
   /*
   Add test for standup
@@ -331,6 +341,13 @@ describe('Testing channelRemoveOwnerV1', () => {
     const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
     requestChannelJoin(authUser2.token, channel.channelId, 200);
     requestChannelRemoveOwner(authUser2.token, channel.channelId, authUser2.authUserId, 403);
+  });
+  test('invalid token', () => {
+    const authUser = requestAuthRegister('emai1@gmail.com', 'password1', 'firstname1', 'lastname1', 200);
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const channel = requestChannelCreate(authUser.token, 'correct name', true, 200);
+    requestChannelJoin(authUser2.token, channel.channelId, 200);
+    requestChannelRemoveOwner('bad', channel.channelId, authUser2.authUserId, 403);
   });
 });
 

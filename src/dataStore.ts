@@ -16,6 +16,36 @@ type authUserId = {
   authUserId: number
 };
 
+interface channelsJoined {
+  numChannelsJoined: number,
+  timeStamp: number,
+}
+
+interface dmsJoined {
+  numDmsJoined: number,
+  timeStamp: number,
+}
+
+interface messagesSent {
+  numMessagesSent: number,
+  timeStamp: number,
+}
+
+interface channelsExist {
+  numChannelsExist: number,
+  timeStamp: number,
+}
+
+interface dmsExist {
+  numDmsExist: number,
+  timeStamp: number,
+}
+
+interface messagesExist {
+  numMessagesExist: number,
+  timeStamp: number,
+}
+
 interface User {
   uId: number,
   email: string,
@@ -27,6 +57,12 @@ interface User {
   permissionId: number,
   notifications: Notification[],
   messagesTagged: id[];
+  channelsJoined: channelsJoined[],
+  dmsJoined: dmsJoined[],
+  messagesSent: messagesSent[],
+  totalChannelsJoined: number,
+  totalDmsJoined: number,
+  totalMessagesSent: number,
 }
 
 interface UserInfo {
@@ -53,6 +89,7 @@ interface Message {
   message: string,
   timeSent: number,
   reacts?: React[]
+  isPinned: boolean,
 }
 type MessageId = { messageId: number };
 
@@ -108,6 +145,7 @@ interface Standup {
   messages: standupMsg[],
   timeFinish: number,
   isActive: boolean,
+  uId: number
 }
 
 type channelReturn = { channels: ChannelInfo[] };
@@ -125,6 +163,12 @@ type Data = {
   users: User[],
   channels: Channel[],
   dms: Dm[],
+  channelsExist: channelsExist[],
+  dmsExist: dmsExist[],
+  messagesExist: messagesExist[],
+  totalMessagesExist: number,
+  totalDmsExist: number,
+  totalChannelsExist: number,
   standups: Standup[]
   resetCodes: Codes[]
 }
@@ -142,6 +186,12 @@ let data: Data = {
   users: [],
   channels: [],
   dms: [],
+  channelsExist: [],
+  dmsExist: [],
+  messagesExist: [],
+  totalMessagesExist: 0,
+  totalDmsExist: 0,
+  totalChannelsExist: 0,
   standups: [],
   resetCodes: []
 };
@@ -170,6 +220,7 @@ function loadData() {
 
 export { getData, setData };
 export { channelId, ChannelInfo, channelReturn, Data, Channel, Message, MessageId, Dm, dmId, DmInfo, dmReturn, Notification };
+export { channelsJoined, dmsJoined, messagesSent, channelsExist, dmsExist, messagesExist };
 export { timeReturn, activeReturn, Standup, standupMsg };
 export { React };
 export { authUserId, User, UserInfo, userReturn, allUserReturn, uId, token, Codes };
