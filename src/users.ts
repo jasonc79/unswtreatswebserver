@@ -3,26 +3,20 @@ import { returnValidId, checkValidToken, checkValidUser, updateUser, returnValid
 import { checkValidEmail } from './auth';
 import HTTPError from 'http-errors';
 
-/*
-userProfileV1 checks if authUserId and uId are valid and then returns an object containing
-an array of objects containing the user's details
-
-Arguments:
-    authUserId (number)     - holds the id of the user that is searching for the infomation
-    uId (number)            - holds the id of the user that's details are being searched for
-
-Return Value:
-    Returns
-        { users:
-            uId: user.uId,
-            email: user.email,
-            nameFirst: user.nameFirst,
-            nameLast: user.nameLast,
-            handleStr: user.handleStr,
-        }
-        on if authUserId and uId are valid
-    Returns { error: 'error' } on an invalid authUserId or uId
-*/
+/**
+ * userProfileV3
+ * For a valid user, returns information about their userId, email, first name, last name, and handle
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {number} uId the id of the user that's details are being searched for
+ * 
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if uId does not refer to a valid user
+ * @returns { user } if there is no error
+ */
 
 function userProfileV3(token: string, uId: number) : error | userReturn {
   if (!checkValidUser(uId)) {
@@ -44,19 +38,22 @@ function userProfileV3(token: string, uId: number) : error | userReturn {
   };
 }
 
-/*
-Update the authorised user's first and last name
-
-Arguments:
-    token (string)     -  The token of the user
-    nameFirst (string) - The first name of the user
-    nameLast (string)  - The last name of the user
-
-Return Value:
-    Returns {error: 'error'}  on invalid email
-    Returns {error: 'error'}  when email is already being used by another user
-    Returns {} on no error
-*/
+/**
+ * userSetNameV2
+ * Update the authorised user's first and last name
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} nameFirst The first name of the user
+ * @param {string} nameLast The last name of the user
+ * 
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if length of nameFirst is not between 1 and 50 characters inclusive
+ *    if length of nameLast is not between 1 and 50 characters inclusive
+ * @returns {} if there is no error
+ */
 
 function userSetNameV2(token: string, nameFirst: string, nameLast: string) : object | error {
   const firstNameLength = nameFirst.length;
@@ -76,18 +73,23 @@ function userSetNameV2(token: string, nameFirst: string, nameLast: string) : obj
   updateUser(user.uId, user);
   return {};
 }
-/*
-Update the authorised user's email address
 
-Arguments:
-    token (string)     -  The token of the user
-    email (string)     - The email of the user
-
-Return Value:
-    Returns {error: 'error'}  on invalid email
-    Returns {error: 'error'}  when email is already being used by another user
-    Returns {} on no error
+/**
+ * userSetEmailV2
+ * Update the authorised user's email address
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} email the email of the user
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if invalid user email
+ *    if the email is already used by another user
+ * @returns {} if there is no error
  */
+
 function userSetEmailV2(token: string, email: string) {
   email = email.toLowerCase();
   if (!checkValidEmail(email)) {
@@ -102,19 +104,24 @@ function userSetEmailV2(token: string, email: string) {
   return {};
 }
 
-/*
-Update the authorised user's handle (i.e. display name)
-
-Arguments:
-    token (string)     -  The token of the user
-    handleStr (string)  - The handle string of the user
-
-Return Value:
-    Returns {error: 'error'}  on invalid user handle
-    Returns {error: 'error'}  when handle length is less than 3 or greater than 3 characters
-    Returns {error: 'error'}  on handle without non-alphanumeric characters
-    Returns {} on no error
+/**
+ * userSetHandleV2
+ * Update the authorised user's handle (i.e. display name)
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ * @param {string} handleStr the handle string of the user
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ *    if invalid user handlestr
+ *    if on handle without non-alphanumeric characters
+ *    if when handle length is less than 3 or greater than 20 characters
+ *    iv the handle is already used by another user
+ * @returns {} if there is no error
  */
+
 function userSetHandleV2(token: string, handleStr: string) {
   const handleLength = handleStr.length;
   if (handleLength > 20 || handleLength < 3) {
@@ -135,6 +142,19 @@ function userSetHandleV2(token: string, handleStr: string) {
   updateUser(user.uId, user);
   return {};
 }
+
+/**
+ * usersAllV2
+ * Returns an array of all users and their associated details.
+ *
+ * Arguments:
+ * @param {string} token tells the server who is currently accessing it
+ *
+ * Return Values:
+ * @returns { error }
+ *    if token is invalid
+ * @returns { users: userDetails } if there is no error
+ */
 
 function usersAllV2(token: string) : error | allUserReturn {
   if (!checkValidToken(token)) {
@@ -170,6 +190,7 @@ type returnWorkspaceStats = { workspaceStats: workspaceStats};
  *    if token is invalid
  * @returns {returnWorkspaceStats} if there is no error
  */
+
 function usersStatsV1(token: string) : (returnWorkspaceStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
@@ -213,6 +234,7 @@ type returnUserStats = { userStats: userStats};
  *    if token is invalid
  * @returns {returnUserStats} if there is no error
  */
+
 function userStatsV1(token: string) : (returnUserStats) {
   if (!checkValidToken(token)) {
     throw HTTPError(403, 'Invalid token');
