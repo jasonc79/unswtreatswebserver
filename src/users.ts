@@ -34,6 +34,7 @@ function userProfileV3(token: string, uId: number) : error | userReturn {
       nameFirst: user.nameFirst,
       nameLast: user.nameLast,
       handleStr: user.handleStr,
+      profileImgUrl: user.profileImgUrl,
     }
   };
 }

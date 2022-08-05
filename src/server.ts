@@ -8,12 +8,14 @@ import errorHandler from 'middleware-http-errors';
 import { authRegisterV1, authLoginV1, authLogoutV1, authPasswordRequest, authPasswordReset } from './auth';
 import { dmCreateV2, dmDetailsV2, dmListV2, dmRemoveV2, dmLeaveV2, dmMessagesV2 } from './dm';
 import { channelsCreateV1, channelsListV1, channelsListallV1 } from './channels';
-import { userProfileV3, usersAllV2, userSetNameV2, userSetEmailV2, userSetHandleV2, userStatsV1, usersStatsV1 } from './users';
-import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1, searchV1 } from './message';
 import { clearV1 } from './other';
-import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { standupStartV1, standupActiveV1, standupSendV1 } from './standup';
+import { uploadPhotoV1 } from './userprofile';
+import { userProfileV3, usersAllV2, userSetNameV2, userSetEmailV2, userSetHandleV2, userStatsV1, usersStatsV1 } from './users';
+import { messageSendV1, messageSenddmV1, messageEditV1, messageRemoveV1, messageSendlaterV1, messageSendlaterdmV1, messageShareV1, messagePinV1, messageUnpinV1, searchV1, messageReactV1, messageUnreactV1 } from './message';
+import { channelMessagesV3, channelDetailsV2, channelLeaveV2, channelAddOwnerV2, channelRemoveOwnerV2, channelJoinV1, channelInviteV3 } from './channel';
 import { adminPermissionChangeV1, adminRemoveV1 } from './admin';
+
 // Set up web app, use JSON
 const app = express();
 app.use(express.json());
@@ -232,6 +234,18 @@ app.get('/users/all/v2', (req, res, next) => {
   }
 });
 
+app.post('/user/profile/uploadphoto/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { imgUrl, xStart, yStart, xEnd, yEnd } = req.body;
+    return res.json(uploadPhotoV1(token, imgUrl, xStart, yStart, xEnd, yEnd));
+  } catch (err) {
+    next(err);
+  }
+});
+// to access profile pics folder
+// app.use('/static', express.static('profilepics'));
+
 app.get('/user/stats/v1', (req, res, next) => {
   try {
     const token = req.headers.token as string;
@@ -336,6 +350,26 @@ app.post('/message/share/v1', (req, res, next) => {
     const token = req.headers.token as string;
     const { ogMessageId, message, channelId, dmId } = req.body;
     return res.json(messageShareV1(token, ogMessageId, message, channelId, dmId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/react/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId, reactId } = req.body;
+    return res.json(messageReactV1(token, messageId, reactId));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/message/unreact/v1', (req, res, next) => {
+  try {
+    const token = req.headers.token as string;
+    const { messageId, reactId } = req.body;
+    return res.json(messageUnreactV1(token, messageId, reactId));
   } catch (err) {
     next(err);
   }
@@ -485,6 +519,9 @@ app.use(errorHandler());
 // for logging errors
 app.use(morgan('dev'));
 
+// to access profile pics folder
+app.use('/img', express.static('profilepics'));
+
 // start server
 const server = app.listen(PORT, HOST, () => {
   console.log(`⚡️ Server listening on port ${PORT} at ${HOST}`);
@@ -494,3 +531,5 @@ const server = app.listen(PORT, HOST, () => {
 process.on('SIGINT', () => {
   server.close(() => console.log('Shutting down server gracefully.'));
 });
+
+export { PORT, HOST };

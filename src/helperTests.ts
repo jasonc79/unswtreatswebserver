@@ -13,8 +13,20 @@ const FORBIDDEN = 403;
 // Return types
 export type authUserReturn = {
   token: string,
-  authUserId: number
+  authUserId: number,
+  profileImgUrl: string,
 }
+
+export type createDmReturn = {
+  dmId: number,
+  name: string,
+}
+
+export type createChannelReturn = {
+  channelId: number,
+  name: string
+}
+
 type headers = {
   token?: string
 }
@@ -176,6 +188,10 @@ export function requestUserHandle(token: string, handleStr: string, err?: number
   return requestHelper('PUT', '/user/profile/sethandle/v2', { token: token }, { handleStr }, err);
 }
 
+export function requestUserUploadPhoto(token: string, imgUrl: string, xStart: number, yStart: number, xEnd: number, yEnd: number, err?: number) {
+  return requestHelper('POST', '/user/profile/uploadphoto/v1', { token: token }, { imgUrl, xStart, yStart, xEnd, yEnd }, err);
+}
+
 export function requestUserStats(token: string, err?: number) {
   return requestHelper('GET', '/user/stats/v1', { token: token }, {}, err);
 }
@@ -231,6 +247,14 @@ export function requestAdminRemove(token: string, uId: number, err?: number) {
 }
 export function requestUserPermissionChange(token: string, uId: number, permissionId: number, err?: number) {
   return requestHelper('POST', '/admin/userpermission/change/v1', { token: token }, { uId, permissionId }, err);
+}
+
+export function requestMessageReact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/react/v1', { token: token }, { messageId, reactId }, err);
+}
+
+export function requestMessageUnreact(token: string, messageId: number, reactId: number, err?: number) {
+  return requestHelper('POST', '/message/unreact/v1', { token: token }, { messageId, reactId }, err);
 }
 
 //= ===========================================================================//

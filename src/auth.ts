@@ -3,6 +3,7 @@ import { checkValidToken, updateUser, returnValidUser, returnValidId, getHashOf 
 import validator from 'validator';
 import HTTPError from 'http-errors';
 import nodemailer from 'nodemailer';
+import { PORT, HOST } from './server';
 
 export const SECRET = 'Teatime';
 export const ELEMENT = 'Water';
@@ -56,6 +57,9 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     numMessagesSent: 0,
     timeStamp: currTime,
   };
+
+  const profileImgUrl = `http://${HOST}:${PORT}/img/defaultpfp.jpg`;
+
   // Generate uId using the size of array users and default permission 2
   const user = {
     uId: data.users.length,
@@ -72,6 +76,7 @@ const authRegisterV1 = (email: string, password: string, nameFirst: string, name
     totalChannelsJoined: 0,
     totalDmsJoined: 0,
     totalMessagesSent: 0,
+    profileImgUrl: profileImgUrl,
   };
   // Global owner
   if (user.uId === 0) {

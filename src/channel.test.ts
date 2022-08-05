@@ -75,14 +75,16 @@ describe('Testing channelDetailsV2', () => {
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         }],
         ownerMembers: [{
           uId: userInfo.user.uId,
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         }],
       })
     );
@@ -121,7 +123,8 @@ describe('Testing channelLeaveV2', () => {
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         }],
       })
     );
@@ -170,21 +173,24 @@ describe('Testing channelAddOwnerV1', () => {
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         }],
         allMembers: [{
           uId: userInfo.user.uId,
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         },
         {
           uId: newUserInfo.user.uId,
           email: newUserInfo.user.email,
           handleStr: newUserInfo.user.handleStr,
           nameFirst: newUserInfo.user.nameFirst,
-          nameLast: newUserInfo.user.nameLast
+          nameLast: newUserInfo.user.nameLast,
+          profileImgUrl: newUserInfo.user.profileImgUrl,
         }],
       })
     );
@@ -199,28 +205,32 @@ describe('Testing channelAddOwnerV1', () => {
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         },
         {
           uId: newUserInfo.user.uId,
           email: newUserInfo.user.email,
           handleStr: newUserInfo.user.handleStr,
           nameFirst: newUserInfo.user.nameFirst,
-          nameLast: newUserInfo.user.nameLast
+          nameLast: newUserInfo.user.nameLast,
+          profileImgUrl: newUserInfo.user.profileImgUrl,
         }],
         allMembers: [{
           uId: userInfo.user.uId,
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         },
         {
           uId: newUserInfo.user.uId,
           email: newUserInfo.user.email,
           handleStr: newUserInfo.user.handleStr,
           nameFirst: newUserInfo.user.nameFirst,
-          nameLast: newUserInfo.user.nameLast
+          nameLast: newUserInfo.user.nameLast,
+          profileImgUrl: newUserInfo.user.profileImgUrl,
         }],
       })
     );
@@ -282,7 +292,8 @@ describe('Testing channelRemoveOwnerV1', () => {
           email: userInfo.user.email,
           handleStr: userInfo.user.handleStr,
           nameFirst: userInfo.user.nameFirst,
-          nameLast: userInfo.user.nameLast
+          nameLast: userInfo.user.nameLast,
+          profileImgUrl: userInfo.user.profileImgUrl,
         }],
         allMembers: [
           {
@@ -290,14 +301,16 @@ describe('Testing channelRemoveOwnerV1', () => {
             email: userInfo.user.email,
             handleStr: userInfo.user.handleStr,
             nameFirst: userInfo.user.nameFirst,
-            nameLast: userInfo.user.nameLast
+            nameLast: userInfo.user.nameLast,
+            profileImgUrl: userInfo.user.profileImgUrl,
           },
           {
             uId: removeUserInfo.user.uId,
             email: removeUserInfo.user.email,
             handleStr: removeUserInfo.user.handleStr,
             nameFirst: removeUserInfo.user.nameFirst,
-            nameLast: removeUserInfo.user.nameLast
+            nameLast: removeUserInfo.user.nameLast,
+            profileImgUrl: removeUserInfo.user.profileImgUrl,
           }],
       }
     );
@@ -409,7 +422,9 @@ describe('Testing channelJoinV1', () => {
     requestChannelJoin(authUser2.token, channel.channelId, 403);
   });
   test('positive case', () => {
+    const profile1 = requestUserProfile(authUser.token, authUser.authUserId);
     const authUser2 = requestAuthRegister('email2@gmail.com', 'password2', 'firstname2', 'lastname2', 200);
+    const profile2 = requestUserProfile(authUser2.token, authUser.authUserId);
     const channel = requestChannelCreate(authUser2.token, 'name', true, 200);
     const channelJoin = requestChannelJoin(authUser.token, channel.channelId, 200);
     const channelDetails = requestChannelDetails(authUser.token, channel.channelId, 200);
@@ -424,7 +439,8 @@ describe('Testing channelJoinV1', () => {
             email: 'email2@gmail.com',
             nameFirst: 'firstname2',
             nameLast: 'lastname2',
-            handleStr: 'firstname2lastname2'
+            handleStr: 'firstname2lastname2',
+            profileImgUrl: profile1.user.profileImgUrl,
           }
         ],
         allMembers: [
@@ -433,14 +449,16 @@ describe('Testing channelJoinV1', () => {
             email: 'email2@gmail.com',
             nameFirst: 'firstname2',
             nameLast: 'lastname2',
-            handleStr: 'firstname2lastname2'
+            handleStr: 'firstname2lastname2',
+            profileImgUrl: profile2.user.profileImgUrl,
           },
           {
             uId: authUser.authUserId,
             email: 'email1@gmail.com',
             nameFirst: 'firstname1',
             nameLast: 'lastname1',
-            handleStr: 'firstname1lastname1'
+            handleStr: 'firstname1lastname1',
+            profileImgUrl: profile1.user.profileImgUrl,
           }
         ]
       }

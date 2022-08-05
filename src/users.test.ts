@@ -48,6 +48,7 @@ describe('Testing userProfileV3', () => {
         nameFirst: nameFirst2,
         nameLast: nameLast2,
         handleStr: handleStr2,
+        profileImgUrl: profile.user.profileImgUrl,
       }
     });
   });
@@ -130,6 +131,7 @@ describe('Testing usersAllV2', () => {
   describe('Valid Token', () => {
     test('one user', () => {
       const users = requestAllUsers(authUser.token, 200);
+      const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
       expect(users).toStrictEqual({
         users: [
           {
@@ -137,15 +139,19 @@ describe('Testing usersAllV2', () => {
             email: email,
             nameFirst: nameFirst,
             nameLast: nameLast,
-            handleStr: handleStr
+            handleStr: handleStr,
+            profileImgUrl: userInfo.user.profileImgUrl,
           }
         ]
       });
     });
 
     test('multiple users', () => {
+      const profile1 = requestUserProfile(authUser.token, authUser.authUserId);
       const authUser2 = requestAuthRegister(email2, password2, nameFirst2, nameLast2, 200);
+      const profile2 = requestUserProfile(authUser2.token, authUser.authUserId);
       const authUser3 = requestAuthRegister(email3, password3, nameFirst3, nameLast3, 200);
+      const profile3 = requestUserProfile(authUser3.token, authUser.authUserId);
       const users = requestAllUsers(authUser.token, 200);
       expect(users).toStrictEqual({
         users: [
@@ -154,7 +160,8 @@ describe('Testing usersAllV2', () => {
             email: email,
             nameFirst: nameFirst,
             nameLast: nameLast,
-            handleStr: handleStr
+            handleStr: handleStr,
+            profileImgUrl: profile1.user.profileImgUrl,
           },
           {
             uId: authUser2.authUserId,
@@ -162,6 +169,7 @@ describe('Testing usersAllV2', () => {
             nameFirst: nameFirst2,
             nameLast: nameLast2,
             handleStr: handleStr2,
+            profileImgUrl: profile2.user.profileImgUrl,
           },
           {
             uId: authUser3.authUserId,
@@ -169,6 +177,7 @@ describe('Testing usersAllV2', () => {
             nameFirst: nameFirst3,
             nameLast: nameLast3,
             handleStr: handleStr3,
+            profileImgUrl: profile3.user.profileImgUrl,
           }
         ]
       });

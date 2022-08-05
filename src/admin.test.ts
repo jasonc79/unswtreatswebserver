@@ -67,7 +67,8 @@ describe('Testing admin remove', () => {
             email: '',
             nameFirst: 'Removed',
             nameLast: 'user',
-            handleStr: ''
+            handleStr: '',
+            profileImgUrl: ''
           }
         })
       );
@@ -140,7 +141,8 @@ describe('Testing admin remove', () => {
           email: '',
           nameFirst: 'Removed',
           nameLast: 'user',
-          handleStr: ''
+          handleStr: '',
+          profileImgUrl: '',
         }
       })
     );
@@ -152,7 +154,8 @@ describe('Testing admin remove', () => {
           email: '',
           nameFirst: 'Removed',
           nameLast: 'user',
-          handleStr: ''
+          handleStr: '',
+          profileImgUrl: '',
         }
       })
     );

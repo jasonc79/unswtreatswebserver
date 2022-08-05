@@ -119,6 +119,59 @@ export function checkDmMessageSender(token: string, messageId: number) : boolean
   }
   return false;
 }
+
+export function checkReactId(id: number) {
+  const validReacts = [1]; // 1 for like react, can add more in the future
+  for (const react of validReacts) {
+    if (react === id) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function checkMessageSource(messageId: number): number {
+  let messageSource: number;
+  if (!checkValidChannelMessage(messageId)) {
+    messageSource = 0; // Message is located in a DM
+  }
+  if (!checkValidDmMessage(messageId)) {
+    messageSource = 1; // Message is located in a channel
+  }
+  return messageSource;
+}
+
+export function returnValidMessage(messageId: number): Message {
+  let message;
+  if (!checkValidChannelMessage(messageId)) {
+    message = returnValidMessagefromDm(messageId);
+  }
+  if (!checkValidDmMessage(messageId)) {
+    message = returnValidMessagefromChannel(messageId);
+  }
+  return message;
+}
+
+export function checkAlreadyReacted(token: string, messageId: number, reactId: number): number {
+  const message = returnValidMessage(messageId);
+  const user = returnValidUser(token);
+  if ('reacts' in message) {
+    for (const react of message.reacts) {
+      if (react.reactId === reactId) {
+        if (react.uIds.includes(user.uId)) {
+          react.isThisUserReacted = true;
+          return 2;
+        }
+        return 1;
+      }
+    }
+  }
+  return 0;
+  // 0 : No current reacts in that reactId
+  // 1 : Already reacts with that reactId but not from the authorised user
+  // 2 : Already reacts with that reactId, including authorised user
+}
+
 //= ==========================================================================//
 // RETURN FUNCTIONS - RETURNS AN OBJECT                                      //
 //= ==========================================================================//
@@ -231,6 +284,7 @@ export function removeUser(uId: number) {
       user.nameLast = 'user';
       user.email = '';
       user.handleStr = '';
+      user.profileImgUrl = '';
     }
   }
   // Remove user from all channel

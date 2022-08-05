@@ -41,6 +41,7 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
       handleStr: owner.handleStr,
       nameFirst: owner.nameFirst,
       nameLast: owner.nameLast,
+      profileImgUrl: owner.profileImgUrl,
     };
     owners.push(tempUser);
   }
@@ -52,6 +53,7 @@ function channelDetailsV2(token: string, channelId: number) : (error | channelDe
       handleStr: member.handleStr,
       nameFirst: member.nameFirst,
       nameLast: member.nameLast,
+      profileImgUrl: member.profileImgUrl,
     };
     members.push(tempUser);
   }

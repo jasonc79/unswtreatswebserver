@@ -1,4 +1,4 @@
-import { authUserReturn, requestAuthRegister, requestClear, requestDmList, requestDmCreate, requestDmMessages, requestMessageSenddm, requestDmDetails } from './helperTests';
+import { requestUserProfile, authUserReturn, requestAuthRegister, requestClear, requestDmList, requestDmCreate, requestDmMessages, requestMessageSenddm, requestDmDetails } from './helperTests';
 import { requestDmLeave, requestDmRemove } from './helperTests';
 import { removeFile } from './helperTests';
 
@@ -96,7 +96,9 @@ describe('Testing dm/details/v2', () => {
 
   test('Valid inputs', () => {
     const authUser = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
+    const userInfo = requestUserProfile(authUser.token, authUser.authUserId);
     const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+    const userInfo1 = requestUserProfile(authUser.token, authUser.authUserId);
     const uIds = [];
     uIds.push(uId1.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
@@ -109,12 +111,14 @@ describe('Testing dm/details/v2', () => {
           handleStr: 'namefirst0namelast0',
           nameFirst: 'nameFirst0',
           nameLast: 'nameLast0',
+          profileImgUrl: userInfo.user.profileImgUrl,
           uId: authUser.authUserId,
         }, {
           email: 'email1@email.com',
           handleStr: 'namefirst1namelast1',
           nameFirst: 'nameFirst1',
           nameLast: 'nameLast1',
+          profileImgUrl: userInfo1.user.profileImgUrl,
           uId: uId1.authUserId,
         }],
       }
