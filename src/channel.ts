@@ -6,7 +6,6 @@ import { userProfileV3 } from './users';
 import HTTPError from 'http-errors';
 
 type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[], allMembers: UserInfo[] };
-
 /**
  * ChannelDetailsV2
  * Given a channel with ID channelId that the authorised user is a member of, provide basic details about the channel.
@@ -15,10 +14,13 @@ type channelDetails = { name: string, isPublic: boolean, ownerMembers: UserInfo[
  * @param {string} token tells the server who is currently accessing it
  * @param {number} channelId is the id of the channel being accessed
  *
- * @returns { error }
- *    channelId is invalid
- *    token is invalid
- *    function caller isnt part of channel
+ * Error throwing:
+ * @throws { HTTPError(400) }
+ *    - Invalid channelId
+ * @throws { HttpError(403) }
+ *    - Invalid token
+ *    - Authorisd user is not a member of the channel
+ * Returns:
  * @returns { channelDetails } if there is no error
  */
 
@@ -267,7 +269,7 @@ function channelLeaveV2(token: string, channelId: number): (object) {
   if (isActive(channelId)) {
     const standUp = returnActiveStandup(channelId);
     if (standUp.uId === user.uId) {
-      throw HTTPError(403, 'the authorised user is the starter of an active standup in the channel');
+      throw HTTPError(400, 'the authorised user is the starter of an active standup in the channel');
     }
   }
   currChannel.ownerMembers = currChannel.ownerMembers.filter((temp) => temp.uId !== user.uId);
