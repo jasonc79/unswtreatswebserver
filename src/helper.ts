@@ -1,4 +1,4 @@
-import { Channel, getData, setData, User, Data, token, Dm, Message } from './dataStore';
+import { Channel, getData, setData, User, Data, token, Dm, Message, Standup } from './dataStore';
 import { ELEMENT } from './auth';
 import crypto from 'crypto';
 
@@ -293,6 +293,14 @@ export function returnUserPermission(uId: number) {
   }
 }
 
+export function returnActiveStandup(channelId: number) : Standup {
+  const data = getData();
+  for (const standup of data.standups) {
+    if (standup.channelId === channelId) {
+      return standup;
+    }
+  }
+}
 //= ==========================================================================//
 // GET OR RETURN OBJECTS USING IDS                                                                   //
 //= ==========================================================================//

@@ -175,6 +175,15 @@ export function requestUserEmail(token: string, email: string, err?: number) {
 export function requestUserHandle(token: string, handleStr: string, err?: number) {
   return requestHelper('PUT', '/user/profile/sethandle/v2', { token: token }, { handleStr }, err);
 }
+
+export function requestUserStats(token: string, err?: number) {
+  return requestHelper('GET', '/user/stats/v1', { token: token }, {}, err);
+}
+
+export function requestUsersStats(token: string, err?: number) {
+  return requestHelper('GET', '/users/stats/v1', { token: token }, {}, err);
+}
+
 // Message functions
 export function requestMessageSend(token: string, channelId: number, message: string, err?: number) {
   return requestHelper('POST', '/message/send/v2', { token: token }, { channelId, message }, err);
@@ -190,6 +199,14 @@ export function requestMessageEdit(token: string, messageId: number, message: st
 
 export function requestMessageRemove(token: string, messageId: number, err?: number) {
   return requestHelper('DELETE', '/message/remove/v2', { token: token }, { messageId }, err);
+}
+
+export function requestMessagePin(token: string, messageId: number, err?: number) {
+  return requestHelper('POST', '/message/pin/v1', { token: token }, { messageId }, err);
+}
+
+export function requestMessageUnpin(token: string, messageId: number, err?: number) {
+  return requestHelper('POST', '/message/unpin/v1', { token: token }, { messageId }, err);
 }
 
 export function requestMessageSendlater(token: string, channelId: number, message: string, timeSent: number, err?: number) {

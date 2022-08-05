@@ -51,8 +51,8 @@ describe('Testing admin remove', () => {
               messageId: message.messageId,
               uId: user.authUserId,
               message: 'Removed User',
-              timeSent: expect.any(Number)
-
+              timeSent: expect.any(Number),
+              isPinned: false
             },
           ],
           start: 0,
@@ -94,14 +94,15 @@ describe('Testing admin remove', () => {
             messageId: message2.messageId,
             uId: user2.authUserId,
             message: 'Removed User',
-            timeSent: expect.any(Number)
-
+            timeSent: expect.any(Number),
+            isPinned: false
           },
           {
             messageId: message1.messageId,
             uId: user.authUserId,
             message: 'Removed User',
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            isPinned: false
           }
         ],
         start: 0,
@@ -116,14 +117,15 @@ describe('Testing admin remove', () => {
             messageId: dmMessage2.messageId,
             uId: user2.authUserId,
             message: 'Removed User',
-            timeSent: expect.any(Number)
-
+            timeSent: expect.any(Number),
+            isPinned: false
           },
           {
             messageId: dmMessage1.messageId,
             uId: user.authUserId,
             message: 'Removed User',
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            isPinned: false
           }
         ],
         start: 0,

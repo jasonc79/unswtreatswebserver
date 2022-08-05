@@ -168,6 +168,14 @@ describe('Testing dm/remove/v2', () => {
     const dm = -1;
     requestDmRemove(authUser.token, dm, 400);
   });
+  test('dmId has already been removed', () => {
+    const uId1 = requestAuthRegister('email1@email.com', 'password1', 'nameFirst1', 'nameLast1');
+    const uIds = [];
+    uIds.push(uId1.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    requestDmRemove(authUser.token, dm.dmId);
+    requestDmRemove(authUser.token, dm.dmId, 400);
+  });
 
   test('dmId is valid and the authorised user is not the original DM creator', () => {
     const authUser1 = requestAuthRegister('email0@email.com', 'password0', 'nameFirst0', 'nameLast0');
@@ -244,13 +252,21 @@ describe('Testing dm/leave/v2', () => {
 });
 
 describe('Testing dmMessagesV1', () => {
+  test('Invalid token', () => {
+    const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
+    const uIds = [];
+    uIds.push(authUser2.authUserId);
+    const dm = requestDmCreate(authUser.token, uIds);
+    expect(dm).toStrictEqual({ dmId: dm.dmId });
+    requestDmMessages('bad', dm.dmId, 0, 403);
+  });
   test('Empty messages', () => {
     const authUser2 = requestAuthRegister('emai2@gmail.com', 'password2', 'firstname2', 'lastname2');
     const uIds = [];
     uIds.push(authUser2.authUserId);
     const dm = requestDmCreate(authUser.token, uIds);
     expect(dm).toStrictEqual({ dmId: dm.dmId });
-    const messages = requestDmMessages(authUser2.token, dm.dmId, 0);
+    const messages = requestDmMessages(authUser2.token, dm.dmId, 0, 200);
     expect(messages).toStrictEqual(
       expect.objectContaining({
         messages: [],

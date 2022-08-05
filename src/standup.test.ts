@@ -158,13 +158,13 @@ describe('Testing standupSendV1', () => {
         const channelMsg = requestChannelMessages(authUser.token, channel.channelId, 0, 200);
         const packedMsg = `${handleStr}: ${msg}\n`;
 
-        // CHANGE THIS CASE WHEN NESSAGE/PIN IS IMPLEMENTED
         expect(channelMsg).toStrictEqual({
           messages: [{
             messageId: expect.any(Number),
             uId: authUser.authUserId,
             message: packedMsg,
-            timeSent: expect.any(Number)
+            timeSent: expect.any(Number),
+            isPinned: false
           }],
           start: 0,
           end: -1
